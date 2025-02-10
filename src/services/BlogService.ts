@@ -11,7 +11,7 @@ export class BlogService {
         })
     }
     static mySearch(blogSearchRequest: BlogSearchRequest): Promise<ApiResponse<PageResponse<BlogResponse>>> {
-        return instance.get(`${basePath}/my-blog`, { params: { ...blogSearchRequest } })
+        return instance.get(`${basePath}/mine`, { params: { ...blogSearchRequest } })
     }
     static create(blog: BlogRequest, file?: File): Promise<ApiResponse<BlogResponse>> {
         const form = new FormData();

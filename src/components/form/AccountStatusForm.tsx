@@ -4,6 +4,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
+import { cn } from "@/lib/utils"
 import RoleService from "@/services/RoleService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
@@ -46,7 +47,6 @@ const AccountStatusForm = ({ account, onSubmit }: Props) => {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
-
                 <div className='grid grid-cols-2 gap-4'>
                     <FormField control={form.control} name='enabled' render={({ field }) => (
                         <FormItem>
@@ -111,14 +111,10 @@ const AccountStatusForm = ({ account, onSubmit }: Props) => {
                                 </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                                {roles.map(role => <SelectItem key={role.id} value={`${role.id}`}>{role.name}</SelectItem>)}
+                                {roles.map(role => <SelectItem className={cn("hover:bg-slate-100", field.value === role.id ? "bg-slate-200" : "")} key={role.id} value={`${role.id}`}>{role.name}</SelectItem>)}
                             </SelectContent>
                             <FormMessage />
                         </Select>
-                        {/* <FormControl>
-                                <Combobox array={roles.map(role => ({ label: role.name, value: role.id }))} value={field.value} onChange={field.onChange} />
-                            </FormControl> */}
-                        <FormMessage />
                     </FormItem>
                 )} />
                 {form.formState.isSubmitting ?
@@ -128,7 +124,7 @@ const AccountStatusForm = ({ account, onSubmit }: Props) => {
                     </Button> :
                     <Button type='submit'>Submit</Button>}
             </form>
-        </Form>
+        </Form >
     )
 }
 

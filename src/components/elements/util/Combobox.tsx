@@ -6,13 +6,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { cn } from '@/lib/utils'
 import { Check, ChevronsUpDown, Command } from 'lucide-react'
 type DataItem = {
-    value: string | number,
+    value: string,
     label: string
 }
 type Props = {
     array: DataItem[],
-    value: string | number,
-    onChange: (value: string | number) => void
+    value: string
+    onChange: (value: string) => void
 }
 const Combobox = ({ array, value, onChange }: Props) => {
     return (
@@ -42,9 +42,9 @@ const Combobox = ({ array, value, onChange }: Props) => {
                         placeholder="Search framework..."
                         className="h-9"
                     />
-                    <CommandList>
-                        <CommandEmpty>No framework found.</CommandEmpty>
-                        <CommandGroup>
+                    <CommandEmpty>No framework found.</CommandEmpty>
+                    <CommandGroup>
+                        <CommandList>
                             {array.map((item) => (
                                 <CommandItem
                                     value={item.label}
@@ -64,8 +64,8 @@ const Combobox = ({ array, value, onChange }: Props) => {
                                     />
                                 </CommandItem>
                             ))}
-                        </CommandGroup>
-                    </CommandList>
+                        </CommandList>
+                    </CommandGroup>
                 </Command>
             </PopoverContent>
         </Popover>

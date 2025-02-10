@@ -25,4 +25,5 @@ export default class FunctionUtil {
             return false;
         }
     }
+    // static getDataResponse<T extends Object>(set: (value: T) => void, toast: Toast)
 }

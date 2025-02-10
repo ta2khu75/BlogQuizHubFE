@@ -1,5 +1,6 @@
 "use client"
 import NavAuth from '@/components/elements/header/NavAuth';
+import SearchElement from '@/components/elements/header/Search';
 import { Button } from '@/components/ui/button';
 import { navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from '@radix-ui/react-navigation-menu';
@@ -66,7 +67,8 @@ const Navbar = () => {
                     }}>{!show ? <Menu /> : <Menu className='rotate-90' />}</Button>
                 </div>
             </nav>
-            {show && (<nav className='md:hidden flex  justify-center basis-full'>
+            {show && (<nav className='md:hidden flex flex-col items-center basis-full'>
+                <SearchElement />
                 <NavLinks className='flex flex-col' />
             </nav>)}
         </>

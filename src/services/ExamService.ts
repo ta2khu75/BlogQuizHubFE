@@ -12,7 +12,7 @@ export default class ExamService {
         })
     }
     static mySearch(examSearch: ExamSearchRequest): Promise<ApiResponse<PageResponse<ExamResponse>>> {
-        return instance.get(`${basePath}/my-exam`, { params: { ...examSearch } })
+        return instance.get(`${basePath}/mine`, { params: { ...examSearch } })
     }
     static mySearchBlogNull(keyword: string, page = 1, size = 10): Promise<ApiResponse<PageResponse<ExamResponse>>> {
         return instance.get(`${basePath}/my-exam/blog-null`, { params: { keyword, page, size } })

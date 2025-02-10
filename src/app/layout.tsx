@@ -33,7 +33,11 @@ export default function RootLayout({
         <StoreProvider>
           <Toaster />
           <Header />
-          {children}
+          <main className="w-10/12 mx-auto">
+            <div className="flex justify-center">
+              {children}
+            </div>
+          </main>
         </StoreProvider>
       </body>
     </html>

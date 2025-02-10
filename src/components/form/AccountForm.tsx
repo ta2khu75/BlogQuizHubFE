@@ -88,11 +88,13 @@ const AccountForm = ({ onSubmit }: Props) => {
             </FormItem>
           )}
         />
-        {form.formState.isSubmitting ? <Button disabled>
-          <Loader2 className="animate-spin" />
-          Please wait
-        </Button> :
-          <Button type='submit'>Submit</Button>}
+        <div className="flex justify-end">
+          {form.formState.isSubmitting ? <Button disabled>
+            <Loader2 className="animate-spin" />
+            Please wait
+          </Button> :
+            <Button type='submit'>Submit</Button>}
+        </div>
       </form>
     </Form>
   )

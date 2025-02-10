@@ -1,6 +1,6 @@
 "use client"
-import Title from '@/components/elements/header/Title'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
@@ -41,10 +41,11 @@ const LoginPage = () => {
         }
     };
     return (
-        <div className='flex items-center justify-center min-h-screen'>
-            <div className="w-full max-w-md p-4 pt-2 bg-white rounded-lg shadow-md">
-                <Title title='Login' />
-                <Button onClick={() => dispatch(AuthActions.reset())}>reset</Button>
+        <Card className="w-[350px]">
+            <CardHeader>
+                <CardTitle>Login</CardTitle>
+            </CardHeader>
+            <CardContent>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onLogin)} className='space-y-4'>
                         <FormField control={form.control} name='email' render={({ field }) => (
@@ -65,17 +66,20 @@ const LoginPage = () => {
                                 <FormMessage />
                             </FormItem>
                         )} />
-                        {form.formState.isSubmitting ?
-                            <Button disabled>
-                                <Loader2 className="animate-spin" />
-                                Please wait
-                            </Button> :
-                            <Button type='submit'>Submit</Button>
-                        }
+
+                        <CardFooter className="flex justify-end">
+                            {form.formState.isSubmitting ?
+                                <Button disabled>
+                                    <Loader2 className="animate-spin" />
+                                    Please wait
+                                </Button> :
+                                <Button type='submit'>Submit</Button>
+                            }
+                        </CardFooter>
                     </form>
                 </Form>
-            </div>
-        </div >
+            </CardContent>
+        </Card>
     )
 }
 

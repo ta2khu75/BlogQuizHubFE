@@ -1,6 +1,6 @@
 "use client"
-import Title from '@/components/elements/header/Title'
 import AccountForm from '@/components/form/AccountForm'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useToast } from '@/hooks/use-toast'
 import AuthService from '@/services/AuthService'
 import FunctionUtil from '@/util/FunctionUtil'
@@ -22,12 +22,21 @@ const RegisterPage = () => {
         }
     }
     return (
-        <div className='flex items-center justify-center min-h-screen'>
-            <div className="w-full max-w-md p-4 bg-white rounded-lg shadow-md">
-                <Title title='Register' />
+
+        <Card className="w-[350px]">
+            <CardHeader>
+                <CardTitle>Register</CardTitle>
+            </CardHeader>
+            <CardContent>
                 <AccountForm onSubmit={onRegister} />
-            </div>
-        </div>
+            </CardContent>
+        </Card>
+        // <div className='flex items-center justify-center min-h-screen'>
+        //     <div className="w-full max-w-md p-4 bg-white rounded-lg shadow-md">
+        //         <Title title='Register' />
+        //         <AccountForm onSubmit={onRegister} />
+        //     </div>
+        // </div>
     )
 }
 
