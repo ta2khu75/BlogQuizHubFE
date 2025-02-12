@@ -1,5 +1,5 @@
 import React from 'react'
-import { Group, ChartColumn, UsersRound, Search, Settings } from "lucide-react"
+import { Group, ChartColumn, UsersRound, Settings, TypeOutline } from "lucide-react"
 
 import {
   Sidebar,
@@ -30,9 +30,9 @@ const items = [
     icon: Group,
   },
   {
-    title: "Search",
-    url: "#",
-    icon: Search,
+    title: "Category",
+    url: "/admin/exam-category",
+    icon: TypeOutline,
   },
   {
     title: "Settings",

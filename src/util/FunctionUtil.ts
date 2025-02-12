@@ -7,8 +7,11 @@ export default class FunctionUtil {
     static isType<T extends object>(object: object, field: string): object is T {
         return field in object
     }
+
     static capitalizeFirstLetter = (str: string) => (str.charAt(0).toUpperCase() + str.slice(1)).replace(/_/g, ' ');
     static showError = (error: unknown) => {
+        console.log(error);
+
         return error instanceof Error ? error.message : "An unexpected error occurred";
     }
     static isInfoResponse = (object: object): object is InfoResponse => {

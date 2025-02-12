@@ -1,4 +1,4 @@
-interface ExamBase{
+interface ExamBase {
     title: string;
     duration: number;
     description: string;

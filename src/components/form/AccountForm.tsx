@@ -21,9 +21,9 @@ type Props = {
   onSubmit: (value: AccountRequest) => void
 }
 const AccountForm = ({ onSubmit }: Props) => {
-  const form = useForm({
+  const form = useForm<AccountRequest>({
     resolver: zodResolver(formSchema),
-    defaultValues: { email: '', password: '', confirm_password: '', first_name: '', last_name: '', birthday: new Date().toISOString().split('T')[0] }
+    defaultValues: { email: "", password: '', confirm_password: '', first_name: '', last_name: '', birthday: new Date().toISOString().split('T')[0] }
   })
   return (
     <Form {...form}>

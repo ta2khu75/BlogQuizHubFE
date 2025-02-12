@@ -6,11 +6,11 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
-import { z, ZodType } from "zod"
+import { z } from "zod"
 
-const formSchema: ZodType<RoleRequest> = z.object({
+const formSchema = z.object({
     name: z.string().min(3),
-    permission_ids: z.set(z.number())
+    permission_ids: z.set(z.number()),
 })
 type Props = {
     role?: RoleDetailResponse,

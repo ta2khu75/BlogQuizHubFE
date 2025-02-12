@@ -3,16 +3,14 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
-import RoleService from "@/services/RoleService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
-import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z, ZodType } from "zod"
 
 type Props = {
+    roles: RoleResponse[],
     account: ManagedAccountResponse,
     onSubmit: (value: AccountStatusRequest) => void
 }
@@ -21,22 +19,8 @@ const formSchema: ZodType<AccountStatusRequest> = z.object({
     non_locked: z.boolean(),
     role_id: z.number()
 })
-const AccountStatusForm = ({ account, onSubmit }: Props) => {
-    const { toast } = useToast()
-    const [roles, setRoles] = useState<RoleResponse[]>([])
-    useEffect(() => {
-        fetchAllRole()
-    }, [])
-    const fetchAllRole = () => {
-        RoleService.readAll().then(res => {
-            if (res.success) {
-                setRoles(res.data)
-            } else {
-                toast({ description: res.message_error, variant: "destructive" })
-            }
-        }).catch(err => toast(err))
-    }
-    const form = useForm({
+const AccountStatusForm = ({ account, onSubmit, roles }: Props) => {
+    const form = useForm<AccountStatusRequest>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             enabled: account?.enabled ?? false,

@@ -8,6 +8,7 @@ import AccountStatusForm from "@/components/form/AccountStatusForm";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import AccountService from "@/services/AccountService";
+import RoleService from "@/services/RoleService";
 import FunctionUtil from "@/util/FunctionUtil";
 import { useEffect, useState } from "react";
 
@@ -15,11 +16,23 @@ const AccountPage = () => {
     const { toast } = useToast()
     const [accountPage, setAccountPage] = useState<PageResponse<ManagedAccountResponse>>();
     const [account, setAccount] = useState<ManagedAccountResponse>();
+    const [roles, setRoles] = useState<RoleResponse[]>([])
     const [openCreate, setOpenCreate] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
     useEffect(() => {
         fetchAccountPage()
+        fetchRoleList()
     }, [])
+
+    const fetchRoleList = () => {
+        RoleService.readAll().then(res => {
+            if (res.success) {
+                setRoles(res.data)
+            } else {
+                toast({ description: res.message_error, variant: "destructive" })
+            }
+        }).catch(err => toast(err))
+    }
     const fetchAccountPage = () => {
         AccountService.readPage().then(response => {
             if (response.success) {
@@ -86,7 +99,7 @@ const AccountPage = () => {
                 <AccountForm onSubmit={onCreate} />
             </Modal>
             <Modal open={openEdit} onCancel={onCancelEdit} title={"Edit account status"} description="Edit account status here. Click submit when you are done.">
-                {account && <AccountStatusForm account={account} onSubmit={onUpdate} />}
+                {account && <AccountStatusForm account={account} roles={roles} onSubmit={onUpdate} />}
             </Modal>
             <TableElement<ManagedAccountResponse> handleEditClick={handleEditClick} showIndex visibleColumns={["email", "username", "birthday", "enabled", "non_locked", "role"]} array={accountPage?.content ?? []} />
         </>
