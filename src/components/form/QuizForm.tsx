@@ -9,6 +9,7 @@ import { useFieldArray, UseFormReturn } from 'react-hook-form'
 import { z } from 'zod'
 import { FilePlus2 } from 'lucide-react';
 export const quizSchema = z.object({
+    id: z.number().optional(),
     question: z.string().min(3),
     quiz_type: z.nativeEnum(QuizType),
     answers: z.array(answerSchema).nonempty()
@@ -40,7 +41,6 @@ const QuizForm = ({ form, quizIndex }: Props) => {
                     <FormMessage />
                 </FormItem>
             )} />
-            {form.getValues(`quizzes.${quizIndex}.quiz_type`) === QuizType.MULTIPLE_CHOICE ? "true" : "false"}
             <FormField
                 control={form.control}
                 name={`quizzes.${quizIndex}.quiz_type`}
@@ -49,7 +49,21 @@ const QuizForm = ({ form, quizIndex }: Props) => {
                         <FormLabel>Quiz type</FormLabel>
                         <FormControl>
                             <RadioGroup
-                                onValueChange={field.onChange}
+                                onValueChange={(value) => {
+                                    if (value === QuizType.MULTIPLE_CHOICE) {
+                                        const name: `quizzes.${number}.answers` = `quizzes.${quizIndex}.answers`
+                                        const answers = form.getValues(name);
+                                        const correctAnswersIndex = answers.findIndex((answer) => answer.correct);
+                                        form.setValue(name, answers.map((answer, answerIndex) => {
+                                            if (answerIndex === correctAnswersIndex) {
+                                                return { ...answer, correct: true }
+                                            }
+
+                                            return { ...answer, correct: false }
+                                        }))
+                                    }
+                                    field.onChange(value)
+                                }}
                                 defaultValue={field.value}
                                 className="flex space-y-1"
                             >
@@ -74,9 +88,29 @@ const QuizForm = ({ form, quizIndex }: Props) => {
                     <Button type='button' className='bg-green-600 hover:bg-green-500' onClick={onAddAnswer}><FilePlus2 /></Button>
                     <FormLabel onClick={onAddAnswer} className='flex items-center gap-x-2'> Answers</FormLabel>
                 </div>
-                {answerFields.map((answer, answerIndex) => (
-                    <AnswerForm key={answerIndex} answerIndex={answerIndex} quizIndex={quizIndex} onDelete={() => removeAnswer(answerIndex)} form={form} />
-                ))}
+                {form.getValues(`quizzes.${quizIndex}.quiz_type`) === QuizType.MULTIPLE_CHOICE ?
+                    <>
+                        {answerFields.map((answer, answerIndex) => (
+                            <AnswerForm key={`${quizIndex}${answerIndex}`} quizType={form.getValues(`quizzes.${quizIndex}.quiz_type`)} answerIndex={answerIndex} quizIndex={quizIndex} onDelete={() => removeAnswer(answerIndex)} form={form} />
+                        ))}
+                    </>
+                    :
+                    <RadioGroup defaultValue={`${form.getValues(`quizzes.${quizIndex}.answers`).findIndex((answer) => answer.correct)}`} onValueChange={(value) => {
+                        const name: `quizzes.${number}.answers` = `quizzes.${quizIndex}.answers`
+                        const answers = form.getValues(name)
+                        form.setValue(name, answers.map((answer, index) => {
+                            if (index === Number(value)) {
+                                return { ...answer, correct: true }
+                            } return { ...answer, correct: false }
+                        }));
+                        console.log(form.getValues());
+
+                    }}>
+                        {answerFields.map((answer, answerIndex) => (
+                            <AnswerForm key={`${quizIndex}${answerIndex}`} quizType={form.getValues(`quizzes.${quizIndex}.quiz_type`)} answerIndex={answerIndex} quizIndex={quizIndex} onDelete={() => removeAnswer(answerIndex)} form={form} />
+                        ))}
+                    </RadioGroup>
+                }
             </FormItem>
         </div>
     )

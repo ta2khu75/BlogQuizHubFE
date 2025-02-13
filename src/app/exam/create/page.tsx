@@ -1,6 +1,5 @@
 "use client"
 import ExamForm from '@/components/form/ExamForm'
-import { CarouselApi } from '@/components/ui/carousel'
 import { useToast } from '@/hooks/use-toast'
 import ExamCategoryService from '@/services/ExamCategoryService'
 import FunctionUtil from '@/util/FunctionUtil'
