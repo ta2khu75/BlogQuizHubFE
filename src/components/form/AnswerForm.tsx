@@ -16,7 +16,7 @@ export const answerSchema = z.object({
 type Props = {
     quizIndex: number,
     answerIndex: number,
-    quizType: QuizType
+    quizType: QuizType,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     form: UseFormReturn<ExamRequest, any, undefined>
     onDelete: () => void
@@ -38,7 +38,9 @@ const AnswerForm = ({ answerIndex, quizIndex, form, quizType, onDelete }: Props)
                         <FormControl>
                             {quizType === QuizType.MULTIPLE_CHOICE ?
                                 <Checkbox checked={correct} onCheckedChange={field.onChange} /> :
-                                <RadioGroupItem value={`${answerIndex}`} checked={correct} onSelect={field.onChange} />}
+                                <RadioGroupItem value={`${answerIndex}`} checked={correct}
+                                    onSelect={field.onChange}
+                                />}
                         </FormControl>
                     </FormItem>
                 )}
@@ -51,8 +53,8 @@ const AnswerForm = ({ answerIndex, quizIndex, form, quizType, onDelete }: Props)
                     <FormMessage />
                 </FormItem>
             )} />
-            <Button variant={'destructive'} type='button' onClick={onDelete}><FileX2 /></Button>
-        </div>
+            <Button variant={'destructive'} disabled={form.getValues(`quizzes.${quizIndex}.answers`).length === 1} type='button' onClick={onDelete}><FileX2 /></Button>
+        </div >
     )
 }
 

@@ -2,7 +2,6 @@ import Modal from '@/components/elements/util/Modal';
 import QuizForm, { quizSchema } from '@/components/form/QuizForm';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-// import { Carousel, CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -13,14 +12,13 @@ import { ExamStatus } from '@/types/ExamStatus';
 import { QuizType } from '@/types/QuizType';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FolderX, Loader2, FolderPlus } from 'lucide-react';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod'
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Carousel from '@/components/elements/util/Carousel';
 import ExamMenuElement from '@/components/elements/content/exam/ExamMenuElement';
-// import AsideExamElement from '@/components/elements/content/exam/ExamMenuElement';
 const examSchema = z.object({
     title: z.string().min(3).nonempty(),
     exam_level: z.nativeEnum(ExamLevel),
@@ -44,16 +42,27 @@ const ExamForm = ({ examCategories }: Props) => {
         control: form.control,
         name: "quizzes",
     });
+    const errors = form.formState.errors?.quizzes || [];
+    const count = Math.max(quizFields.length - 1, 0)
     const [open, setOpen] = useState(false)
     const [current, setCurrent] = React.useState(0)
-    const count = Math.max(quizFields.length - 1, 0)
+    const slideState = (index: number) => {
+        if (index === current && errors[index]) return "warning";
+        if (index === current) return "selected";
+        if (errors[index]) return "error";
+        return "unselected";
+    };
     const onSubmit = (value: ExamRequest) => {
         console.log(value);
         setOpen(false)
     }
+    const onSub = () => {
+        console.log(form.getValues());
+
+    }
     const onAddQuiz = () => {
         appendQuiz(initQuiz)
-        setCurrent((prev) => Math.max(count, prev + 1))
+        setCurrent((prev) => Math.max(count + 1, prev + 1))
     }
     const onRemoveQuiz = (index: number) => {
         if (count === 0) return
@@ -76,6 +85,7 @@ const ExamForm = ({ examCategories }: Props) => {
                             Slide {current + 1} of {count + 1}
                         </div>
                         <Button type='button' className='bg-blue-600 hover:bg-blue-500' onClick={() => setOpen(true)}>Create</Button>
+                        <button type='submit' onClick={onSub}>submit</button>
                     </div>
                     <button type='button'>start</button>
                     <Modal onCancel={onCancel} open={open} title='Create Exam'>
@@ -196,11 +206,12 @@ const ExamForm = ({ examCategories }: Props) => {
                                     <Card className='w-[100vh] p-10'>
                                         <CardHeader>
                                             <div className='flex justify-between'>
-                                                <div className='flex items-center gap-2'>
+                                                <CardTitle>Quiz {quizIndex + 1}</CardTitle>
+                                                {/* <div className='flex items-center gap-2'>
                                                     <Button type='button' className='bg-green-600 hover:bg-green-500' onClick={onAddQuiz}><FolderPlus /></Button>
                                                     <CardTitle>Quiz {quizIndex + 1}</CardTitle>
-                                                </div>
-                                                <Button variant={count === 0 ? 'secondary' : 'destructive'} type='button' onClick={() => onRemoveQuiz(quizIndex)}><FolderX /></Button>
+                                                </div> */}
+                                                <Button variant={'destructive'} disabled={count === 0 ? true : false} type='button' onClick={() => onRemoveQuiz(quizIndex)}><FolderX /></Button>
                                             </div>
                                         </CardHeader>
                                         <CardContent className="flex justify-center">
@@ -214,7 +225,7 @@ const ExamForm = ({ examCategories }: Props) => {
                     </Carousel>
                 </form>
             </Form >
-            <ExamMenuElement onIndexClick={onSelectedSlide} states={quizFields.map((item, index) => (index === current ? "selected" : "unselected"))} />
+            <ExamMenuElement onIndexClick={onSelectedSlide} states={quizFields.map((item, index) => slideState(index))} />
         </>
     )
 }
