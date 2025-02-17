@@ -207,10 +207,6 @@ const ExamForm = ({ examCategories }: Props) => {
                                         <CardHeader>
                                             <div className='flex justify-between'>
                                                 <CardTitle>Quiz {quizIndex + 1}</CardTitle>
-                                                {/* <div className='flex items-center gap-2'>
-                                                    <Button type='button' className='bg-green-600 hover:bg-green-500' onClick={onAddQuiz}><FolderPlus /></Button>
-                                                    <CardTitle>Quiz {quizIndex + 1}</CardTitle>
-                                                </div> */}
                                                 <Button variant={'destructive'} disabled={count === 0 ? true : false} type='button' onClick={() => onRemoveQuiz(quizIndex)}><FolderX /></Button>
                                             </div>
                                         </CardHeader>

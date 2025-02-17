@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { RadioGroupItem } from '@/components/ui/radio-group';
 import { QuizType } from '@/types/QuizType';
 import { FileX2 } from 'lucide-react';
-import React, { useEffect, useState } from 'react'
+import { memo, useMemo } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 export const answerSchema = z.object({
@@ -21,15 +21,14 @@ type Props = {
     form: UseFormReturn<ExamRequest, any, undefined>
     onDelete: () => void
 }
-const AnswerForm = ({ answerIndex, quizIndex, form, quizType, onDelete }: Props) => {
+const AnswerForm = memo(({ answerIndex, quizIndex, form, quizType, onDelete }: Props) => {
     const answerName: `quizzes.${number}.answers.${number}` = `quizzes.${quizIndex}.answers.${answerIndex}`;
-    const [correct, setCorrect] = useState(form.getValues(`${answerName}.correct`))
-    useEffect(
-        () => {
-            setCorrect(form.getValues(`${answerName}.correct`))
-        },
-        [form.getValues(`${answerName}.correct`)]
-    );
+    // const answersLenght = form.watch(`quizzes.${quizIndex}.answers`).length;
+    // const correct = form.watch(`${answerName}.correct`);
+    const answers = useMemo(() => form.watch(`quizzes.${quizIndex}.answers`), [form.getValues(`quizzes.${quizIndex}.answers`)]);
+    const correct = useMemo(() => form.watch(`${answerName}.correct`), [form.getValues(`${answerName}.correct`)]);
+
+
     return (
         <div className='flex items-center gap-4'>
             <FormField control={form.control} name={`${answerName}.correct`}
@@ -38,9 +37,8 @@ const AnswerForm = ({ answerIndex, quizIndex, form, quizType, onDelete }: Props)
                         <FormControl>
                             {quizType === QuizType.MULTIPLE_CHOICE ?
                                 <Checkbox checked={correct} onCheckedChange={field.onChange} /> :
-                                <RadioGroupItem value={`${answerIndex}`} checked={correct}
-                                    onSelect={field.onChange}
-                                />}
+                                <RadioGroupItem value={`${answerIndex}`} checked={correct} onSelect={field.onChange} />
+                            }
                         </FormControl>
                     </FormItem>
                 )}
@@ -53,9 +51,9 @@ const AnswerForm = ({ answerIndex, quizIndex, form, quizType, onDelete }: Props)
                     <FormMessage />
                 </FormItem>
             )} />
-            <Button variant={'destructive'} disabled={form.getValues(`quizzes.${quizIndex}.answers`).length === 1} type='button' onClick={onDelete}><FileX2 /></Button>
+            <Button variant={'destructive'} disabled={answers.length <= 2} type='button' onClick={onDelete}><FileX2 /></Button>
         </div >
     )
-}
-
+})
+AnswerForm.displayName = "AnswerForm";
 export default AnswerForm
