@@ -4,15 +4,15 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { QuizType } from '@/types/QuizType'
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect } from 'react'
 import { useFieldArray, UseFormReturn } from 'react-hook-form'
 import { z } from 'zod'
 import { FilePlus2 } from 'lucide-react';
 export const quizSchema = z.object({
     id: z.number().optional(),
-    question: z.string().min(3),
+    question: z.string().nonempty(),
     quiz_type: z.nativeEnum(QuizType),
-    answers: z.array(answerSchema).min(2, { message: 'At least 2 answers are required' }).refine((answers) => answers.some((answer) => answer.correct), { message: 'At least one answer must be correct' }),
+    answers: z.array(answerSchema).refine((answers) => answers.some((answer) => answer.correct), { message: 'At least one answer must be correct' }),
 })
 type Props = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -21,18 +21,13 @@ type Props = {
 }
 const QuizForm = ({ form, quizIndex }: Props) => {
     const quizName: `quizzes.${number}` = `quizzes.${quizIndex}`;
-    const quizType = form.watch(`${quizName}.quiz_type`);
-    const answers = form.watch(`${quizName}.answers`);
+    const quizType = form.watch(`${quizName}.quiz_type`)
     const initAnswer = { answer: "", correct: false }
     const { fields: answerFields, append: appendAnswer, remove: removeAnswer } = useFieldArray({
         control: form.control,
         name: `${quizName}.answers`,
         rules: { minLength: 2 },
     });
-    const hasAnswerErrors = form.formState.errors?.quizzes?.[quizIndex]?.answers;
-    const noCorrectAnswer = useMemo(() => {
-        return !answers.some((answer) => answer.correct);
-    }, [answers.map((answer) => answer.correct)]);
     useEffect(() => {
         if (quizType === QuizType.SINGLE_CHOICE) {
             const answers = form.getValues(`${quizName}.answers`);
@@ -97,18 +92,17 @@ const QuizForm = ({ form, quizIndex }: Props) => {
                     <Button type='button' className='bg-green-600 hover:bg-green-500' onClick={() => appendAnswer(initAnswer)}><FilePlus2 /></Button>
                     <FormLabel className='flex items-center gap-x-2'> Answers</FormLabel>
                 </div>
-                {hasAnswerErrors && answers.length < 2 && <FormMessage>At least 2 answers are required</FormMessage>}
-                {hasAnswerErrors && noCorrectAnswer && <FormMessage>At least one answer must be correct</FormMessage>}
+                {form.formState.errors.quizzes?.[quizIndex]?.answers?.root && <FormMessage>{form.formState.errors.quizzes[quizIndex].answers.root.message}</FormMessage>}
                 {quizType === QuizType.MULTIPLE_CHOICE ?
                     <>
-                        {answerFields.map((_, answerIndex) => (
+                        {answerFields.map((answer, answerIndex) => (
                             <AnswerForm key={`${quizIndex}${answerIndex}`} quizType={quizType} answerIndex={answerIndex} quizIndex={quizIndex} onDelete={() => removeAnswer(answerIndex)} form={form} />
                         ))}
                     </>
                     :
                     <RadioGroup onValueChange={(value) => onRadioChange(value)}>
-                        {answerFields.map((_, answerIndex) => (
-                            <AnswerForm key={`${quizIndex}${answerIndex}`} quizType={quizType} answerIndex={answerIndex} quizIndex={quizIndex} onDelete={(() => removeAnswer(answerIndex))} form={form} />
+                        {answerFields.map((answer, answerIndex) => (
+                            <AnswerForm key={answer.id} quizType={quizType} answerIndex={answerIndex} quizIndex={quizIndex} onDelete={(() => removeAnswer(answerIndex))} form={form} />
                         ))}
                     </RadioGroup>
                 }

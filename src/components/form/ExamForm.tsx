@@ -12,7 +12,7 @@ import { ExamStatus } from '@/types/ExamStatus';
 import { QuizType } from '@/types/QuizType';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FolderX, Loader2, FolderPlus } from 'lucide-react';
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod'
 import { Label } from '@/components/ui/label';
@@ -20,20 +20,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Carousel from '@/components/elements/util/Carousel';
 import ExamMenuElement from '@/components/elements/content/exam/ExamMenuElement';
 const examSchema = z.object({
-    title: z.string().min(3).nonempty(),
+    title: z.string().nonempty(),
     exam_level: z.nativeEnum(ExamLevel),
     exam_status: z.nativeEnum(ExamStatus),
     duration: z.number().min(5),
-    description: z.string(),
+    description: z.string().optional(),
     access_modifier: z.nativeEnum(AccessModifier),
     exam_category_id: z.number(),
-    quizzes: z.array(quizSchema).nonempty()
+    quizzes: z.array(quizSchema)
 })
 type Props = {
     examCategories: ExamCategoryResponse[]
 }
 const ExamForm = ({ examCategories }: Props) => {
-    const initQuiz: QuizRequest = { question: "", quiz_type: QuizType.SINGLE_CHOICE, answers: [{ answer: "", correct: false }, { answer: "", correct: false }, { answer: "", correct: false }, { answer: "", correct: false }] };
+    const initQuiz: QuizRequest = { question: "", quiz_type: QuizType.SINGLE_CHOICE, answers: Array(4).fill({ answer: "", correct: false }) };
     const form = useForm<ExamRequest>({
         resolver: zodResolver(examSchema),
         defaultValues: { title: "", exam_level: ExamLevel.EASY, exam_status: ExamStatus.NOT_COMPLETED, duration: 0, exam_category_id: 0, access_modifier: AccessModifier.PRIVATE, description: "", quizzes: [initQuiz] }
@@ -42,16 +42,27 @@ const ExamForm = ({ examCategories }: Props) => {
         control: form.control,
         name: "quizzes",
     });
-    const errors = form.formState.errors?.quizzes || [];
+    const quizErrors = useMemo(() => {
+        return form.formState.errors?.quizzes ?? [];
+    }, [form.formState.errors?.quizzes]);
     const count = Math.max(quizFields.length - 1, 0)
     const [open, setOpen] = useState(false)
     const [current, setCurrent] = React.useState(0)
-    const slideState = (index: number) => {
-        if (index === current && errors[index]) return "warning";
-        if (index === current) return "selected";
-        if (errors[index]) return "error";
-        return "unselected";
-    };
+    useEffect(() => {
+        if (Array.isArray(quizErrors)) {
+            const index = quizErrors.findIndex(error => error !== undefined)
+            if (index !== -1) setCurrent(index)
+        }
+    }, [quizErrors])
+    const slideState = useMemo(() => {
+        console.log(quizErrors);
+        return quizFields.map((item, index) => {
+            if (index === current && quizErrors[index]) return "warning";
+            if (index === current) return "selected";
+            if (quizErrors[index]) return "error";
+            return "unselected";
+        })
+    }, [quizErrors, current, quizFields]);
     const onSubmit = (value: ExamRequest) => {
         console.log(value);
         setOpen(false)
@@ -221,7 +232,8 @@ const ExamForm = ({ examCategories }: Props) => {
                     </Carousel>
                 </form>
             </Form >
-            <ExamMenuElement onIndexClick={onSelectedSlide} states={quizFields.map((item, index) => slideState(index))} />
+            <ExamMenuElement onIndexClick={onSelectedSlide} states={
+                slideState} />
         </>
     )
 }
