@@ -1,76 +1,43 @@
-"use client";
+"use client"
+import ExamForm from '@/components/form/ExamForm'
+import { useToast } from '@/hooks/use-toast'
+import ExamCategoryService from '@/services/ExamCategoryService'
+import ExamService from '@/services/ExamService'
+import FunctionUtil from '@/util/FunctionUtil'
+import React, { use, useEffect, useState } from 'react'
 
-import { useState } from "react";
-
-const Carousel = () => {
-    const [currentIndex, setCurrentIndex] = useState(0);
-
-    const images = [
-        "https://via.placeholder.com/600x300?text=Slide+1",
-        "https://via.placeholder.com/600x300?text=Slide+2",
-        "https://via.placeholder.com/600x300?text=Slide+3",
-    ];
-
-    const nextSlide = () => {
-        setCurrentIndex((prevIndex) =>
-            prevIndex === images.length - 1 ? 0 : prevIndex + 1
-        );
-    };
-
-    const prevSlide = () => {
-        setCurrentIndex((prevIndex) =>
-            prevIndex === 0 ? images.length - 1 : prevIndex - 1
-        );
-    };
-
+const ExamEditPage = ({ params }: { params: Promise<{ examId: string }> }) => {
+    const { toast } = useToast()
+    const { examId } = use(params)
+    const [examCategories, setExamCategories] = useState<ExamCategoryResponse[]>([]);
+    const [exam, setExam] = useState<ExamDetailsResponse>();
+    useEffect(() => {
+        fetchExamCategoryList()
+        fetchExam()
+    }, [examId])
+    const fetchExam = () => {
+        ExamService.readDetailById(examId).then(res => {
+            if (res.success) {
+                setExam(res.data)
+            } else {
+                console.log(res.message_error)
+            }
+        }).catch(err =>
+            toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
+    }
+    const fetchExamCategoryList = () => {
+        ExamCategoryService.readAll().then(res => {
+            if (res.success) {
+                setExamCategories(res.data)
+            } else {
+                console.log(res.message_error)
+            }
+        }).catch(err =>
+            toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
+    }
     return (
-        <div className="relative w-full max-w-2xl mx-auto overflow-hidden">
-            {/* Slides */}
-            <div
-                className="flex transition-transform duration-500"
-                style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-            >
-                {images.map((image, index) => (
-                    <img
-                        key={index}
-                        src={image}
-                        alt={`Slide ${index + 1}`}
-                        className="w-full flex-shrink-0"
-                    />
-                ))}
-            </div>
+        <ExamForm examCategories={examCategories} exam={exam} />
+    )
+}
 
-            {/* Previous Button */}
-            <button
-                onClick={prevSlide}
-                className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75"
-            >
-                ❮
-            </button>
-
-            {/* Next Button */}
-            <button
-                onClick={nextSlide}
-                className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75"
-            >
-                ❯
-            </button>
-
-            {/* Dots
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                {images.map((_, index) => (
-                    <button
-                        key={index}
-                        onClick={() => setCurrentIndex(index)}
-                        className={`w-3 h-3 rounded-full ${index === currentIndex
-                            ? "bg-white"
-                            : "bg-gray-400 hover:bg-gray-500"
-                            }`}
-                    ></button>
-                ))}
-            </div> */}
-        </div>
-    );
-};
-
-export default Carousel;
+export default ExamEditPage

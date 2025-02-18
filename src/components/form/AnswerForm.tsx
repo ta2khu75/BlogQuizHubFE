@@ -11,7 +11,7 @@ import { z } from 'zod';
 export const answerSchema = z.object({
     answer: z.string().nonempty(),
     correct: z.boolean().default(false),
-    id: z.string().optional(),
+    id: z.number().optional(),
 })
 type Props = {
     quizIndex: number,

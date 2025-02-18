@@ -37,8 +37,8 @@ export default class ExamService {
     static delete(id: string): Promise<ApiResponse<void>> {
         return instance.delete(`${basePath}/${id}`);
     }
-    static readDetailsById(id: string): Promise<ApiResponse<ExamDetailsResponse>> {
-        return instance.get(`${basePath}/${id}/details`);
+    static readDetailById(id: string): Promise<ApiResponse<ExamDetailsResponse>> {
+        return instance.get(`${basePath}/${id}/detail`);
     }
     static readById(id: string): Promise<ApiResponse<ExamResponse>> {
         return instance.get(`${basePath}/${id}`);

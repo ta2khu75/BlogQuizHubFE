@@ -103,7 +103,7 @@ const ProfilePage = () => {
                     {isAuthor() &&
                         <Button><Link href={"/exam/create"}>Create</Link></Button>}
                 </div>
-                <ExamSearch />
+                <ExamSearch isAuthor={isAuthor()} />
             </TabsContent>
             <TabsContent value='follower'>
                 follow

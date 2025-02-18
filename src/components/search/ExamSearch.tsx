@@ -1,15 +1,20 @@
 import AvatarElement from '@/components/elements/header/AvatarElement';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useAppSelector } from '@/redux/hooks';
 import ExamService from '@/services/ExamService';
+import { ExamStatus } from '@/types/ExamStatus';
 import FunctionUtil from '@/util/FunctionUtil';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 const size = 10
-const ExamSearch = () => {
+type Props = {
+    isAuthor: boolean
+}
+const ExamSearch = ({ isAuthor }: Props) => {
     const { toast } = useToast()
     const auth = useAppSelector(state => state.auth);
     const searchParams = useSearchParams()
@@ -36,20 +41,20 @@ const ExamSearch = () => {
         }
     }
     return (
-        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3`}>
+        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4`}>
             {examPage?.content?.map(exam =>
             (<Card key={exam.info.id}>
                 <CardHeader>
-                    <CardTitle>
-                        <Link href={"/profile?id="}><AvatarElement account={exam.author} /></Link>
-                    </CardTitle>
-                    <p>{exam.title}</p>
-                    <CardDescription>{exam.description}</CardDescription>
+                    <div className='flex justify-between'>
+                        <Link href={`/profile?id=${exam.author.info.id}`}><AvatarElement account={exam.author} /></Link>
+                        {isAuthor && exam.exam_status === ExamStatus.NOT_COMPLETED && <Button variant={"link"}><Link href={`/exam/edit/${exam.info.id}`}>Edit</Link></Button>}
+                    </div>
+                    <CardTitle>{exam.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Image src={exam.image_path} alt={exam.title} />
+                    <Image src={exam.image_path} width={500} height={500} alt={exam.title} />
                 </CardContent>
-                <CardFooter>
+                <CardFooter className='grid grid-cols-2'>
                     <CardDescription>Category: {exam.exam_category.name}</CardDescription>
                     <CardDescription>Duration: {exam.duration}</CardDescription>
                     <CardDescription>Level: {exam.exam_level}</CardDescription>

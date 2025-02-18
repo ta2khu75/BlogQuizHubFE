@@ -19,6 +19,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Carousel from '@/components/elements/util/Carousel';
 import ExamMenuElement from '@/components/elements/content/exam/ExamMenuElement';
+import ExamService from '@/services/ExamService';
+import { useToast } from '@/hooks/use-toast';
+import FunctionUtil from '@/util/FunctionUtil';
 const examSchema = z.object({
     title: z.string().nonempty(),
     exam_level: z.nativeEnum(ExamLevel),
@@ -27,13 +30,17 @@ const examSchema = z.object({
     description: z.string().optional(),
     access_modifier: z.nativeEnum(AccessModifier),
     exam_category_id: z.number(),
-    quizzes: z.array(quizSchema)
+    quizzes: z.array(quizSchema),
 })
+type examSchema = z.infer<typeof examSchema>;
 type Props = {
-    examCategories: ExamCategoryResponse[]
+    examCategories: ExamCategoryResponse[],
+    exam?: ExamDetailsResponse
 }
-const ExamForm = ({ examCategories }: Props) => {
+const ExamForm = ({ examCategories, exam }: Props) => {
+    const { toast } = useToast()
     const initQuiz: QuizRequest = { question: "", quiz_type: QuizType.SINGLE_CHOICE, answers: Array(4).fill({ answer: "", correct: false }) };
+    const [image, setImage] = useState<{ value: File, error: boolean }>()
     const form = useForm<ExamRequest>({
         resolver: zodResolver(examSchema),
         defaultValues: { title: "", exam_level: ExamLevel.EASY, exam_status: ExamStatus.NOT_COMPLETED, duration: 0, exam_category_id: 0, access_modifier: AccessModifier.PRIVATE, description: "", quizzes: [initQuiz] }
@@ -49,13 +56,17 @@ const ExamForm = ({ examCategories }: Props) => {
     const [open, setOpen] = useState(false)
     const [current, setCurrent] = React.useState(0)
     useEffect(() => {
+        if (!exam) return
+        form.reset({ ...exam, exam_category_id: exam?.exam_category?.id })
+    }, [exam, form])
+    useEffect(() => {
         if (Array.isArray(quizErrors)) {
             const index = quizErrors.findIndex(error => error !== undefined)
             if (index !== -1) setCurrent(index)
         }
     }, [quizErrors])
     const slideState = useMemo(() => {
-        console.log(quizErrors);
+        console.log("error", quizErrors);
         return quizFields.map((item, index) => {
             if (index === current && quizErrors[index]) return "warning";
             if (index === current) return "selected";
@@ -63,13 +74,36 @@ const ExamForm = ({ examCategories }: Props) => {
             return "unselected";
         })
     }, [quizErrors, current, quizFields]);
-    const onSubmit = (value: ExamRequest) => {
-        console.log(value);
-        setOpen(false)
-    }
-    const onSub = () => {
-        console.log(form.getValues());
+    const onSubmit = async (value: ExamRequest) => {
+        console.log("submit", value);
 
+        if (exam) {
+            try {
+                const res = await ExamService.update(exam.info.id, value, image?.value);
+                if (res.success) {
+                    setOpen(false)
+                    toast({ title: "Update success" })
+                } else {
+                    toast({ title: "Update failed", description: FunctionUtil.showError(res.message_error), variant: "destructive" });
+                }
+            } catch (error) {
+                toast({ title: "Update failed", description: FunctionUtil.showError(error), variant: "destructive" });
+            }
+        } else if (image?.value) {
+            try {
+                const res = await ExamService.create(value, image.value);
+                if (res.success) {
+                    setOpen(false)
+                    toast({ title: "Create success" })
+                } else {
+                    toast({ title: "Create failed", description: FunctionUtil.showError(res.message_error), variant: "destructive" });
+                }
+            } catch (error) {
+                toast({ title: "Create failed", description: FunctionUtil.showError(error), variant: "destructive" });
+            }
+        } else {
+            setImage({ value: new File([], ""), error: true })
+        }
     }
     const onAddQuiz = () => {
         appendQuiz(initQuiz)
@@ -95,10 +129,8 @@ const ExamForm = ({ examCategories }: Props) => {
                         <div className="py-2 text-center text-sm text-muted-foreground">
                             Slide {current + 1} of {count + 1}
                         </div>
-                        <Button type='button' className='bg-blue-600 hover:bg-blue-500' onClick={() => setOpen(true)}>Create</Button>
-                        <button type='submit' onClick={onSub}>submit</button>
+                        <Button type='button' className='bg-blue-600 hover:bg-blue-500' onClick={() => setOpen(true)}>{exam ? "Update" : " Create"}</Button>
                     </div>
-                    <button type='button'>start</button>
                     <Modal onCancel={onCancel} open={open} title='Create Exam'>
                         <FormField control={form.control} name='title' render={({ field }) => (
                             <FormItem>
@@ -112,7 +144,7 @@ const ExamForm = ({ examCategories }: Props) => {
                         <FormField control={form.control} name='exam_category_id' render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Exam category</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={`${field.value}`}>
+                                <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={`${field.value}`}>
                                     <FormControl>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select a verified email to display" />
@@ -187,7 +219,7 @@ const ExamForm = ({ examCategories }: Props) => {
                             <FormItem>
                                 <FormLabel>Duration</FormLabel>
                                 <FormControl>
-                                    <Input type='number' placeholder="Duration" {...field} />
+                                    <Input type='number' placeholder="Duration" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -201,6 +233,15 @@ const ExamForm = ({ examCategories }: Props) => {
                                 <FormMessage />
                             </FormItem>
                         )} />
+                        <FormItem>
+                            <FormLabel>Image</FormLabel>
+                            <FormControl>
+                                <Input type='file' accept='image/*' name='image' placeholder='Image' required
+                                    onChange={(e) => { if (e.target.files) setImage({ value: e.target.files?.[0], error: false }) }}
+                                />
+                            </FormControl>
+                            {image?.error && <FormMessage />}
+                        </FormItem>
                         <div className="flex justify-end">
                             {form.formState.isSubmitting ? <Button disabled>
                                 <Loader2 className="animate-spin" />

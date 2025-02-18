@@ -19,7 +19,8 @@ const ExamCreatePage = () => {
             } else {
                 console.log(res.message_error)
             }
-        }).then(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
+        }).catch(err =>
+            toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
     }
     return (
         <ExamForm examCategories={examCategories} />
