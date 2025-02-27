@@ -10,20 +10,26 @@ import { useAppSelector } from '@/redux/hooks'
 import AccountService from '@/services/AccountService'
 import FunctionUtil from '@/util/FunctionUtil'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 const ProfilePage = () => {
     const { toast } = useToast();
+    const router = useRouter()
     const searchParams = useSearchParams()
     const auth = useAppSelector(state => state.auth.account);
     const [account, setAccount] = useState<AccountDetailsResponse>()
     const id = searchParams.get('id')
+    const tab = searchParams.get('tab') ?? 'blog'
+    const pathname = usePathname();
     const isAuthor = () => {
         return account?.info.id === auth?.info.id
     }
     useEffect(() => {
         fetchAccount()
     }, [id])
+    const onTabChange = (value: string) => {
+        router.push(`${pathname}?id=${id}&tab=${value}`)
+    }
     const fetchAccount = () => {
         if (id) {
             AccountService.readById(id).then(res => {
@@ -36,7 +42,7 @@ const ProfilePage = () => {
         }
     }
     return (
-        <Tabs defaultValue="blog">
+        <Tabs defaultValue={tab} onValueChange={(value) => onTabChange(value)}>
             <Card>
                 <CardHeader className='flex flex-col items-center'>
                     <CardTitle>

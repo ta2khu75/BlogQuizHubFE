@@ -1,6 +1,10 @@
+// import TextEditor from '@/components/elements/util/lexical/TextEditor'
+"use client"
+import { TextEditor } from '@/components/elements/util/slate/TextEditor'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { AccessModifier } from '@/types/AccessModifier'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
@@ -30,6 +34,45 @@ const BlogForm = ({ onSubmit }: Props) => {
                         <FormLabel>Title</FormLabel>
                         <FormControl>
                             <Input placeholder="Email" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+                <FormField
+                    control={form.control}
+                    name="access_modifier"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                            <FormLabel>Access modifier</FormLabel>
+                            <FormControl>
+                                <RadioGroup
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                    className="flex space-y-1"
+                                >
+                                    {Object.entries(AccessModifier).map((item) => (
+                                        <FormItem key={item[0]} className="flex items-center space-x-3 space-y-0">
+                                            <FormControl>
+                                                <RadioGroupItem value={item[0]} />
+                                            </FormControl>
+                                            <FormLabel className="font-normal">
+                                                {item[1]}
+                                            </FormLabel>
+                                        </FormItem>
+                                    ))}
+                                </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField control={form.control} name='content' render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Content</FormLabel>
+                        <FormControl>
+                            <TextEditor name={field.name} placeholder="Content" onChange={field.onChange} initialValue={undefined} />
+                            {/* <TextEditor value={field.value} onChange={field.onChange} name="content" /> */}
+                            {/* <Input placeholder="Content" {...field} /> */}
                         </FormControl>
                         <FormMessage />
                     </FormItem>

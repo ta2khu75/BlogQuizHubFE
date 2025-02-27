@@ -192,7 +192,7 @@ const ExamForm = ({ examCategories, exam }: Props) => {
                             name="exam_status"
                             render={({ field }) => (
                                 <FormItem className="space-y-3">
-                                    <FormLabel>Exam title</FormLabel>
+                                    <FormLabel>Exam status</FormLabel>
                                     <FormControl>
                                         <RadioGroup
                                             onValueChange={field.onChange}
@@ -203,6 +203,34 @@ const ExamForm = ({ examCategories, exam }: Props) => {
                                                 <FormItem key={item[1]} className="flex items-center space-x-3 space-y-0">
                                                     <FormControl>
                                                         <RadioGroupItem value={item[1]} />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">
+                                                        {item[1]}
+                                                    </FormLabel>
+                                                </FormItem>
+                                            ))}
+                                        </RadioGroup>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="access_modifier"
+                            render={({ field }) => (
+                                <FormItem className="space-y-3">
+                                    <FormLabel>Access modifier</FormLabel>
+                                    <FormControl>
+                                        <RadioGroup
+                                            onValueChange={field.onChange}
+                                            defaultValue={field.value}
+                                            className="flex space-y-1"
+                                        >
+                                            {Object.entries(AccessModifier).map((item) => (
+                                                <FormItem key={item[0]} className="flex items-center space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <RadioGroupItem value={item[0]} />
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
                                                         {item[1]}
@@ -228,7 +256,7 @@ const ExamForm = ({ examCategories, exam }: Props) => {
                             <FormItem>
                                 <FormLabel>Description</FormLabel>
                                 <FormControl>
-                                    <Textarea {...field} />
+                                    <Textarea placeholder='Description' {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
