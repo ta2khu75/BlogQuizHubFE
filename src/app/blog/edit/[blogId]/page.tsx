@@ -1,9 +1,10 @@
-import TextEditor from '@/components/elements/util/lexical/TextEditor'
+"use client"
+import BlogForm from '@/components/form/BlogForm'
 import React from 'react'
 
 const page = () => {
     return (
-        <TextEditor />
+        <BlogForm onSubmit={() => { }} />
     )
 }
 

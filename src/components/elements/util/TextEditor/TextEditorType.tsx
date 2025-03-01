@@ -1,6 +1,7 @@
-"use client"
 import { AlignCenter, AlignJustify, AlignLeft, AlignRight, Bold, Code, Highlighter, Italic, List, ListOrdered, Quote, Redo, Strikethrough, Subscript, Superscript, Underline, Undo } from "lucide-react";
-import { JSX } from "react";
+import { BaseEditor } from "slate";
+import { HistoryEditor } from "slate-history";
+import { ReactEditor } from "slate-react";
 export enum TextEditorMark {
     Bold = "bold",
     Italic = "italic",
@@ -10,19 +11,8 @@ export enum TextEditorMark {
     Subscript = "subscript",
     Highlight = "highlight",
     Code = "code",
+
 }
-// export enum TextEditorBlock {
-//     LeftAlign = "left",
-//     CenterAlign = "center",
-//     RightAlign = "right",
-//     JustifyAlign = "justify",
-//     // Divider = "divider",
-//     // BlockQuote = "block-quote",
-//     // NumberedList = "numbered-list",
-//     // BulletedList = "bulleted-list",
-//     // Undo = "undo",
-//     // Redo = "redo",
-// }
 export enum TextEditorList {
     NumberedList = "numbered-list",
     BulletedList = "bulleted-list",
@@ -33,36 +23,25 @@ export enum TextEditorAlign {
     RightAlign = "right",
     JustifyAlign = "justify",
 }
-export enum TextEditorEditing {
+export enum TextEditorEdit {
     Undo = "undo",
     Redo = "redo",
 }
-export enum TextEditorBlock {
+export enum TextEditorFormat {
     BlockQuote = "block-quote",
-    Divider = "divider",
 }
-export type TextEditorAction = TextEditorMark | TextEditorList | TextEditorAlign | TextEditorBlock;
-// Bold = "bold",
-// Italic = "italic",
-// Underline = "underline",
-// Strikethrough = "strikethrough",
-// Superscript = "superscript",
-// Subscript = "subscript",
-// Highlight = "highlight",
-// Code = "code",
-// LeftAlign = "left",
-// CenterAlign = "center",
-// RightAlign = "right",
-// JustifyAlign = "justify",
-// Divider = "divider",
-// BlockQuote = "block-quote",
-// NumberedList = "numbered-list",
-// BulletedList = "bulleted-list",
-// Undo = "undo",
-// Redo = "redo",
-// }
-
-export const TEXT_FORMATS: { id: TextEditorAction; icon: JSX.Element }[] = [
+export type TextEditorBlock = TextEditorList | TextEditorAlign | TextEditorFormat;
+export const TEXT_EDITS = [
+    {
+        id: TextEditorEdit.Undo,
+        icon: <Undo />,
+    },
+    {
+        id: TextEditorEdit.Redo,
+        icon: <Redo />,
+    },
+]
+export const TEXT_MARKS = [
     {
         id: TextEditorMark.Bold,
         icon: <Bold />,
@@ -72,7 +51,7 @@ export const TEXT_FORMATS: { id: TextEditorAction; icon: JSX.Element }[] = [
         icon: <Italic />,
     },
     {
-        id: TextEditorMark.Italic,
+        id: TextEditorMark.Underline,
         icon: <Underline />,
     },
     {
@@ -114,18 +93,6 @@ export const TEXT_BLOCKS = [
         icon: <AlignJustify />,
     },
     {
-        id: TextEditorEditing.Undo,
-        icon: <Undo />,
-    },
-    {
-        id: TextEditorEditing.Redo,
-        icon: <Redo />,
-    },
-    {
-        id: TextEditorBlock.BlockQuote,
-        icon: <Quote />,
-    },
-    {
         id: TextEditorList.BulletedList,
         icon: <List />,
     },
@@ -133,9 +100,31 @@ export const TEXT_BLOCKS = [
         id: TextEditorList.NumberedList,
         icon: <ListOrdered />,
     },
+    {
+        id: TextEditorFormat.BlockQuote,
+        icon: <Quote />,
+    },
 ];
 
-// export const HEADER_TAGS = ["h1", "h2", "h3", "h4", "h5", "h6"];
+export const HEADINGS = ["h1", "h2", "h3", "h4", "h5", "h6", "paragraph"];
 
-// export const LIST_TYPES = ["numbered-list", "bulleted-list"];
-// export const TEXT_ALIGN_TYPES = ["left", "center", "right", "justify"];
+
+export type EditorType = BaseEditor & ReactEditor & HistoryEditor;
+export type CustomText = {
+    text: string;
+    bold?: boolean;
+    underline?: boolean;
+    superscript?: boolean;
+    subscript?: boolean;
+    italic?: boolean;
+    code?: boolean;
+    highlight?: boolean;
+    strikethrough?: boolean;
+};
+
+export type CustomElement = {
+    type: string;
+    children: CustomText[];
+    align?: TextEditorAlign;
+    url?: string;
+};

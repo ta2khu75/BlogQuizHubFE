@@ -1,6 +1,4 @@
-// import TextEditor from '@/components/elements/util/lexical/TextEditor'
-"use client"
-import { TextEditor } from '@/components/elements/util/slate/TextEditor'
+import TextEditor from '@/components/elements/util/TextEditor/TextEditor'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -69,12 +67,7 @@ const BlogForm = ({ onSubmit }: Props) => {
                 <FormField control={form.control} name='content' render={({ field }) => (
                     <FormItem>
                         <FormLabel>Content</FormLabel>
-                        <FormControl>
-                            <TextEditor name={field.name} placeholder="Content" onChange={field.onChange} initialValue={undefined} />
-                            {/* <TextEditor value={field.value} onChange={field.onChange} name="content" /> */}
-                            {/* <Input placeholder="Content" {...field} /> */}
-                        </FormControl>
-                        <FormMessage />
+                        <TextEditor name={field.name} className='min-h-[200px]' placeholder="Content" onChange={field.onChange} initialValue={[{ type: 'paragraph', children: [{ text: '' }] }]} />
                     </FormItem>
                 )} />
                 <div className="flex justify-end">

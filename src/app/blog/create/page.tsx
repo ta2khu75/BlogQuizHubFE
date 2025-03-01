@@ -1,5 +1,5 @@
 "use client"
-// import { TextEditor } from '@/components/elements/util/slate/TextEditor'
+import TextEditor from '@/components/elements/util/TextEditor/TextEditor'
 import BlogForm from '@/components/form/BlogForm'
 import React, { useState } from 'react'
 import { Descendant } from 'slate'
@@ -21,13 +21,12 @@ const BlogCreatePage = () => {
     // };
     return (
         // <BlogForm onSubmit={onSubmit} />
-        // <TextEditor name="post"
-        //     placeholder="Write post"
-        //     onChange={onChange}
-        //     initialValue={[{ type: 'paragraph', children: [{ text: '' }] }]}
-        // initialValue={isSuccess ? data || initalValue : undefined}
-        // />
-        <BlogForm onSubmit={onSubmit} />
+        <TextEditor name="post"
+            placeholder="Write post"
+            onChange={onChange}
+            initialValue={[{ type: 'paragraph', children: [{ text: '' }] }]}
+        />
+        // <BlogForm onSubmit={onSubmit} />
     )
 }
 

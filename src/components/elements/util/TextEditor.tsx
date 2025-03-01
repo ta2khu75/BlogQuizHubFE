@@ -1,4 +1,3 @@
-"use client"
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import { FileImage, Link, List, ListOrdered, SquareTerminal } from 'lucide-react';
@@ -204,7 +203,9 @@ const TextEditor = () => {
                     }}
                     renderLeaf={renderLeaf}
                     renderElement={renderElement}
-                    name='Blog' placeholder='Write post' autoFocus className={"h-full text-xl p-2"} />
+                    name='Blog' placeholder='Write post' autoFocus
+                    className={"h-full text-xl p-2"}
+                />
             </div>
         </Slate >
     )

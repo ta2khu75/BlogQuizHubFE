@@ -120,6 +120,9 @@ const ExamForm = ({ examCategories, exam }: Props) => {
     const onCancel = () => {
         setOpen(false)
     }
+    const onChangeImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) setImage({ value: e.target.files?.[0], error: false })
+    }
     return (
         <>
             <Form {...form}>
@@ -247,7 +250,7 @@ const ExamForm = ({ examCategories, exam }: Props) => {
                             <FormItem>
                                 <FormLabel>Duration</FormLabel>
                                 <FormControl>
-                                    <Input type='number' placeholder="Duration" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                                    <Input type='number' min={5} placeholder="Duration" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -265,7 +268,7 @@ const ExamForm = ({ examCategories, exam }: Props) => {
                             <FormLabel>Image</FormLabel>
                             <FormControl>
                                 <Input type='file' accept='image/*' name='image' placeholder='Image' required
-                                    onChange={(e) => { if (e.target.files) setImage({ value: e.target.files?.[0], error: false }) }}
+                                    onChange={onChangeImage}
                                 />
                             </FormControl>
                             {image?.error && <FormMessage />}
