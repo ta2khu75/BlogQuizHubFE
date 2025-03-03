@@ -1,32 +1,39 @@
 "use client"
-import TextEditor from '@/components/elements/util/TextEditor/TextEditor'
 import BlogForm from '@/components/form/BlogForm'
-import React, { useState } from 'react'
-import { Descendant } from 'slate'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useToast } from '@/hooks/use-toast'
+import { BlogService } from '@/services/BlogService'
+import FunctionUtil from '@/util/FunctionUtil'
+import React from 'react'
 
 const BlogCreatePage = () => {
+    const { toast } = useToast()
     const onSubmit = (data: BlogRequest) => {
-        console.log(data);
+        fetchCreate(data)
     }
-    const [value, setValue] = useState<Descendant[]>();
-    // const { mutateAsync: saveData, isPending } = useUpdateData();
-    // const { data, isSuccess } = useData();
+    const fetchCreate = async (data: BlogRequest) => {
+        try {
+            const res = await BlogService.create(data)
+            if (res.success) {
+                toast({ title: "Create success" })
+                localStorage.removeItem("content")
+            } else {
+                toast({ title: "Create failed", description: res.message_error, variant: "destructive" })
+            }
+        } catch (error) {
+            toast({ title: "Create failed", description: FunctionUtil.showError(error), variant: "destructive" })
+        }
+    }
 
-    const onChange = (value: Descendant[]) => {
-        setValue(value);
-    };
-
-    // const onSave = () => {
-    //     saveData(value);
-    // };
     return (
-        // <BlogForm onSubmit={onSubmit} />
-        <TextEditor name="post"
-            placeholder="Write post"
-            onChange={onChange}
-            initialValue={[{ type: 'paragraph', children: [{ text: '' }] }]}
-        />
-        // <BlogForm onSubmit={onSubmit} />
+        <Card>
+            <CardHeader>
+                <CardTitle>Create blog</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <BlogForm onSubmit={onSubmit} />
+            </CardContent>
+        </Card>
     )
 }
 

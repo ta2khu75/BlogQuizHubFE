@@ -11,7 +11,7 @@ type Props = {
     className?: string
     title?: string,
     description?: string,
-    scroll?: boolean
+    scroll?: boolean,
 }
 const Modal = ({ children, open, onCancel, className, title, description, scroll, onConfirm }: Props) => {
     return (

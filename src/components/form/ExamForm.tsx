@@ -22,6 +22,7 @@ import ExamMenuElement from '@/components/elements/content/exam/ExamMenuElement'
 import ExamService from '@/services/ExamService';
 import { useToast } from '@/hooks/use-toast';
 import FunctionUtil from '@/util/FunctionUtil';
+import Confirm from '@/components/elements/util/Confirm';
 const examSchema = z.object({
     title: z.string().nonempty(),
     exam_level: z.nativeEnum(ExamLevel),
@@ -54,6 +55,8 @@ const ExamForm = ({ examCategories, exam }: Props) => {
     }, [form.formState.errors?.quizzes]);
     const count = Math.max(quizFields.length - 1, 0)
     const [open, setOpen] = useState(false)
+    const [openConfirm, setOpenConfirm] = useState(false)
+
     const [current, setCurrent] = React.useState(0)
     useEffect(() => {
         if (!exam) return
@@ -109,9 +112,9 @@ const ExamForm = ({ examCategories, exam }: Props) => {
         appendQuiz(initQuiz)
         setCurrent((prev) => Math.max(count + 1, prev + 1))
     }
-    const onRemoveQuiz = (index: number) => {
+    const onRemoveQuiz = () => {
         if (count === 0) return
-        removeQuiz(index)
+        removeQuiz(current)
         setCurrent((prev) => Math.max(prev - 1, 0))
     }
     const onSelectedSlide = (index: number) => {
@@ -134,7 +137,7 @@ const ExamForm = ({ examCategories, exam }: Props) => {
                         </div>
                         <Button type='button' className='bg-blue-600 hover:bg-blue-500' onClick={() => setOpen(true)}>{exam ? "Update" : " Create"}</Button>
                     </div>
-                    <Modal onCancel={onCancel} open={open} title='Create Exam'>
+                    <Modal scroll onCancel={onCancel} open={open} title={exam ? "Update Exam" : "Create Exam"}>
                         <FormField control={form.control} name='title' render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Title</FormLabel>
@@ -290,7 +293,7 @@ const ExamForm = ({ examCategories, exam }: Props) => {
                                         <CardHeader>
                                             <div className='flex justify-between'>
                                                 <CardTitle>Quiz {quizIndex + 1}</CardTitle>
-                                                <Button variant={'destructive'} disabled={count === 0 ? true : false} type='button' onClick={() => onRemoveQuiz(quizIndex)}><FolderX /></Button>
+                                                <Button variant={'destructive'} disabled={count === 0 ? true : false} type='button' onClick={() => setOpenConfirm(true)}><FolderX /></Button>
                                             </div>
                                         </CardHeader>
                                         <CardContent className="flex justify-center">
@@ -304,6 +307,7 @@ const ExamForm = ({ examCategories, exam }: Props) => {
                     </Carousel>
                 </form>
             </Form >
+            <Confirm onCancel={() => setOpenConfirm(false)} open={openConfirm} onContinue={() => onRemoveQuiz()} title='Do you want to delete this quiz?' />
             <ExamMenuElement onIndexClick={onSelectedSlide} states={
                 slideState} />
         </>

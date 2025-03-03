@@ -34,6 +34,8 @@
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.5.2",
+    "escape-html": "^1.0.3",
+    "firebase": "^11.4.0",
     "image-extensions": "^1.1.0",
     "is-url": "^1.2.4",
     "lexical": "^0.25.0",
@@ -56,6 +58,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/escape-html": "^1.0.4",
     "@types/is-url": "^1.2.32",
     "@types/node": "^20",
     "@types/react": "^19",

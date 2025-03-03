@@ -44,7 +44,7 @@ export default function TextEditorTool() {
     return (
         <div className="flex flex-wrap gap-2">
             <Select defaultValue="paragraph" onValueChange={(value) => toggleBlock(editor, value as TextEditorBlock)}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[120px]">
                     <SelectValue placeholder="Font size" />
                 </SelectTrigger>
                 <SelectContent>
@@ -58,6 +58,7 @@ export default function TextEditorTool() {
             {TEXT_MARKS.map(({ id, icon }) => (
                 <Button
                     key={id}
+                    type="button"
                     onMouseDown={() => onMarkClick(id)}
                     variant={getMarkSelectionProps(id)}
                 >
@@ -85,15 +86,17 @@ export default function TextEditorTool() {
             {TEXT_BLOCKS.map(({ id, icon }) => (
                 <Button
                     key={id}
+                    type="button"
                     variant={getBlockSelectionProps(id)}
                     onMouseDown={() => onBlockClick(id)}
                 >{icon}</Button>
             ))}
-            <Button disabled={editor.history.undos.length == 0} onMouseDown={() => editor.undo()}><Undo /></Button>
-            <Button disabled={editor.history.redos.length == 0} onMouseDown={() => editor.redo()}><Redo /></Button>
+            <Button type="button" disabled={editor.history.undos.length == 0} onMouseDown={() => editor.undo()}><Undo /></Button>
+            <Button type="button" disabled={editor.history.redos.length == 0} onMouseDown={() => editor.redo()}><Redo /></Button>
             <Modal open={openUrl} onCancel={() => { setOpenUrl(false); setUrl("") }}>
                 <form className="flex items-center" onSubmit={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     if (!url) return
                     insertLink(editor, url); setOpenUrl(false); setUrl("")
                 }}>

@@ -38,6 +38,7 @@ const BlogSearch = () => {
     }
     return (
         <div>
+            {auth.authenticated && auth.account?.info.id === authorId ? "true" : "false"}
             {
                 blogPage?.content?.map(blog => (
                     <Card key={blog.info.id}>

@@ -28,7 +28,7 @@ const AnswerForm = ({ answerIndex, quizIndex, form, quizType, onDelete }: Props)
     const correct = form.watch(`${answerName}.correct`);
     useEffect(() => {
         if (correct && form.formState.errors?.quizzes?.[quizIndex]?.answers) {
-            form.clearErrors(`${answersName}.root` as const);
+            form.clearErrors(`${answersName}.root`);
         }
     }, [correct])
     return (

@@ -1,6 +1,6 @@
 "use client"
-import React, { memo, useState } from "react";
-import { createEditor, Descendant } from "slate";
+import React, { memo, useMemo, useState } from "react";
+import { createEditor } from "slate";
 import { withHistory } from "slate-history";
 import {
     Editable,
@@ -17,9 +17,9 @@ import { RenderLeaf } from "@/components/elements/util/TextEditor/TextEditorLeaf
 interface TextEditorProps {
     name: string;
     placeholder: string;
-    initialValue: Descendant[] | undefined;
+    initialValue?: string;
     className?: string
-    onChange: (value: Descendant[]) => void;
+    onChange: (value: string) => void;
 }
 
 declare module "slate" {
@@ -32,12 +32,22 @@ declare module "slate" {
 
 
 
-
-
 const TextEditor = ({ name, placeholder, onChange, initialValue, className }: TextEditorProps) => {
     const [editor] = useState(withImage(withInline(withHistory(withReact(createEditor())))));
 
-    if (!initialValue) return null;
+    const initValue = useMemo(() => {
+        const content = localStorage.getItem('content') || initialValue;
+        if (content) {
+            onChange(content)
+            return JSON.parse(content)
+        }
+        return [{
+            type: 'paragraph',
+            children: [{ text: '' }],
+        }]
+    },
+        [initialValue]
+    )
 
     const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
         const key = event?.key?.toLowerCase();
@@ -61,18 +71,21 @@ const TextEditor = ({ name, placeholder, onChange, initialValue, className }: Te
     return (
         <Slate
             editor={editor}
-            initialValue={initialValue}
-            onChange={(value) => {
-                onChange(value);
+            onValueChange={(value) => {
+                const valueString = JSON.stringify(value)
+                localStorage.setItem('content', valueString)
+                console.log(valueString);
+                onChange(valueString);
             }}
+            initialValue={initValue}
         >
             <div>
                 <TextEditorTool />
                 <Editable
                     disableDefaultStyles
-                    className={`border-2 border-black p-2 ${className}`}
+                    className={`border-2 border-black p-2 relative rounded-md ${className}`}
                     name={name}
-                    renderPlaceholder={({ attributes }) => <span {...attributes} className="pt-2">{placeholder}</span>}
+                    renderPlaceholder={({ attributes }) => <span {...attributes} className="absolute">{placeholder}</span>}
                     placeholder={placeholder}
                     autoFocus
                     renderLeaf={RenderLeaf}
@@ -80,7 +93,7 @@ const TextEditor = ({ name, placeholder, onChange, initialValue, className }: Te
                     onKeyDown={onKeyDown}
                 />
             </div>
-        </Slate>
+        </Slate >
     );
 }
 
