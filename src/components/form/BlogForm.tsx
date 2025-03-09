@@ -18,10 +18,11 @@ const formSchema: ZodType<BlogRequest> = z.object({
 })
 type FormData = z.infer<typeof formSchema>;
 type Props = {
-    onSubmit: (data: BlogRequest) => void
+    onSubmit: (data: BlogRequest) => void,
+    blog?: BlogDetailsResponse
 }
 
-const BlogForm = ({ onSubmit }: Props) => {
+const BlogForm = ({ onSubmit, blog }: Props) => {
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: { title: "", content: "", blog_tags: [""], access_modifier: AccessModifier.PRIVATE },
@@ -31,9 +32,17 @@ const BlogForm = ({ onSubmit }: Props) => {
         control: form.control,
         name: "blog_tags",
     });
+
+    useEffect(() => {
+        if (!blog) return
+        console.log(blog);
+
+        form.reset({ ...blog })
+    }, [blog, form])
     useEffect(() => {
         if (tagFields.length === 0) {
-            appendTag(""); // Nếu mảng trống, thêm phần tử mới
+            appendTag(""); // Nếu mản
+            // g trống, thêm phần tử mới
         }
     }, [tagFields.length]);
     return (
@@ -116,7 +125,7 @@ const BlogForm = ({ onSubmit }: Props) => {
                     <FormItem>
                         <FormLabel>Content</FormLabel>
                         <FormControl>
-                            <TextEditor name={field.name} className='min-h-[200px]' placeholder="Content" onChange={field.onChange} />
+                            <TextEditor name={field.name} initialValue={field.value} className='min-h-[200px]' placeholder="Content" onChange={field.onChange} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

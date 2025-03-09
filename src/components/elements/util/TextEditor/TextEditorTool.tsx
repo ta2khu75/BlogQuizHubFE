@@ -106,7 +106,9 @@ export default function TextEditorTool() {
                 </form>
             </Modal>
             <Modal open={openImage} className="max-w-max" onCancel={() => setOpenImage(false)} >
-                <UploadImage setOpen={setOpenImage} onAdd={(url) => onAddImage(url)} imageUrls={imageUrls} setImageUrls={setImageUrls} />
+                <UploadImage
+                    // setOpen={setOpenImage} 
+                    onAdd={(url) => onAddImage(url)} imageUrls={imageUrls} setImageUrls={setImageUrls} />
             </Modal>
         </div >
     );

@@ -3,43 +3,40 @@ import { Descendant, Text } from 'slate'
 import escapeHtml from 'escape-html'
 export const serializeToHtml = (node: Descendant): string => {
     if (Text.isText(node)) {
-        let string = escapeHtml(node.text);
-
-        if (node.bold) string = `<strong>${string}</strong>`;
-        if (node.italic) string = `<em>${string}</em>`;
-        if (node.underline) string = `<u>${string}</u>`;
-        if (node.strikethrough) string = `<del>${string}</del>`;
-        if (node.code) string = `<code>${string}</code>`;
-        if (node.highlight) string = `<mark>${string}</mark>`;
-        if (node.superscript) string = `<sup>${string}</sup>`;
-        if (node.subscript) string = `<sub>${string}</sub>`;
-
-        return string;
+        const text = escapeHtml(node.text);
+        let className = "";
+        if (node.bold) className = "font-bold";
+        else if (node.italic) className = "italic";
+        else if (node.underline) className = "underline";
+        else if (node.strikethrough) className = "line-through";
+        else if (node.code) className = "text-black p-1 text-sm font-mono bg-gray-200";
+        else if (node.highlight) className = "text-black p-1 bg-yellow-300 border border-yellow-600";
+        return `<span class="${className}">${text}</span>`;
     }
 
     const children = node.children?.map(n => serializeToHtml(n)).join("") || "";
 
     switch (node.type) {
         case "block-quote":
-            return `<blockquote>${children}</blockquote>`;
+            return `<blockquote class="pl-3 border-l-4 text-gray-600 dark:text-gray-400 border-gray-300 bg-gray-100 dark:border-gray-500 dark:bg-gray-800">${children}</blockquote>`;
         case "numbered-list":
-            return `<ol>${children}</ol>`;
+            return `<ol class="list-decimal">${children}</ol>`;
         case "bulleted-list":
-            return `<ul>${children}</ul>`;
+            return `<ul class="list-disc">${children}</ul>`;
         case "list-item":
             return `<li>${children}</li>`;
         case "h1":
-            return `<h1>${children}</h1>`;
+            return `<h1 class="text-6xl">${children}</h1>`;
         case "h2":
-            return `<h2>${children}</h2>`;
+            return `<h2 class="text-5xl">${children}</h2>`;
         case "h3":
-            return `<h3>${children}</h3>`;
+            return `<h3 class="text-4xl">${children}</h3>`;
         case "h4":
-            return `<h4>${children}</h4>`;
+            return `<h4 class="text-3xl">${children}</h4>`;
         case "h5":
-            return `<h5>${children}</h5>`;
+            return `<h5 class="text-2xl" >${children}</h5>`;
         case "h6":
-            return `<h6>${children}</h6>`;
+            return `<h6 class="text-xl">${children}</h6>`;
         case "link":
             return `<a href="${escapeHtml(node.url)}" target="_blank">${children}</a>`;
         case "image":
@@ -49,28 +46,3 @@ export const serializeToHtml = (node: Descendant): string => {
             return `<p>${children}</p>`;
     }
 };
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-// export const serializeToHtml = (node: any) => {
-//     if (Text.isText(node)) {
-//         let string = escapeHtml(node.text)
-//         if (node.bold) {
-//             string = `<strong>${string}</strong>`
-//         }
-//         return string
-//     }
-
-//     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//     const children = node.children.map((n: any) => serializeToHtml(n)).join('')
-
-//     switch (node.type) {
-//         case 'quote':
-//             return `<blockquote><p>${children}</p></blockquote>`
-//         case 'paragraph':
-//             return `<p>${children}</p>`
-//         case 'link':
-//             return `<a href="${escapeHtml(node.url)}">${children}</a>`
-//         default:
-//             return children
-//     }
-// }

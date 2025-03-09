@@ -1,18 +1,23 @@
 import ImageElement from '@/components/elements/util/TextEditor/UploadImage/ImageElement'
 import { Input } from '@/components/ui/input'
+import FileUtil from '@/util/FileUtil'
 import { Label } from '@radix-ui/react-label'
 import React from 'react'
 type UploadImageProps = {
     imageUrls: string[]
     setImageUrls: (imageUrls: string[]) => void
-    setOpen: (open: boolean) => void
+    // setOpen: (open: boolean) => void
     onAdd: (url: string) => void
 }
 const UploadImage = ({ imageUrls, setImageUrls, onAdd }: UploadImageProps) => {
-    const onImageChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onImageChanged = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            const urls = Array.from(e.target.files).map(file => URL.createObjectURL(file))
-            setImageUrls([...imageUrls, ...urls])
+            try {
+                const urls = await Promise.all(Array.from(e.target.files).map(file => FileUtil.uploadFile(file.name, file)))
+                setImageUrls([...imageUrls, ...urls])
+            } catch (error) {
+                console.log(error);
+            }
         }
     }
     return (

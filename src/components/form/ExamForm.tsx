@@ -23,6 +23,7 @@ import ExamService from '@/services/ExamService';
 import { useToast } from '@/hooks/use-toast';
 import FunctionUtil from '@/util/FunctionUtil';
 import Confirm from '@/components/elements/util/Confirm';
+import { useRouter } from 'next/navigation';
 const examSchema = z.object({
     title: z.string().nonempty(),
     exam_level: z.nativeEnum(ExamLevel),
@@ -40,6 +41,7 @@ type Props = {
 }
 const ExamForm = ({ examCategories, exam }: Props) => {
     const { toast } = useToast()
+    const router = useRouter()
     const initQuiz: QuizRequest = { question: "", quiz_type: QuizType.SINGLE_CHOICE, answers: Array(4).fill({ answer: "", correct: false }) };
     const [image, setImage] = useState<{ value: File, error: boolean }>()
     const form = useForm<ExamRequest>({
@@ -86,6 +88,7 @@ const ExamForm = ({ examCategories, exam }: Props) => {
                 if (res.success) {
                     setOpen(false)
                     toast({ title: "Update success" })
+                    router.push(`/profile?id=${res.data.author.info.id}&tab=exam`)
                 } else {
                     toast({ title: "Update failed", description: FunctionUtil.showError(res.message_error), variant: "destructive" });
                 }
@@ -98,6 +101,7 @@ const ExamForm = ({ examCategories, exam }: Props) => {
                 if (res.success) {
                     setOpen(false)
                     toast({ title: "Create success" })
+                    router.push(`/profile?id=${res.data.author.info.id}&tab=exam`)
                 } else {
                     toast({ title: "Create failed", description: FunctionUtil.showError(res.message_error), variant: "destructive" });
                 }

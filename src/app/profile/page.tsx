@@ -11,7 +11,7 @@ import AccountService from '@/services/AccountService'
 import FunctionUtil from '@/util/FunctionUtil'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 const ProfilePage = () => {
     const { toast } = useToast();
     const router = useRouter()
@@ -21,9 +21,9 @@ const ProfilePage = () => {
     const id = searchParams.get('id')
     const tab = searchParams.get('tab') ?? 'blog'
     const pathname = usePathname();
-    const isAuthor = () => {
-        return account?.info.id === auth?.info.id
-    }
+    const isAuthor = useMemo(() => {
+        return id === auth?.info.id
+    }, [auth, id])
     useEffect(() => {
         fetchAccount()
     }, [id])
@@ -41,6 +41,8 @@ const ProfilePage = () => {
             }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
         }
     }
+    console.log("auth", auth);
+
     return (
         <Tabs defaultValue={tab} onValueChange={(value) => onTabChange(value)}>
             <Card>
@@ -98,18 +100,18 @@ const ProfilePage = () => {
             <TabsContent value="blog">
                 <div className='flex justify-between'>
                     <CardTitle>Blog</CardTitle>
-                    {isAuthor() &&
+                    {isAuthor &&
                         <Button><Link href="/blog/create">Create</Link></Button>}
                 </div>
-                <BlogSearch />
+                <BlogSearch isAuthor={isAuthor} />
             </TabsContent>
             <TabsContent value='exam'>
                 <div className='flex justify-between'>
                     <CardTitle>Exam</CardTitle>
-                    {isAuthor() &&
+                    {isAuthor &&
                         <Button><Link href={"/exam/create"}>Create</Link></Button>}
                 </div>
-                <ExamSearch isAuthor={isAuthor()} />
+                <ExamSearch isAuthor={isAuthor} />
             </TabsContent>
             <TabsContent value='follower'>
                 follow

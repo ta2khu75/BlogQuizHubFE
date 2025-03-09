@@ -1,5 +1,5 @@
 "use client"
-import React, { memo, useMemo, useState } from "react";
+import React, { memo, useEffect, useMemo, useState } from "react";
 import { createEditor } from "slate";
 import { withHistory } from "slate-history";
 import {
@@ -30,24 +30,18 @@ declare module "slate" {
     }
 }
 
-
-
 const TextEditor = ({ name, placeholder, onChange, initialValue, className }: TextEditorProps) => {
     const [editor] = useState(withImage(withInline(withHistory(withReact(createEditor())))));
-
     const initValue = useMemo(() => {
-        const content = localStorage.getItem('content') || initialValue;
-        if (content) {
-            onChange(content)
-            return JSON.parse(content)
+        const content = localStorage.getItem('content') ?? initialValue;
+        return content ? JSON.parse(content) : [{ type: 'paragraph', children: [{ text: '' }] }];
+    }, [initialValue]);
+
+    useEffect(() => {
+        if (initialValue) {
+            onChange(initialValue); // Gọi trong useEffect để tránh cập nhật state khi render
         }
-        return [{
-            type: 'paragraph',
-            children: [{ text: '' }],
-        }]
-    },
-        [initialValue]
-    )
+    }, [initialValue, onChange]);
 
     const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
         const key = event?.key?.toLowerCase();
@@ -70,11 +64,12 @@ const TextEditor = ({ name, placeholder, onChange, initialValue, className }: Te
 
     return (
         <Slate
+            // key={JSON.stringify(initValue)}
             editor={editor}
             onValueChange={(value) => {
                 const valueString = JSON.stringify(value)
                 localStorage.setItem('content', valueString)
-                console.log(valueString);
+                console.log("onChange", valueString);
                 onChange(valueString);
             }}
             initialValue={initValue}

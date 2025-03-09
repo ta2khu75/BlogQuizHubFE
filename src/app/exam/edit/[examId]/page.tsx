@@ -4,7 +4,7 @@ import { useToast } from '@/hooks/use-toast'
 import ExamCategoryService from '@/services/ExamCategoryService'
 import ExamService from '@/services/ExamService'
 import FunctionUtil from '@/util/FunctionUtil'
-import React, { use, useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 
 const ExamEditPage = ({ params }: { params: Promise<{ examId: string }> }) => {
     const { toast } = useToast()
