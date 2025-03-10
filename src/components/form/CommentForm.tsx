@@ -12,12 +12,13 @@ const formSchema: ZodType<CommentRequest> = z.object({
 })
 type Props = {
     onSubmit: (value: CommentRequest) => void
-    blog_id: string
+    blog_id: string,
+    comment?: CommentResponse
 }
-const CommentForm = ({ onSubmit, blog_id }: Props) => {
+const CommentForm = ({ onSubmit, blog_id, comment }: Props) => {
     const form = useForm<CommentRequest>({
         resolver: zodResolver(formSchema),
-        defaultValues: { content: "", blog_id }
+        defaultValues: { content: comment?.content ?? "", blog_id }
     })
     return (
         <Form {...form}>

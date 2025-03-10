@@ -7,20 +7,20 @@ export class CommentService {
         return instance.get(`${basePath}/${id}`);
     }
     static create(comment: CommentRequest, file?: File): Promise<ApiResponse<CommentResponse>> {
-        const form = new FormData();
-        if (file) {
-            form.append("image", file)
-        }
-        form.append("comment", JSON.stringify(comment));
-        return instance.post(basePath, form);
+        // const form = new FormData();
+        // if (file) {
+        //     form.append("image", file)
+        // }
+        // form.append("comment", JSON.stringify(comment));
+        return instance.post(basePath, comment);
     }
     static update(id: string, comment: CommentRequest, file?: File): Promise<ApiResponse<CommentResponse>> {
-        const form = new FormData();
-        if (file) {
-            form.append("image", file)
-        }
-        form.append("comment", JSON.stringify(comment));
-        return instance.post(`${basePath}/${id}`, form);
+        // const form = new FormData();
+        // if (file) {
+        //     form.append("image", file)
+        // }
+        // form.append("comment", JSON.stringify(comment));
+        return instance.put(`${basePath}/${id}`, comment);
     }
     static delete(id: string): Promise<ApiResponse<void>> {
         return instance.delete(`${basePath}/${id}`);

@@ -1,3 +1,4 @@
-interface CommentBase{
+interface CommentBase {
     content: string;
+    blog_id: string;
 }
