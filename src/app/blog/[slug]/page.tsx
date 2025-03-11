@@ -14,12 +14,15 @@ import FunctionUtil from '@/util/FunctionUtil';
 import StringUtil from '@/util/StringUtil';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import React, { use, useEffect, useMemo, useState } from 'react'
 import { Descendant } from 'slate';
 
 const BlogAboutPage = ({ params }: { params: Promise<{ slug: string }> }) => {
     const { toast } = useToast()
     const { slug } = use(params)
+    const searchParams = useSearchParams()
+    const page = Number(searchParams.get('page')) || 1
     const [openComment, setOpenComment] = useState(false)
     const auth = useAppSelector(state => state.auth)
     const blog_id = useMemo(() => StringUtil.getIdFromSlugUrl(slug), [slug])
@@ -29,6 +32,9 @@ const BlogAboutPage = ({ params }: { params: Promise<{ slug: string }> }) => {
         fetchBlog()
         fetchPageComment()
     }, [blog_id])
+    useEffect(() => {
+        fetchPageComment()
+    }, [page])
     const fetchBlog = () => {
         BlogService.readDetails(blog_id).then(res => {
             if (res.success) {
@@ -41,7 +47,7 @@ const BlogAboutPage = ({ params }: { params: Promise<{ slug: string }> }) => {
         ))
     }
     const fetchPageComment = () => {
-        CommentService.readPageByBlog(blog_id).then(res => {
+        CommentService.readPageByBlog(blog_id, page).then(res => {
             if (res.success) {
                 setCommentPage(res.data)
             } else {

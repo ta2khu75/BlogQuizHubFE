@@ -2,7 +2,6 @@ import CommentElement from '@/components/elements/content/comment/CommentItem'
 import Pageination from '@/components/elements/util/Pageination'
 import { useToast } from '@/hooks/use-toast'
 import { CommentService } from '@/services/CommentService'
-import { usePathname } from 'next/navigation'
 import React from 'react'
 type Props = {
     commentPage?: PageResponse<CommentResponse>
@@ -30,24 +29,6 @@ const CommentPagination = ({ commentPage, blog_id, auth, setCommentPage }: Props
             {
                 commentPage && <Pageination<CommentResponse> page={commentPage} />
             }
-            {/* <Pagination> <PaginationContent>
-                    <PaginationItem>
-                        <PaginationPrevious href={`${pathname}`} />
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationLink href={`${pathname}?page=1`}>1</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationEllipsis />
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationLink href={`${pathname}?page=${commentPage?.total_pages}`}>{commentPage?.total_pages}</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationNext href="#" />
-                    </PaginationItem>
-                </PaginationContent>
-            </Pagination> */}
         </div>
     )
 }

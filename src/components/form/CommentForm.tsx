@@ -22,7 +22,7 @@ const CommentForm = ({ onSubmit, blog_id, comment }: Props) => {
     })
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4 w-full'>
+            <form onSubmit={form.handleSubmit(async (value) => { await onSubmit(value); form.reset() })} className='space-y-4 w-full'>
                 <FormField control={form.control} name='content' render={({ field }) => (
                     <FormItem>
                         <FormLabel>Content</FormLabel>
