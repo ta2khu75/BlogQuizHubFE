@@ -13,14 +13,15 @@ type Props = {
     isAuthor: boolean,
     blog_id: string,
     setCommentPage: React.Dispatch<React.SetStateAction<PageResponse<CommentResponse> | undefined>>
+    onDelete: () => void
+
 }
-const CommentElement = ({ comment, isAuthor, blog_id, setCommentPage }: Props) => {
+const CommentItem = ({ comment, isAuthor, blog_id, setCommentPage, onDelete }: Props) => {
     const [open, setOpen] = useState(false)
     const [openConfirm, setOpenConfirm] = useState(false)
     const { toast } = useToast()
     const onSubmit = async (value: CommentRequest) => {
         try {
-            console.log("log submit");
             const res = await CommentService.update(comment.info.id, value)
             if (res.success) {
                 setCommentPage(prev => prev ? { ...prev, content: prev?.content.map(comment => comment.info.id === res.data.info.id ? res.data : comment) } : undefined)
@@ -30,16 +31,6 @@ const CommentElement = ({ comment, isAuthor, blog_id, setCommentPage }: Props) =
         } catch (error) {
             toast({ title: "Update comment failed", description: FunctionUtil.showError(error), variant: "destructive" })
         }
-    }
-    const onDelete = () => {
-        CommentService.delete(comment.info.id).then(res => {
-            if (res.success) {
-                setCommentPage(prev => prev ? { ...prev, content: prev.content?.filter(commentItem => comment.info.id !== commentItem.info.id) } : undefined)
-                toast({ title: "Delete success" })
-            } else {
-                toast({ title: "Delete comment failed", description: res.message_error, variant: "destructive" })
-            }
-        })
     }
     const isOpenForm = () => {
         if (open) return <CommentForm comment={comment} onSubmit={onSubmit} blog_id={blog_id} />
@@ -72,4 +63,4 @@ const CommentElement = ({ comment, isAuthor, blog_id, setCommentPage }: Props) =
     )
 }
 
-export default CommentElement
+export default CommentItem

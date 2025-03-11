@@ -1,5 +1,8 @@
 import CommentElement from '@/components/elements/content/comment/CommentItem'
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
+import Pageination from '@/components/elements/util/Pageination'
+import { useToast } from '@/hooks/use-toast'
+import { CommentService } from '@/services/CommentService'
+import { usePathname } from 'next/navigation'
 import React from 'react'
 type Props = {
     commentPage?: PageResponse<CommentResponse>
@@ -8,27 +11,43 @@ type Props = {
     setCommentPage: React.Dispatch<React.SetStateAction<PageResponse<CommentResponse> | undefined>>
 }
 const CommentPagination = ({ commentPage, blog_id, auth, setCommentPage }: Props) => {
+    const { toast } = useToast()
+    const onDelete = (commentId: string) => {
+        CommentService.delete(commentId).then(res => {
+            if (res.success) {
+                setCommentPage(prev => prev ? { ...prev, total_elements: prev.total_elements - 1, content: prev.content?.filter(commentItem => commentId !== commentItem.info.id) } : undefined)
+                toast({ title: "Delete success" })
+            } else {
+                toast({ title: "Delete comment failed", description: res.message_error, variant: "destructive" })
+            }
+        })
+    }
     return (
         <div className='w-full'>
             {
-                commentPage?.content?.map(comment => <CommentElement blog_id={blog_id} key={comment?.info.id} setCommentPage={setCommentPage} isAuthor={comment?.author?.info?.id === auth.account?.info.id} comment={comment} />)
+                commentPage?.content?.map(comment => <CommentElement onDelete={() => onDelete(comment.info.id)} blog_id={blog_id} key={comment?.info.id} setCommentPage={setCommentPage} isAuthor={comment?.author?.info?.id === auth.account?.info.id} comment={comment} />)
             }
-            <Pagination>
-                <PaginationContent>
+            {
+                commentPage && <Pageination<CommentResponse> page={commentPage} />
+            }
+            {/* <Pagination> <PaginationContent>
                     <PaginationItem>
-                        <PaginationPrevious href="#" />
+                        <PaginationPrevious href={`${pathname}`} />
                     </PaginationItem>
                     <PaginationItem>
-                        <PaginationLink href="#">1</PaginationLink>
+                        <PaginationLink href={`${pathname}?page=1`}>1</PaginationLink>
                     </PaginationItem>
                     <PaginationItem>
                         <PaginationEllipsis />
                     </PaginationItem>
                     <PaginationItem>
+                        <PaginationLink href={`${pathname}?page=${commentPage?.total_pages}`}>{commentPage?.total_pages}</PaginationLink>
+                    </PaginationItem>
+                    <PaginationItem>
                         <PaginationNext href="#" />
                     </PaginationItem>
                 </PaginationContent>
-            </Pagination>
+            </Pagination> */}
         </div>
     )
 }

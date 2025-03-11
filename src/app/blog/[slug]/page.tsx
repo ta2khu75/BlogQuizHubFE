@@ -1,16 +1,18 @@
 "use client"
-import CommentElement from '@/components/elements/content/comment/CommentItem';
 import CommentPagination from '@/components/elements/content/comment/CommentPagination';
 import { serializeToHtml } from '@/components/elements/util/TextEditor/TextEditorConvert';
 import CommentForm from '@/components/form/CommentForm';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import { useAppSelector } from '@/redux/hooks';
 import { BlogService } from '@/services/BlogService';
 import { CommentService } from '@/services/CommentService';
 import FunctionUtil from '@/util/FunctionUtil';
 import StringUtil from '@/util/StringUtil';
+import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import React, { use, useEffect, useMemo, useState } from 'react'
 import { Descendant } from 'slate';
@@ -18,6 +20,7 @@ import { Descendant } from 'slate';
 const BlogAboutPage = ({ params }: { params: Promise<{ slug: string }> }) => {
     const { toast } = useToast()
     const { slug } = use(params)
+    const [openComment, setOpenComment] = useState(false)
     const auth = useAppSelector(state => state.auth)
     const blog_id = useMemo(() => StringUtil.getIdFromSlugUrl(slug), [slug])
     const [commentPage, setCommentPage] = useState<PageResponse<CommentResponse>>();
@@ -52,7 +55,7 @@ const BlogAboutPage = ({ params }: { params: Promise<{ slug: string }> }) => {
             const res = await CommentService.create(value)
             if (res.success) {
                 toast({ title: "Create success" })
-                setCommentPage(prev => prev ? { ...prev, content: [res.data, ...prev.content ?? []] } : undefined)
+                setCommentPage(prev => prev ? { ...prev, total_elements: prev.total_elements + 1, content: [res.data, ...prev.content ?? []] } : undefined)
             }
         } catch (error) {
             toast({ title: "Create comment failed", description: FunctionUtil.showError(error), variant: "destructive" })
@@ -75,13 +78,25 @@ const BlogAboutPage = ({ params }: { params: Promise<{ slug: string }> }) => {
                     <CardContent className="my-4" dangerouslySetInnerHTML={{ __html: (JSON.parse(blog.content) as Descendant[]).map(n => serializeToHtml(n)).join("") }}></CardContent>
                 }
                 <CardFooter className='flex flex-col'>
-                    <CommentForm blog_id={blog_id} onSubmit={fetchCreateComment} />
+                    <div className='w-full mb-4'>
+                        <CardTitle>
+                            <span className='mr-4'>Comment ({commentPage?.total_elements})</span>
+                            {!openComment &&
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button onClick={() => setOpenComment(true)}><Plus /></Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>Add comment</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            }
+                        </CardTitle>
+                        {openComment && <CommentForm blog_id={blog_id} onSubmit={fetchCreateComment} />}
+                    </div>
                     <CommentPagination commentPage={commentPage} blog_id={blog_id} setCommentPage={setCommentPage} auth={auth} />
-                    {/* <div className='w-full'>
-                        {
-                            commentPage?.content?.map(comment => <CommentElement blog_id={blog_id} key={comment.info.id} setCommentPage={setCommentPage} isAuthor={comment.author.info.id === auth.account?.info.id} comment={comment} />)
-                        }
-                    </div> */}
                 </CardFooter>
             </Card>
         </div>
