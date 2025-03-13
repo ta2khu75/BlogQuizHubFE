@@ -1,3 +1,3 @@
-interface QuizDetailsResponse extends QuizResponse{
-    answers:AnswerResponse[]
+interface QuizDetailResponse extends QuizResponse {
+    answers: AnswerResponse[]
 }

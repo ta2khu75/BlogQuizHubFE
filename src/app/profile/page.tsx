@@ -41,7 +41,6 @@ const ProfilePage = () => {
             }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
         }
     }
-    console.log("auth", auth);
 
     return (
         <Tabs defaultValue={tab} onValueChange={(value) => onTabChange(value)}>

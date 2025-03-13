@@ -3,7 +3,7 @@ import instance from "@/util/apiInstance";
 
 const basePath = BasePath.EXAM_RESULT;
 export default class ExamResultService {
-  static readByExamId(examId: string): Promise<ApiResponse<ExamResultResponse>> {
+  static takeExam(examId: string): Promise<ApiResponse<ExamResultResponse>> {
     return instance.get(`${basePath}/exam/${examId}`);
   }
   static submitExam(

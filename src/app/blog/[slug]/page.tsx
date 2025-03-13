@@ -25,18 +25,18 @@ const BlogAboutPage = ({ params }: { params: Promise<{ slug: string }> }) => {
     const page = Number(searchParams.get('page')) || 1
     const [openComment, setOpenComment] = useState(false)
     const auth = useAppSelector(state => state.auth)
-    const blog_id = useMemo(() => StringUtil.getIdFromSlugUrl(slug), [slug])
+    const blogId = useMemo(() => StringUtil.getIdFromSlugUrl(slug), [slug])
     const [commentPage, setCommentPage] = useState<PageResponse<CommentResponse>>();
     const [blog, setBlog] = useState<BlogDetailsResponse>();
     useEffect(() => {
         fetchBlog()
         fetchPageComment()
-    }, [blog_id])
+    }, [blogId])
     useEffect(() => {
         fetchPageComment()
     }, [page])
     const fetchBlog = () => {
-        BlogService.readDetails(blog_id).then(res => {
+        BlogService.readDetails(blogId).then(res => {
             if (res.success) {
                 setBlog(res.data)
             } else {
@@ -47,7 +47,7 @@ const BlogAboutPage = ({ params }: { params: Promise<{ slug: string }> }) => {
         ))
     }
     const fetchPageComment = () => {
-        CommentService.readPageByBlog(blog_id, page).then(res => {
+        CommentService.readPageByBlog(blogId, page).then(res => {
             if (res.success) {
                 setCommentPage(res.data)
             } else {
@@ -100,9 +100,9 @@ const BlogAboutPage = ({ params }: { params: Promise<{ slug: string }> }) => {
                                 </TooltipProvider>
                             }
                         </CardTitle>
-                        {openComment && <CommentForm blog_id={blog_id} onSubmit={fetchCreateComment} />}
+                        {openComment && <CommentForm blog_id={blogId} onSubmit={fetchCreateComment} />}
                     </div>
-                    <CommentPagination commentPage={commentPage} blog_id={blog_id} setCommentPage={setCommentPage} auth={auth} />
+                    <CommentPagination commentPage={commentPage} blog_id={blogId} setCommentPage={setCommentPage} auth={auth} />
                 </CardFooter>
             </Card>
         </div>

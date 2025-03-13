@@ -42,14 +42,14 @@ const ExamSearch = ({ isAuthor }: Props) => {
                         <Link href={`/profile?id=${exam.author.info.id}`}><AvatarElement account={exam.author} /></Link>
                         {isAuthor && exam.exam_status === ExamStatus.NOT_COMPLETED && <>{exam.access_modifier} <Button variant={"link"}><Link href={`/exam/edit/${exam.info.id}`}>Edit</Link></Button></>}
                     </div>
-                    <CardTitle><Link href={`/exam/about/${StringUtil.convertSlugUrl(exam.title)}-${exam.info.id}.html`} className='hover:underline'>{exam.title}</Link> </CardTitle>
+                    <CardTitle><Link href={`/exam/about/${StringUtil.convertSlugUrl(exam.title)}-id-${exam.info.id}.html`} className='hover:underline'>{exam.title}</Link> </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Image src={exam.image_path} width={500} height={500} alt={exam.title} />
                 </CardContent>
                 <CardFooter className='grid grid-cols-2'>
                     <CardDescription>Category: {exam.exam_category.name}</CardDescription>
-                    <CardDescription>Duration: {exam.duration}</CardDescription>
+                    <CardDescription>Duration: {exam.duration} {exam.duration > 1 ? "minutes" : "minute"}</CardDescription>
                     <CardDescription>Level: {exam.exam_level}</CardDescription>
                     <CardDescription>Status: {exam.exam_status}</CardDescription>
                 </CardFooter>
