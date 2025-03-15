@@ -31,7 +31,6 @@ export const authSlide = createSlice({
       state.account = initialState.account;
       state.authenticated = initialState.authenticated;
       state.refresh_token = initialState.refresh_token;
-      localStorage.removeItem("auth");
     },
   },
 });

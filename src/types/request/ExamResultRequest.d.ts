@@ -1,4 +1,4 @@
 
 interface ExamResultRequest {
-    user_answers: UserAnswerRequest[]
+    exam_answer: ExamAnswerRequest[]
 }

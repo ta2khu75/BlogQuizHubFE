@@ -1,21 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export interface ExamState {
-   [key:string]:QuizDetailsResponse[];
+  [key: string]: QuizDetailResponse[];
 }
-const initialState:ExamState= {
+const initialState: ExamState = {
 }
 // luu danh sach quiz
-export const examSlice= createSlice({
+export const examSlice = createSlice({
   name: "exam",
   initialState,
   reducers: {
     setExam: (
       state = initialState,
-      action: PayloadAction<{examId:string, quizzes:QuizDetailsResponse[]}>
+      action: PayloadAction<{ examId: string, quizzes: QuizDetailResponse[] }>
     ) => {
-      state[action.payload.examId]=action.payload.quizzes;
+      state[action.payload.examId] = action.payload.quizzes;
     },
-    deleteExam:(state, action:PayloadAction<string>)=>{
+    deleteExam: (state, action: PayloadAction<string>) => {
       delete state[action.payload];
     },
     resetExam: () => {
@@ -23,5 +23,5 @@ export const examSlice= createSlice({
     },
   },
 });
-export const { setExam, resetExam, deleteExam} = examSlice.actions;
+export const { setExam, resetExam, deleteExam } = examSlice.actions;
 export default examSlice.reducer;

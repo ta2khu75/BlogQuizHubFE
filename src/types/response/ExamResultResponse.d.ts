@@ -3,6 +3,6 @@ interface ExamResultResponse {
     correct_count: number;
     exam: ExamDetailsResponse;
     account: AccountResponse;
-    end_time: Date;
+    end_time: string;
     info: InfoResponse;
 }

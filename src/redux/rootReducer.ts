@@ -1,24 +1,17 @@
+import { AuthReducer } from '@/redux/slice/authSlide';
+import { ExamAnswerReducer } from '@/redux/slice/examAnswerSlice';
 import { combineReducers } from '@reduxjs/toolkit';
-import blogHistoryReducer from './slice/blogHistorySlice';
-import examReducer from './slice/examSlice';
-import imageReducer from './slice/imageSlice';
-import quizExamReducer from './slice/quizExamSlice';
-import quizReducer from './slice/quizSlice';
-import routerRedirectReducer from './slice/routerRedirect';
-// Import other slices as needed
 
-// Combine all your slices into one root slice
-const rootReducer = combineReducers({
-  //   shoppingCart: shoppingCardReducer,
-  // count: counterReducer,
-  exams: examReducer,
-  quizExam: quizExamReducer,
-  quiz: quizReducer,
-  image: imageReducer,
-  blogHistory: blogHistoryReducer,
-  routerRedirect: routerRedirectReducer
-  // socialAccount: socialAccountReducer
-  // Add other slices here
+export const rootReducer = combineReducers({
+  auth: AuthReducer,
+  examAnswer: ExamAnswerReducer
 });
+// export const makeStore = () => {
+//   return store
+// }
 
-export default rootReducer;
+// // Infer the type of makeStore
+// export type AppStore = ReturnType<typeof makeStore>
+// // Infer the `RootState` and `AppDispatch` types from the store itself
+// export type RootState = ReturnType<typeof store.getState>
+// export type AppDispatch = typeof store.dispatch
