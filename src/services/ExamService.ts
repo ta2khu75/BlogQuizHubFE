@@ -1,19 +1,19 @@
 import { BasePath } from '@/env/BasePath';
-import { ExamSearchRequest } from '@/types/request/search/ExamSearchRequest';
+import { ExamSearch } from '@/types/request/search/ExamSearch';
 import instance from '@/util/apiInstance';
 import qs from 'qs';
 const basePath = BasePath.EXAM
 export default class ExamService {
-    static search(examSearchRequest: ExamSearchRequest): Promise<ApiResponse<PageResponse<ExamResponse>>> {
+    static search(examSearch: ExamSearch): Promise<ApiResponse<PageResponse<ExamResponse>>> {
         return instance.get(basePath, {
-            params: { ...examSearchRequest }, paramsSerializer: (params) => {
+            params: { ...examSearch }, paramsSerializer: (params) => {
                 return qs.stringify(params, { arrayFormat: 'repeat' });
             }
         })
     }
-    static mySearch(examSearch: ExamSearchRequest): Promise<ApiResponse<PageResponse<ExamResponse>>> {
-        return instance.get(`${basePath}/mine`, { params: { ...examSearch } })
-    }
+    // static mySearch(examSearch: ExamSearchRequest): Promise<ApiResponse<PageResponse<ExamResponse>>> {
+    //     return instance.get(`${basePath}/mine`, { params: { ...examSearch } })
+    // }
     static mySearchBlogNull(keyword: string, page = 1, size = 10): Promise<ApiResponse<PageResponse<ExamResponse>>> {
         return instance.get(`${basePath}/my-exam/blog-null`, { params: { keyword, page, size } })
     }

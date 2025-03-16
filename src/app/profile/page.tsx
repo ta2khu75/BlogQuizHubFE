@@ -1,5 +1,6 @@
 "use client"
 import BlogSearch from '@/components/search/BlogSearch'
+import ExamResultSearch from '@/components/search/ExamResultSearch'
 import ExamSearch from '@/components/search/ExamSearch'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -41,6 +42,11 @@ const ProfilePage = () => {
             }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
         }
     }
+    // const renderTabContent = useMemo(()=>{
+    //    if(isAuthor){
+
+    //    } 
+    // },[isAuthor])
 
     return (
         <Tabs defaultValue={tab} onValueChange={(value) => onTabChange(value)}>
@@ -69,7 +75,7 @@ const ProfilePage = () => {
                     </CardDescription>
                 </CardContent>
                 <CardFooter className="flex justify-around">
-                    <TabsList className={`grid w-full grid-cols-3 h-16 lg:w-[150vh] md:w-[70vh]`}>
+                    <TabsList className={`grid w-full grid-cols-${isAuthor ? 4 : 3} h-16 lg:w-[150vh] md:w-[70vh]`}>
                         <TabsTrigger className='flex flex-col items-center' value="blog">
                             <CardTitle>
                                 {account?.blog_count}
@@ -88,11 +94,11 @@ const ProfilePage = () => {
                             </CardTitle>
                             Follower
                         </TabsTrigger>
-                        {/* {isAuthor() &&
-                            <TabsTrigger className='flex flex-col items-center' value="Exam result">
+                        {isAuthor &&
+                            <TabsTrigger className='flex flex-col items-center p-4' value="examResult">
                                 Exam result
                             </TabsTrigger>
-                        } */}
+                        }
                     </TabsList>
                 </CardFooter>
             </Card>
@@ -114,6 +120,9 @@ const ProfilePage = () => {
             </TabsContent>
             <TabsContent value='follower'>
                 follow
+            </TabsContent>
+            <TabsContent value='examResult'>
+                <ExamResultSearch />
             </TabsContent>
         </Tabs >
     )

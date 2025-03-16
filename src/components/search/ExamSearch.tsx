@@ -2,7 +2,6 @@ import AvatarElement from '@/components/elements/header/AvatarElement';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-// import { useAppSelector } from '@/redux/hooks';
 import ExamService from '@/services/ExamService';
 import { ExamStatus } from '@/types/ExamStatus';
 import FunctionUtil from '@/util/FunctionUtil';
@@ -17,21 +16,22 @@ type Props = {
 }
 const ExamSearch = ({ isAuthor }: Props) => {
     const { toast } = useToast()
-    // const auth = useAppSelector(state => state.auth);
     const searchParams = useSearchParams()
     const authorId = searchParams.get("id")
     const [examPage, setExamPage] = useState<PageResponse<ExamResponse>>()
     useEffect(() => {
-        fetchSearchBlog()
+        fetchSearchExam()
     }, [authorId])
-    const fetchSearchBlog = () => {
-        ExamService.search({ page: 1, size, authorId: authorId ?? undefined }).then(res => {
-            if (res.success) {
-                setExamPage(res.data);
-            } else {
-                toast({ variant: "destructive", description: res.message_error })
-            }
-        }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
+    const fetchSearchExam = () => {
+        if (authorId) {
+            ExamService.search({ page: 1, size, authorId: authorId }).then(res => {
+                if (res.success) {
+                    setExamPage(res.data);
+                } else {
+                    toast({ variant: "destructive", description: res.message_error })
+                }
+            }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
+        }
     }
     return (
         <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4`}>

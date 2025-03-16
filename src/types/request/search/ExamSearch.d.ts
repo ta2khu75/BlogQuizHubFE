@@ -1,8 +1,9 @@
 import { ExamLevel } from "../../ExamLevel";
 
-interface ExamSearchRequest extends SearchRequestBase {
+interface ExamSearch extends Search {
     examLevels?: ExamLevel[],
     examCategoryIds?: number[],
     minDuration?: number,
-    maxDuration?: number
+    maxDuration?: number,
+    // authorId: string
 }

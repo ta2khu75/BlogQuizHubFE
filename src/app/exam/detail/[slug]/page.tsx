@@ -7,7 +7,8 @@ import Modal from '@/components/elements/util/Modal'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useToast } from '@/hooks/use-toast'
-import { useAppSelector } from '@/redux/hooks'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import { ExamAnswerActions } from '@/redux/slice/examAnswerSlice'
 import ExamResultService from '@/services/ExamResultService'
 import FunctionUtil from '@/util/FunctionUtil'
 import StringUtil from '@/util/StringUtil'
@@ -16,6 +17,7 @@ import React, { use, useEffect, useMemo, useRef, useState } from 'react'
 const ExamDetailPage = ({ params }: { params: Promise<{ slug: string }> }) => {
     const { slug } = use(params)
     const { toast } = useToast()
+    const dispatch = useAppDispatch()
     const [current, setCurrent] = useState(0)
     const examId = useMemo(() => StringUtil.getIdFromSlugUrl(slug), [slug])
     const examAnswer = useAppSelector((state) => state.examAnswer?.[examId ?? ""]) ?? [];
@@ -32,14 +34,13 @@ const ExamDetailPage = ({ params }: { params: Promise<{ slug: string }> }) => {
             quiz_id: Number(quiz_id),
             answer_ids: Array.isArray(answer_ids) ? (answer_ids as number[]) : [],
         }));
-        console.log(answerUser);
-
         try {
             countdownRef.current?.stopCountdown();
             const res = await ExamResultService.submitExam(examResult?.info.id, { exam_answer: answerUser })
             if (res.success) {
                 setExamResult(res.data)
                 setOpenResult(true)
+                dispatch(ExamAnswerActions.delete(examId))
             }
             else {
                 toast({ variant: "destructive", description: res.message_error })
@@ -52,6 +53,9 @@ const ExamDetailPage = ({ params }: { params: Promise<{ slug: string }> }) => {
         ExamResultService.takeExam(examId).then(res => {
             if (res.success) {
                 setExamResult(res.data)
+                if (res.status_code === 201) {
+                    dispatch(ExamAnswerActions.delete(examId))
+                }
             } else {
                 toast({ variant: "destructive", description: res.message_error })
             }
