@@ -7,7 +7,7 @@ type Props = {
     count: number;
     onNextSlide?: () => void
     onPrevSlide?: () => void
-    className?: string
+    className?: string,
 }
 const Carousel = ({ children, current, onNextSlide, onPrevSlide, className, count }: Props) => {
     return (

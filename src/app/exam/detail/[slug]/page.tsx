@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useToast } from '@/hooks/use-toast'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
-import { ExamAnswerActions } from '@/redux/slice/examAnswerSlice'
+import { UserAnswerActions } from '@/redux/slice/userAnswerSlice'
 import ExamResultService from '@/services/ExamResultService'
 import FunctionUtil from '@/util/FunctionUtil'
 import StringUtil from '@/util/StringUtil'
@@ -20,7 +20,7 @@ const ExamDetailPage = ({ params }: { params: Promise<{ slug: string }> }) => {
     const dispatch = useAppDispatch()
     const [current, setCurrent] = useState(0)
     const examId = useMemo(() => StringUtil.getIdFromSlugUrl(slug), [slug])
-    const examAnswer = useAppSelector((state) => state.examAnswer?.[examId ?? ""]) ?? [];
+    const examAnswer = useAppSelector((state) => state.userAnswer?.[examId ?? ""]) ?? [];
     const countdownRef = useRef<CountdownTimerRef>(null);
     const [examResult, setExamResult] = useState<ExamResultResponse>();
     const [openResult, setOpenResult] = useState(false)
@@ -40,7 +40,7 @@ const ExamDetailPage = ({ params }: { params: Promise<{ slug: string }> }) => {
             if (res.success) {
                 setExamResult(res.data)
                 setOpenResult(true)
-                dispatch(ExamAnswerActions.delete(examId))
+                dispatch(UserAnswerActions.delete(examId))
             }
             else {
                 toast({ variant: "destructive", description: res.message_error })
@@ -54,7 +54,7 @@ const ExamDetailPage = ({ params }: { params: Promise<{ slug: string }> }) => {
             if (res.success) {
                 setExamResult(res.data)
                 if (res.status_code === 201) {
-                    dispatch(ExamAnswerActions.delete(examId))
+                    dispatch(UserAnswerActions.delete(examId))
                 }
             } else {
                 toast({ variant: "destructive", description: res.message_error })

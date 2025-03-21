@@ -37,7 +37,7 @@ const examSchema = z.object({
 type examSchema = z.infer<typeof examSchema>;
 type Props = {
     examCategories: ExamCategoryResponse[],
-    exam?: ExamDetailsResponse
+    exam?: ExamResponse
 }
 const ExamForm = ({ examCategories, exam }: Props) => {
     const { toast } = useToast()

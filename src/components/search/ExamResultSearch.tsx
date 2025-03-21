@@ -35,7 +35,7 @@ const ExamResultSearch = () => {
                     <div className='flex justify-between items-center'>
                         <Link href={`/profile?id=${examResult.exam.author.info.id}`}><AvatarElement account={examResult.exam.author} /></Link>
                     </div>
-                    <CardTitle><Link href={`/exam-result/detail/${StringUtil.convertSlugUrl(examResult.exam.title)}-id-${examResult.info.id}.html`} className='hover:underline'>{examResult.exam.title}</Link> </CardTitle>
+                    <CardTitle><Link href={`/exam-result/${StringUtil.convertSlugUrl(examResult.exam.title)}-id-${examResult.info.id}.html`} className='hover:underline'>{examResult.exam.title}</Link> </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Image src={examResult.exam.image_path} width={500} height={500} alt={examResult.exam.title} />

@@ -10,7 +10,7 @@ const ExamEditPage = ({ params }: { params: Promise<{ examId: string }> }) => {
     const { toast } = useToast()
     const { examId } = use(params)
     const [examCategories, setExamCategories] = useState<ExamCategoryResponse[]>([]);
-    const [exam, setExam] = useState<ExamDetailsResponse>();
+    const [exam, setExam] = useState<ExamResponse>();
     useEffect(() => {
         fetchExamCategoryList()
         fetchExam()

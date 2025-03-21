@@ -15,8 +15,8 @@ export interface ExamListState {
 }
 // luu cac dap an cua bai thi
 const initialState: ExamListState = {};
-export const examAnswer = createSlice({
-  name: "examAnswer",
+export const userAnswer = createSlice({
+  name: "userAnswer",
   initialState,
   reducers: {
     // set: (
@@ -45,7 +45,6 @@ export const examAnswer = createSlice({
       } else {
         state[examId][quizId] = [answerId]
       }
-      // localStorage.setItem("examAnswer", JSON.stringify(state));
     },
     remove: (state, action: PayloadAction<ExamAnswer>) => {
       const { examId, quizId, answerId, quizType } = action.payload;
@@ -69,5 +68,5 @@ export const examAnswer = createSlice({
     },
   },
 });
-export const ExamAnswerActions = examAnswer.actions;
-export const ExamAnswerReducer = examAnswer.reducer;
+export const UserAnswerActions = userAnswer.actions;
+export const UserAnswerReducer = userAnswer.reducer;

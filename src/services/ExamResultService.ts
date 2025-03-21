@@ -12,9 +12,9 @@ export default class ExamResultService {
   ): Promise<ApiResponse<ExamResultResponse>> {
     return instance.put(`${basePath}/${id}`, data);
   }
-  static readDetailsById(
-    id: number
-  ): Promise<ApiResponse<ExamResultDetailsResponse>> {
+  static readDetailById(
+    id: string
+  ): Promise<ApiResponse<ExamResultResponse>> {
     return instance.get(`${basePath}/${id}`);
   }
   // static search(): Promise<ApiResponse<PageResponse<ExamResultResponse>>> {

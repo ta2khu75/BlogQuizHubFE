@@ -1,10 +1,10 @@
 import { AuthReducer } from '@/redux/slice/authSlide';
-import { ExamAnswerReducer } from '@/redux/slice/examAnswerSlice';
+import { UserAnswerReducer } from '@/redux/slice/userAnswerSlice';
 import { combineReducers } from '@reduxjs/toolkit';
 
 export const rootReducer = combineReducers({
   auth: AuthReducer,
-  examAnswer: ExamAnswerReducer
+  userAnswer: UserAnswerReducer
 });
 // export const makeStore = () => {
 //   return store

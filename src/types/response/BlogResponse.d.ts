@@ -3,6 +3,7 @@ interface BlogResponse extends BlogBase {
     comment_count: number;
     image_path: string;
     author: AccountResponse;
-    info:InfoResponse;
-    exams: ExamResponse[];
+    info: InfoResponse;
+    content?: string;
+    exam?: ExamResponse[];
 }
