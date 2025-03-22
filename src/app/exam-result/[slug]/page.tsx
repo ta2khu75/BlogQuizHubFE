@@ -39,7 +39,7 @@ const ExamResultPage = ({ params }: { params: Promise<{ slug: string }> }) => {
                 <CardTitle>{examResult?.exam.title}</CardTitle>
                 <p>Correct: {examResult?.correct_count}/{examResult?.exam?.quizzes?.length ?? 0}</p>
                 <p>Point: {examResult?.point}</p>
-                <Button onClick={() => setShowAnswer(true)}>Show answer</Button>
+                <Button onClick={() => setShowAnswer(!showAnswer)}>{showAnswer ? "Hide answer" : "Show answer"}</Button>
             </CardHeader>
             <Card>
                 <CardContent >

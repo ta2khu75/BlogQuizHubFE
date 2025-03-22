@@ -19,11 +19,12 @@ const formSchema: ZodType<BlogRequest> = z.object({
 type FormData = z.infer<typeof formSchema>;
 type Props = {
     onSubmit: (data: BlogRequest) => void,
-    blog?: BlogDetailsResponse
+    isEdit?: boolean,
+    blog?: BlogResponse
 }
 
-const BlogForm = ({ onSubmit, blog }: Props) => {
-    const form = useForm({
+const BlogForm = ({ onSubmit, blog, isEdit = false }: Props) => {
+    const form = useForm<BlogRequest>({
         resolver: zodResolver(formSchema),
         defaultValues: { title: "", content: "", blog_tags: [""], access_modifier: AccessModifier.PRIVATE },
         shouldUnregister: false
@@ -32,19 +33,24 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
         control: form.control,
         name: "blog_tags",
     });
-
     useEffect(() => {
         if (!blog) return
-        console.log(blog);
-
-        form.reset({ ...blog })
+        form.reset({ ...blog, access_modifier: blog.access_modifier ?? AccessModifier.PRIVATE })
     }, [blog, form])
     useEffect(() => {
         if (tagFields.length === 0) {
-            appendTag(""); // Nếu mản
-            // g trống, thêm phần tử mới
+            appendTag(""); // Nếu mảng trống, thêm phần tử mới
         }
     }, [tagFields.length]);
+    const onReset = () => {
+        console.log("reset");
+
+        if (isEdit) {
+            form.reset({ ...blog })
+        } else {
+            form.reset({ title: "", content: "", blog_tags: [""], access_modifier: AccessModifier.PRIVATE })
+        }
+    }
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
@@ -92,7 +98,6 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                     </div>
                     <FormMessage />
                 </FormItem>
-                {/* )} /> */}
                 <FormField
                     control={form.control}
                     name="access_modifier"
@@ -102,7 +107,7 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                             <FormControl>
                                 <RadioGroup
                                     onValueChange={field.onChange}
-                                    defaultValue={field.value}
+                                    value={field.value}
                                     className="flex space-y-1"
                                 >
                                     {Object.entries(AccessModifier).map((item) => (
@@ -125,12 +130,14 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                     <FormItem>
                         <FormLabel>Content</FormLabel>
                         <FormControl>
-                            <TextEditor name={field.name} initialValue={field.value} className='min-h-[200px]' placeholder="Content" onChange={field.onChange} />
+                            <TextEditor isEdit={isEdit} name={field.name} initialValue={field.value} className='min-h-[200px]' placeholder="Content" onChange={field.onChange} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
                 )} />
-                <div className="flex justify-end">
+                <div className="flex justify-between">
+                    <Button type='button' onClick={onReset}>Reset</Button>
+
                     {form.formState.isSubmitting ?
                         <Button disabled>
                             <Loader2 className="animate-spin" />

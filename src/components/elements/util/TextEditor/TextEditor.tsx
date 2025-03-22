@@ -1,6 +1,5 @@
-"use client"
-import React, { memo, useEffect, useMemo, useState } from "react";
-import { createEditor } from "slate";
+import React, { memo, useMemo, useState } from "react";
+import { createEditor, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import {
     Editable,
@@ -17,8 +16,9 @@ import { RenderLeaf } from "@/components/elements/util/TextEditor/TextEditorLeaf
 interface TextEditorProps {
     name: string;
     placeholder: string;
-    initialValue?: string;
-    className?: string
+    initialValue: string;
+    className?: string;
+    isEdit?: boolean;
     onChange: (value: string) => void;
 }
 
@@ -30,18 +30,19 @@ declare module "slate" {
     }
 }
 
-const TextEditor = ({ name, placeholder, onChange, initialValue, className }: TextEditorProps) => {
+const TextEditor = ({ name, placeholder, isEdit = false, onChange, initialValue, className }: TextEditorProps) => {
     const [editor] = useState(withImage(withInline(withHistory(withReact(createEditor())))));
+    const defaultValue = [{ type: 'paragraph', children: [{ text: '' }] }]
     const initValue = useMemo(() => {
         const content = localStorage.getItem('content') ?? initialValue;
-        return content ? JSON.parse(content) : [{ type: 'paragraph', children: [{ text: '' }] }];
+        const initValue = content ? JSON.parse(content) : [];
+        if (initValue.length === 0 && !isEdit) return defaultValue
+        return initValue;
     }, [initialValue]);
-
-    useEffect(() => {
-        if (initialValue) {
-            onChange(initialValue); // Gọi trong useEffect để tránh cập nhật state khi render
-        }
-    }, [initialValue, onChange]);
+    const resetEditor = () => {
+        Transforms.delete(editor, { at: [0] }); // Remove existing content
+        Transforms.insertNodes(editor, defaultValue, { at: [0] }); // Insert default value
+    };
 
     const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
         const key = event?.key?.toLowerCase();
@@ -61,10 +62,9 @@ const TextEditor = ({ name, placeholder, onChange, initialValue, className }: Te
             editor.redo();
         }
     };
-
+    if (initValue.length === 0) return null
     return (
         <Slate
-            // key={JSON.stringify(initValue)}
             editor={editor}
             onValueChange={(value) => {
                 const valueString = JSON.stringify(value)
@@ -72,7 +72,7 @@ const TextEditor = ({ name, placeholder, onChange, initialValue, className }: Te
                 console.log("onChange", valueString);
                 onChange(valueString);
             }}
-            initialValue={initValue}
+            initialValue={initValue.length === 0 ? [{ type: 'paragraph', children: [{ text: '' }] }] : initValue}
         >
             <div>
                 <TextEditorTool />

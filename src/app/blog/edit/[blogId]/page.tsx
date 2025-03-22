@@ -11,7 +11,7 @@ const BlogEditPage = ({ params }: { params: Promise<{ blogId: string }> }) => {
     const router = useRouter()
     const { toast } = useToast()
     const { blogId } = use(params)
-    const [blog, setBlog] = useState<BlogDetailsResponse>();
+    const [blog, setBlog] = useState<BlogResponse>();
     useEffect(() => {
         fetchBlog()
     }, [blogId])
@@ -48,7 +48,7 @@ const BlogEditPage = ({ params }: { params: Promise<{ blogId: string }> }) => {
                 <CardTitle>Update blog</CardTitle>
             </CardHeader>
             <CardContent>
-                <BlogForm blog={blog} onSubmit={onSubmit} />
+                <BlogForm blog={blog} isEdit={true} onSubmit={onSubmit} />
             </CardContent>
         </Card>
     )

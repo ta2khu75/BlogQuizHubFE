@@ -7,9 +7,9 @@ export class FollowService {
         return instance.get(`${basePath}/account/${followingId}`);
     }
     static unFollow(followingId: string): Promise<ApiResponse<FollowResponse>> {
-        return instance.delete(`${basePath}/account/${followingId}/delete`);
+        return instance.delete(`${basePath}/account/${followingId}`);
     }
-    static checkFollowing(followingId: string): Promise<ApiResponse<FollowResponse>> {
+    static checkFollowing(followingId: string): Promise<ApiResponse<BooleanResponse>> {
         return instance.get(`${basePath}/account/${followingId}/check`);
     }
     static readPageFollower(followingId: string, page = 1, size = 10): Promise<ApiResponse<PageResponse<FollowResponse>>> {

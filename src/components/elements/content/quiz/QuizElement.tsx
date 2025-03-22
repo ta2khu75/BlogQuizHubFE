@@ -5,6 +5,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { UserAnswerActions } from '@/redux/slice/userAnswerSlice'
 import { QuizType } from '@/types/QuizType'
+import { Check, X } from 'lucide-react'
 type Props = {
     examId: string
     quiz: QuizResponse
@@ -35,6 +36,7 @@ const QuizElement = ({ quiz, index, examId, showResult = false, showAnswer = fal
                     <div key={answer.id} className="flex items-center space-x-2">
                         <Checkbox disabled={showResult} checked={showResult ? userAnswerResult.includes(answer.id) : answerIds.includes(answer.id)} onCheckedChange={checked => onCheckboxChange(checked, answer.id)} key={`a-${answer.id}`} value={answer.id} />
                         <Label htmlFor={`a-${answer.id}`}>{answer.id}</Label>
+                        {showAnswer && answer.correct && <span className='text-green-500'>  <Check /></span>}
                     </div>
                 ))
                 return (
@@ -48,6 +50,7 @@ const QuizElement = ({ quiz, index, examId, showResult = false, showAnswer = fal
                     <div key={answer.id} className="flex items-center space-x-2">
                         <RadioGroupItem id={`a-${answer.id}`} value={`${answer.id}`} title={answer.answer} />
                         <Label htmlFor={`a-${answer.id}`}>{answer.answer}</Label>
+                        {showAnswer && answer.correct && <span className='text-green-500'>  <Check /></span>}
                     </div>
                 ))
                 return <RadioGroup disabled={showResult} defaultValue={showResult ? `${userAnswerResult?.[0]}` : `${answerIds?.[0]}`} onValueChange={(value) => onRadioChange(Number(value))}>
@@ -58,7 +61,7 @@ const QuizElement = ({ quiz, index, examId, showResult = false, showAnswer = fal
                 return <p>Loại câu hỏi không được hỗ trợ</p>;
         }
     }
-    const renderResult = () => {
+    const isCorrect = () => {
         if (quizType === QuizType.MULTIPLE_CHOICE) {
             return quiz.answers?.every(answer => !answer.correct || userAnswerResult.includes(answer.id));
         } else {
@@ -71,8 +74,8 @@ const QuizElement = ({ quiz, index, examId, showResult = false, showAnswer = fal
                 <CardTitle className='flex justify-between'>
                     <span>{index + 1}. {quiz.question}</span>
                     {showResult &&
-                        <span>
-                            {renderResult() ? <span className='text-green-500'>Đúng</span> : <span className='text-red-500'>Sai</span>}
+                        <span className='text-xl'>
+                            {isCorrect() ? <span className='text-green-500'>  <Check /></span> : <span className='text-red-500'><X /></span>}
                         </span>
                     }
                 </CardTitle>

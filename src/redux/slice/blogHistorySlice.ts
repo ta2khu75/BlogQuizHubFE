@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export interface BlogHistoryState {
-    [key: string]: BlogDetailsResponse;
+    [key: string]: BlogResponse;
 }
 const initialState: BlogHistoryState = {
 }
@@ -11,7 +11,7 @@ export const blogHistorySlice = createSlice({
     reducers: {
         setBlogHistory: (
             state = initialState,
-            action: PayloadAction<{ blogId: string, blog: BlogDetailsResponse }>
+            action: PayloadAction<{ blogId: string, blog: BlogResponse }>
         ) => {
             state[action.payload.blogId] = action.payload.blog;
         },

@@ -14,8 +14,8 @@ import { useEffect, useState } from "react"
 
 const RoleAdminPage = () => {
     const { toast } = useToast()
-    const [roles, setRoles] = useState<RoleDetailResponse[]>([])
-    const [role, setRole] = useState<RoleDetailResponse>()
+    const [roles, setRoles] = useState<RoleResponse[]>([])
+    const [role, setRole] = useState<RoleResponse>()
     const [open, setOpen] = useState(false)
     const [openConfirm, setOpenConfirm] = useState(false)
     const [permissionGroups, setPermissionGroups] = useState<PermissionGroupResponse[]>([])
@@ -41,11 +41,11 @@ const RoleAdminPage = () => {
             }
         }).catch(err => toast({ description: FunctionUtil.showError(err), variant: "destructive" }))
     }
-    const handleEditClick = (role: RoleDetailResponse) => {
+    const handleEditClick = (role: RoleResponse) => {
         setRole(role)
         setOpen(true)
     }
-    const handleDeleteClick = (role: RoleDetailResponse) => {
+    const handleDeleteClick = (role: RoleResponse) => {
         setRole(role)
         setOpenConfirm(true)
     }
@@ -118,7 +118,7 @@ const RoleAdminPage = () => {
                 <RoleForm onSubmit={onSubmit} permissionGroups={permissionGroups} role={role} />
             </Modal>
             <Confirm open={openConfirm} title={`Are you want delete role ${role?.name} ?`} onCancel={onCancel} onContinue={onDelete} />
-            <TableElement<RoleDetailResponse> showIndex handleDeleteClick={handleDeleteClick} handleEditClick={handleEditClick} visibleColumns={["name"]} array={roles} />
+            <TableElement<RoleResponse> showIndex handleDeleteClick={handleDeleteClick} handleEditClick={handleEditClick} visibleColumns={["name"]} array={roles} />
         </>
     )
 }

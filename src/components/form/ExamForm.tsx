@@ -58,8 +58,8 @@ const ExamForm = ({ examCategories, exam }: Props) => {
     const count = Math.max(quizFields.length - 1, 0)
     const [open, setOpen] = useState(false)
     const [openConfirm, setOpenConfirm] = useState(false)
+    const [current, setCurrent] = useState(0)
 
-    const [current, setCurrent] = React.useState(0)
     useEffect(() => {
         if (!exam) return
         form.reset({ ...exam, exam_category_id: exam?.exam_category?.id })
@@ -178,7 +178,7 @@ const ExamForm = ({ examCategories, exam }: Props) => {
                                     <FormControl>
                                         <RadioGroup
                                             onValueChange={field.onChange}
-                                            defaultValue={field.value}
+                                            value={field.value}
                                             className="flex space-y-1"
                                         >
                                             {Object.entries(ExamLevel).map((item) => (
@@ -206,7 +206,7 @@ const ExamForm = ({ examCategories, exam }: Props) => {
                                     <FormControl>
                                         <RadioGroup
                                             onValueChange={field.onChange}
-                                            defaultValue={field.value}
+                                            value={field.value}
                                             className="flex space-y-1"
                                         >
                                             {Object.entries(ExamStatus).map((item) => (
@@ -234,7 +234,7 @@ const ExamForm = ({ examCategories, exam }: Props) => {
                                     <FormControl>
                                         <RadioGroup
                                             onValueChange={field.onChange}
-                                            defaultValue={field.value}
+                                            value={field.value}
                                             className="flex space-y-1"
                                         >
                                             {Object.entries(AccessModifier).map((item) => (

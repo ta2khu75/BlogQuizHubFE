@@ -19,7 +19,7 @@ export default class AuthService {
     return instance.post(`${basePath}/register`, account);
   }
   static changePassword(account: AccountPasswordRequest): Promise<ApiResponse<AccountResponse>> {
-    return instance.post(`${basePath}/change-password`, account);
+    return instance.put(`${basePath}/change-password`, account);
   }
   static checkAdmin(): Promise<ApiResponse<BooleanResponse>> {
     return instance.get(`${basePath}/check-admin`);

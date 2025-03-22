@@ -13,7 +13,7 @@ const formSchema = z.object({
     permission_ids: z.set(z.number()),
 })
 type Props = {
-    role?: RoleDetailResponse,
+    role?: RoleResponse,
     permissionGroups: PermissionGroupResponse[],
     onSubmit: (value: RoleRequest) => void
 }
