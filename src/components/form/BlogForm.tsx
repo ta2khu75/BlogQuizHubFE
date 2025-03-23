@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import TextEditor from '@/components/elements/util/TextEditor/TextEditor'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -24,9 +25,17 @@ type Props = {
 }
 
 const BlogForm = ({ onSubmit, blog, isEdit = false }: Props) => {
+    const getBlogForm = () => {
+        const blogForm = localStorage.getItem("blogForm")
+        if (blogForm) {
+            return JSON.parse(blogForm)
+        } return undefined;
+    }
+    const blogForm = getBlogForm()
+    const blogDefault = { title: "", content: "", blog_tags: [""], access_modifier: AccessModifier.PRIVATE }
     const form = useForm<BlogRequest>({
         resolver: zodResolver(formSchema),
-        defaultValues: { title: "", content: "", blog_tags: [""], access_modifier: AccessModifier.PRIVATE },
+        defaultValues: blogForm ?? blogDefault,
         shouldUnregister: false
     })
     const { fields: tagFields, append: appendTag, remove: removeTag } = useFieldArray<FormData>({
@@ -34,21 +43,30 @@ const BlogForm = ({ onSubmit, blog, isEdit = false }: Props) => {
         name: "blog_tags",
     });
     useEffect(() => {
-        if (!blog) return
-        form.reset({ ...blog, access_modifier: blog.access_modifier ?? AccessModifier.PRIVATE })
-    }, [blog, form])
+        if (_.isEqual(blogForm, blogDefault) && blog) form.reset({ ...blog })
+        // else {
+        //     form.reset(blogDefalut)
+        // }
+    }, [blog])
     useEffect(() => {
         if (tagFields.length === 0) {
             appendTag(""); // Nếu mảng trống, thêm phần tử mới
         }
-    }, [tagFields.length]);
+    }, [tagFields.length, appendTag]);
+    useEffect(() => {
+        const subscription = form.watch((values) => {
+            localStorage.setItem("blogForm", JSON.stringify(values));
+        });
+        return () => subscription.unsubscribe();
+    }, []);
+
     const onReset = () => {
         console.log("reset");
-
         if (isEdit) {
             form.reset({ ...blog })
         } else {
             form.reset({ title: "", content: "", blog_tags: [""], access_modifier: AccessModifier.PRIVATE })
+
         }
     }
     return (
@@ -130,7 +148,7 @@ const BlogForm = ({ onSubmit, blog, isEdit = false }: Props) => {
                     <FormItem>
                         <FormLabel>Content</FormLabel>
                         <FormControl>
-                            <TextEditor isEdit={isEdit} name={field.name} initialValue={field.value} className='min-h-[200px]' placeholder="Content" onChange={field.onChange} />
+                            <TextEditor onReset={() => console.log('reset')} isEdit={isEdit} name={field.name} initialValue={field.value} className='min-h-[200px]' placeholder="Content" onChange={field.onChange} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

@@ -1,5 +1,5 @@
 interface QuizResponse extends QuizBase {
     id: number;
     file_path?: string;
-    answers?: AnswerResponse[]
+    answers: AnswerResponse[]
 }

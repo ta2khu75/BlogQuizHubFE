@@ -1,4 +1,5 @@
 import Modal from '@/components/elements/util/Modal';
+import _ from "lodash";
 import QuizForm, { quizSchema } from '@/components/form/QuizForm';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,7 +24,7 @@ import ExamService from '@/services/ExamService';
 import { useToast } from '@/hooks/use-toast';
 import FunctionUtil from '@/util/FunctionUtil';
 import Confirm from '@/components/elements/util/Confirm';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 const examSchema = z.object({
     title: z.string().nonempty(),
     exam_level: z.nativeEnum(ExamLevel),
@@ -40,13 +41,26 @@ type Props = {
     exam?: ExamResponse
 }
 const ExamForm = ({ examCategories, exam }: Props) => {
+    const getExamForm = () => {
+        const examForm = localStorage.getItem("examForm")
+        if (examForm) {
+            return JSON.parse(examForm)
+        } return undefined;
+    }
+    const examForm: ExamRequest = getExamForm()
     const { toast } = useToast()
+    // const pathname = usePathname();
     const router = useRouter()
-    const initQuiz: QuizRequest = { question: "", quiz_type: QuizType.SINGLE_CHOICE, answers: Array(4).fill({ answer: "", correct: false }) };
     const [image, setImage] = useState<{ value: File, error: boolean }>()
+    const [open, setOpen] = useState(false)
+    const [openConfirm, setOpenConfirm] = useState(false)
+    const [current, setCurrent] = useState(0)
+    const initQuiz: QuizRequest = { question: "", quiz_type: QuizType.SINGLE_CHOICE, answers: Array(4).fill({ answer: "", correct: false }) };
+    // JSON.parse(localStorage.getItem("examForm") ?? `{"title":"","exam_level":"EASY","exam_status":"NOT_COMPLETED","duration":0,"exam_category_id":0,"access_modifier":"PRIVATE","description":"","quizzes":[{"question":"","quiz_type":"SINGLE_CHOICE","answers":[{"answer":"","correct":false},{"answer":"","correct":false},{"answer":"","correct":false},{"answer":"","correct":false}]}]}`)
+    const examDefault = { title: "", exam_level: ExamLevel.EASY, exam_status: ExamStatus.NOT_COMPLETED, duration: 0, exam_category_id: 0, access_modifier: AccessModifier.PRIVATE, description: "", quizzes: [initQuiz] }
     const form = useForm<ExamRequest>({
         resolver: zodResolver(examSchema),
-        defaultValues: { title: "", exam_level: ExamLevel.EASY, exam_status: ExamStatus.NOT_COMPLETED, duration: 0, exam_category_id: 0, access_modifier: AccessModifier.PRIVATE, description: "", quizzes: [initQuiz] }
+        defaultValues: examForm ?? examDefault
     })
     const { fields: quizFields, append: appendQuiz, remove: removeQuiz } = useFieldArray({
         control: form.control,
@@ -56,22 +70,51 @@ const ExamForm = ({ examCategories, exam }: Props) => {
         return form.formState.errors?.quizzes ?? [];
     }, [form.formState.errors?.quizzes]);
     const count = Math.max(quizFields.length - 1, 0)
-    const [open, setOpen] = useState(false)
-    const [openConfirm, setOpenConfirm] = useState(false)
-    const [current, setCurrent] = useState(0)
-
     useEffect(() => {
-        if (!exam) return
-        form.reset({ ...exam, exam_category_id: exam?.exam_category?.id })
-    }, [exam, form])
+        const subscription = form.watch((values) => {
+            localStorage.setItem("examForm", JSON.stringify(values));
+        });
+        return () => subscription.unsubscribe();
+    }, [form]);
+    useEffect(() => {
+        if (_.isEqual(examForm, examDefault) && exam) {
+            form.reset({ ...exam, exam_category_id: exam?.exam_category?.id })
+        }
+        // else {
+        //     form.reset(examDefault)
+        // }
+    }, [exam])
     useEffect(() => {
         if (Array.isArray(quizErrors)) {
             const index = quizErrors.findIndex(error => error !== undefined)
             if (index !== -1) setCurrent(index)
         }
     }, [quizErrors])
+    // useEffect(() => {
+    //     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+    //         if (form.formState.isDirty) {
+    //             event.preventDefault();
+    //             event.returnValue = "Bạn có chắc chắn muốn rời đi? Những thay đổi chưa lưu sẽ bị mất.";
+    //         }
+    //     };
+
+    //     const handleRouteChange = () => {
+    //         if (form.formState.isDirty) {
+    //             const confirmLeave = window.confirm("Bạn có chắc chắn muốn rời đi? Những thay đổi chưa lưu sẽ bị mất?");
+    //             if (!confirmLeave) {
+    //                 throw new Error("Route change aborted.");
+    //             }
+    //         }
+    //     };
+
+    //     window.addEventListener("beforeunload", handleBeforeUnload);
+
+    //     return () => {
+    //         window.removeEventListener("beforeunload", handleBeforeUnload);
+    //     };
+    // }, [pathname, form.formState.isDirty]);
+
     const slideState = useMemo(() => {
-        console.log("error", quizErrors);
         return quizFields.map((item, index) => {
             if (index === current && quizErrors[index]) return "warning";
             if (index === current) return "selected";
@@ -80,8 +123,6 @@ const ExamForm = ({ examCategories, exam }: Props) => {
         })
     }, [quizErrors, current, quizFields]);
     const onSubmit = async (value: ExamRequest) => {
-        console.log("submit", value);
-
         if (exam) {
             try {
                 const res = await ExamService.update(exam.info.id, value, image?.value);
@@ -130,12 +171,23 @@ const ExamForm = ({ examCategories, exam }: Props) => {
     const onChangeImage = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) setImage({ value: e.target.files?.[0], error: false })
     }
+    const onReset = () => {
+        if (exam) {
+            form.reset({ ...exam, exam_category_id: exam?.exam_category?.id })
+            setCurrent(0)
+        } else {
+            form.reset(examDefault)
+            setCurrent(0)
+        }
+    }
     return (
         <>
             <Form {...form}>
+                {/* <button onClick={() => dispatch(ExamActions.reset())}>reset</button> */}
                 <form className='w-[100vh' onSubmit={form.handleSubmit(onSubmit)}>
                     <div className='flex justify-between'>
-                        <Button type='button' className='bg-green-600 hover:bg-green-500' onClick={onAddQuiz}><FolderPlus /></Button>
+                        <Button variant={'destructive'} type='button' onClick={() => onReset()}>Reset</Button>
+                        {/* <Button type='button' className='bg-green-600 hover:bg-green-500' onClick={onAddQuiz}><FolderPlus /></Button> */}
                         <div className="py-2 text-center text-sm text-muted-foreground">
                             Slide {current + 1} of {count + 1}
                         </div>
@@ -296,6 +348,7 @@ const ExamForm = ({ examCategories, exam }: Props) => {
                                     <Card className='w-[100vh] p-10'>
                                         <CardHeader>
                                             <div className='flex justify-between'>
+                                                <Button type='button' className='bg-green-600 hover:bg-green-500' onClick={onAddQuiz}><FolderPlus /></Button>
                                                 <CardTitle>Quiz {quizIndex + 1}</CardTitle>
                                                 <Button variant={'destructive'} disabled={count === 0 ? true : false} type='button' onClick={() => setOpenConfirm(true)}><FolderX /></Button>
                                             </div>

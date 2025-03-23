@@ -4,5 +4,5 @@ interface ExamResponse extends ExamBase {
     exam_category: ExamCategoryResponse
     info: InfoResponse,
     blog?: BlogResponse,
-    quizzes?: QuizResponse[]
+    quizzes: QuizResponse[]
 }

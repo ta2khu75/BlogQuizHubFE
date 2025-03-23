@@ -1,5 +1,5 @@
 import React, { memo, useMemo, useState } from "react";
-import { createEditor, Transforms } from "slate";
+import { createEditor } from "slate";
 import { withHistory } from "slate-history";
 import {
     Editable,
@@ -20,6 +20,7 @@ interface TextEditorProps {
     className?: string;
     isEdit?: boolean;
     onChange: (value: string) => void;
+    onReset: () => void
 }
 
 declare module "slate" {
@@ -34,15 +35,20 @@ const TextEditor = ({ name, placeholder, isEdit = false, onChange, initialValue,
     const [editor] = useState(withImage(withInline(withHistory(withReact(createEditor())))));
     const defaultValue = [{ type: 'paragraph', children: [{ text: '' }] }]
     const initValue = useMemo(() => {
-        const content = localStorage.getItem('content') ?? initialValue;
-        const initValue = content ? JSON.parse(content) : [];
-        if (initValue.length === 0 && !isEdit) return defaultValue
-        return initValue;
+        if (initialValue) {
+            const initValue = JSON.parse(initialValue)
+            if (initValue.length === 0 && !isEdit) return defaultValue
+            return initValue;
+        }
+        return defaultValue
+        // const initValue = JSON.parse(initialValue)
+        // if (initValue.length === 0 && !isEdit) return defaultValue
+        // return initValue;
     }, [initialValue]);
-    const resetEditor = () => {
-        Transforms.delete(editor, { at: [0] }); // Remove existing content
-        Transforms.insertNodes(editor, defaultValue, { at: [0] }); // Insert default value
-    };
+    // const resetEditor = () => {
+    //     Transforms.delete(editor, { at: [0] }); // Remove existing content
+    //     Transforms.insertNodes(editor, defaultValue, { at: [0] }); // Insert default value
+    // };
 
     const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
         const key = event?.key?.toLowerCase();
@@ -68,8 +74,6 @@ const TextEditor = ({ name, placeholder, isEdit = false, onChange, initialValue,
             editor={editor}
             onValueChange={(value) => {
                 const valueString = JSON.stringify(value)
-                localStorage.setItem('content', valueString)
-                console.log("onChange", valueString);
                 onChange(valueString);
             }}
             initialValue={initValue.length === 0 ? [{ type: 'paragraph', children: [{ text: '' }] }] : initValue}

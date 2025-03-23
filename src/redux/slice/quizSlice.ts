@@ -10,30 +10,26 @@ export const quizSlice = createSlice({
     name: "quiz",
     initialState,
     reducers: {
-        setQuizzes: (
+        set: (
             state = initialState,
             action: PayloadAction<QuizRequest[]>
         ) => {
             state.value = action.payload
         },
-        deleteQuiz: (state, action: PayloadAction<number>) => {
+        remove: (state, action: PayloadAction<number>) => {
             state.value.splice(action.payload, 1);
         },
-        addQuiz: (state, action: PayloadAction<QuizRequest>) => {
+        add: (state, action: PayloadAction<QuizRequest>) => {
             state.value.push(action.payload);
         },
-        updateQuiz: (state, action: PayloadAction<{ indexQuiz: number, quiz: QuizRequest }>) => {
-            state.value = state.value.map((quiz, index) => {
-                if (index === action.payload.indexQuiz) {
-                    return action.payload.quiz;
-                }
-                return quiz;
-            })
+        update: (state, action: PayloadAction<{ indexQuiz: number, quiz: QuizRequest }>) => {
+            const { indexQuiz, quiz } = action.payload;
+            state.value[indexQuiz] = quiz
         },
         resetQuiz: () => {
             return initialState;
         },
     },
 });
-export const { setQuizzes, deleteQuiz, updateQuiz, addQuiz, resetQuiz } = quizSlice.actions;
-export default quizSlice.reducer;
+export const QuizActions = quizSlice.actions;
+export const QuizReducer = quizSlice.reducer;

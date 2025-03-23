@@ -1,27 +1,32 @@
+import { AccessModifier } from "@/types/AccessModifier";
+import { ExamLevel } from "@/types/ExamLevel";
+import { ExamStatus } from "@/types/ExamStatus";
+import { QuizType } from "@/types/QuizType";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-export interface ExamState {
-  [key: string]: QuizDetailResponse[];
-}
-const initialState: ExamState = {
+const initialState: ExamRequest = {
+    title: "",
+    description: "",
+    duration: 0,
+    quizzes: [{ question: "", quiz_type: QuizType.SINGLE_CHOICE, answers: Array(4).fill({ answer: "", correct: false }) }],
+    exam_level: ExamLevel.EASY,
+    exam_category_id: 0,
+    exam_status: ExamStatus.NOT_COMPLETED,
+    access_modifier: AccessModifier.PRIVATE
 }
 // luu danh sach quiz
-export const examSlice = createSlice({
-  name: "exam",
-  initialState,
-  reducers: {
-    setExam: (
-      state = initialState,
-      action: PayloadAction<{ examId: string, quizzes: QuizDetailResponse[] }>
-    ) => {
-      state[action.payload.examId] = action.payload.quizzes;
+export const ExamSlice = createSlice({
+    name: "exam",
+    initialState,
+    reducers: {
+        set: (state,
+            action: PayloadAction<ExamRequest>
+        ) => {
+            Object.assign(state, action.payload);
+        },
+        reset: () => {
+            return initialState;
+        },
     },
-    deleteExam: (state, action: PayloadAction<string>) => {
-      delete state[action.payload];
-    },
-    resetExam: () => {
-      return initialState;
-    },
-  },
 });
-export const { setExam, resetExam, deleteExam } = examSlice.actions;
-export default examSlice.reducer;
+export const ExamActions = ExamSlice.actions;
+export const ExamReducer = ExamSlice.reducer;
