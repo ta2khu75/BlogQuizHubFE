@@ -44,9 +44,6 @@ const BlogForm = ({ onSubmit, blog, isEdit = false }: Props) => {
     });
     useEffect(() => {
         if (_.isEqual(blogForm, blogDefault) && blog) form.reset({ ...blog })
-        // else {
-        //     form.reset(blogDefalut)
-        // }
     }, [blog])
     useEffect(() => {
         if (tagFields.length === 0) {
@@ -61,11 +58,10 @@ const BlogForm = ({ onSubmit, blog, isEdit = false }: Props) => {
     }, []);
 
     const onReset = () => {
-        console.log("reset");
-        if (isEdit) {
+        if (blog) {
             form.reset({ ...blog })
         } else {
-            form.reset({ title: "", content: "", blog_tags: [""], access_modifier: AccessModifier.PRIVATE })
+            form.reset(blogDefault)
 
         }
     }

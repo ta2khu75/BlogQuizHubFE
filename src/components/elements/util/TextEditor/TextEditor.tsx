@@ -39,11 +39,10 @@ const TextEditor = ({ name, placeholder, isEdit = false, onChange, initialValue,
             const initValue = JSON.parse(initialValue)
             if (initValue.length === 0 && !isEdit) return defaultValue
             return initValue;
+        } else {
+            if (!isEdit) return defaultValue
+            return []
         }
-        return defaultValue
-        // const initValue = JSON.parse(initialValue)
-        // if (initValue.length === 0 && !isEdit) return defaultValue
-        // return initValue;
     }, [initialValue]);
     // const resetEditor = () => {
     //     Transforms.delete(editor, { at: [0] }); // Remove existing content

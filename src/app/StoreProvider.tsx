@@ -1,4 +1,5 @@
 'use client'
+import useRemoveStorage from '@/hooks/useBeforeUnload';
 // import { rootReducer } from '@/redux/rootReducer'
 // import { AuthActions } from '@/redux/slice/authSlide'
 // import { ExamAnswerActions } from '@/redux/slice/examAnswerSlice'
@@ -11,6 +12,7 @@ interface Props {
     readonly children: React.ReactNode
 }
 export default function StoreProvider({ children }: Props) {
+    useRemoveStorage();
     // const storeRef = useRef<AppStore | null>(null);
 
     // if (!storeRef.current) {

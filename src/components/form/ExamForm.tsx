@@ -24,7 +24,7 @@ import ExamService from '@/services/ExamService';
 import { useToast } from '@/hooks/use-toast';
 import FunctionUtil from '@/util/FunctionUtil';
 import Confirm from '@/components/elements/util/Confirm';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 const examSchema = z.object({
     title: z.string().nonempty(),
     exam_level: z.nativeEnum(ExamLevel),
@@ -49,14 +49,12 @@ const ExamForm = ({ examCategories, exam }: Props) => {
     }
     const examForm: ExamRequest = getExamForm()
     const { toast } = useToast()
-    // const pathname = usePathname();
     const router = useRouter()
     const [image, setImage] = useState<{ value: File, error: boolean }>()
     const [open, setOpen] = useState(false)
     const [openConfirm, setOpenConfirm] = useState(false)
     const [current, setCurrent] = useState(0)
     const initQuiz: QuizRequest = { question: "", quiz_type: QuizType.SINGLE_CHOICE, answers: Array(4).fill({ answer: "", correct: false }) };
-    // JSON.parse(localStorage.getItem("examForm") ?? `{"title":"","exam_level":"EASY","exam_status":"NOT_COMPLETED","duration":0,"exam_category_id":0,"access_modifier":"PRIVATE","description":"","quizzes":[{"question":"","quiz_type":"SINGLE_CHOICE","answers":[{"answer":"","correct":false},{"answer":"","correct":false},{"answer":"","correct":false},{"answer":"","correct":false}]}]}`)
     const examDefault = { title: "", exam_level: ExamLevel.EASY, exam_status: ExamStatus.NOT_COMPLETED, duration: 0, exam_category_id: 0, access_modifier: AccessModifier.PRIVATE, description: "", quizzes: [initQuiz] }
     const form = useForm<ExamRequest>({
         resolver: zodResolver(examSchema),
@@ -80,9 +78,6 @@ const ExamForm = ({ examCategories, exam }: Props) => {
         if (_.isEqual(examForm, examDefault) && exam) {
             form.reset({ ...exam, exam_category_id: exam?.exam_category?.id })
         }
-        // else {
-        //     form.reset(examDefault)
-        // }
     }, [exam])
     useEffect(() => {
         if (Array.isArray(quizErrors)) {
@@ -90,30 +85,6 @@ const ExamForm = ({ examCategories, exam }: Props) => {
             if (index !== -1) setCurrent(index)
         }
     }, [quizErrors])
-    // useEffect(() => {
-    //     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-    //         if (form.formState.isDirty) {
-    //             event.preventDefault();
-    //             event.returnValue = "Bạn có chắc chắn muốn rời đi? Những thay đổi chưa lưu sẽ bị mất.";
-    //         }
-    //     };
-
-    //     const handleRouteChange = () => {
-    //         if (form.formState.isDirty) {
-    //             const confirmLeave = window.confirm("Bạn có chắc chắn muốn rời đi? Những thay đổi chưa lưu sẽ bị mất?");
-    //             if (!confirmLeave) {
-    //                 throw new Error("Route change aborted.");
-    //             }
-    //         }
-    //     };
-
-    //     window.addEventListener("beforeunload", handleBeforeUnload);
-
-    //     return () => {
-    //         window.removeEventListener("beforeunload", handleBeforeUnload);
-    //     };
-    // }, [pathname, form.formState.isDirty]);
-
     const slideState = useMemo(() => {
         return quizFields.map((item, index) => {
             if (index === current && quizErrors[index]) return "warning";
