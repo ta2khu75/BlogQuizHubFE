@@ -1,5 +1,5 @@
 export default interface UserAnswerResponse {
     id: number;
-    quiz: QuizResponse;
+    question: QuestionResponse;
     answers: AnswerResponse[]
 }

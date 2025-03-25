@@ -1,113 +1,407 @@
-import AnswerForm, { answerSchema } from '@/components/form/AnswerForm'
-import { Button } from '@/components/ui/button'
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { QuizType } from '@/types/QuizType'
-import React, { useEffect } from 'react'
-import { useFieldArray, UseFormReturn } from 'react-hook-form'
+import Modal from '@/components/elements/util/Modal';
+import _ from "lodash";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Textarea } from '@/components/ui/textarea';
+import { AccessModifier } from '@/types/AccessModifier';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FolderX, Loader2, FolderPlus } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod'
-import { FilePlus2 } from 'lucide-react';
-export const quizSchema = z.object({
-    id: z.number().optional(),
-    question: z.string().nonempty(),
-    quiz_type: z.nativeEnum(QuizType),
-    answers: z.array(answerSchema).refine((answers) => answers.some((answer) => answer.correct), { message: 'At least one answer must be correct' }),
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Carousel from '@/components/elements/util/Carousel';
+import { useToast } from '@/hooks/use-toast';
+import FunctionUtil from '@/util/FunctionUtil';
+import Confirm from '@/components/elements/util/Confirm';
+import { useRouter } from 'next/navigation';
+import { Switch } from '@/components/ui/switch';
+import { QuizLevel } from '@/types/QuizLevel';
+import QuizMenuElement from '@/components/elements/content/exam/QuizMenuElement';
+import { QuestionType } from '@/types/QuestionType';
+import QuizService from '@/services/QuizService';
+import QuestionForm, { questionSchema } from '@/components/form/QuestionForm';
+const quizSchema = z.object({
+    title: z.string().nonempty(),
+    quiz_level: z.nativeEnum(QuizLevel),
+    duration: z.number().min(5),
+    description: z.string().optional(),
+    access_modifier: z.nativeEnum(AccessModifier),
+    quiz_category_id: z.number(),
+    showAnswer: z.boolean().default(true),
+    showResult: z.boolean().default(true),
+    isShuffle: z.boolean().default(true),
+    isCompleted: z.boolean().default(false),
+    questions: z.array(questionSchema),
 })
+type quizSchema = z.infer<typeof quizSchema>;
 type Props = {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    form: UseFormReturn<ExamRequest, any, undefined>
-    quizIndex: number
+    quizCategories: QuizCategoryResponse[],
+    quiz?: QuizResponse
 }
-const QuizForm = ({ form, quizIndex }: Props) => {
-    const quizName: `quizzes.${number}` = `quizzes.${quizIndex}`;
-    const quizType = form.watch(`${quizName}.quiz_type`)
-    const initAnswer = { answer: "", correct: false }
-    const { fields: answerFields, append: appendAnswer, remove: removeAnswer } = useFieldArray({
+const QuizForm = ({ quizCategories, quiz }: Props) => {
+    const getQuizForm = () => {
+        const quizForm = localStorage.getItem("quizForm")
+        if (quizForm) {
+            return JSON.parse(quizForm)
+        } return undefined;
+    }
+    const quizForm: QuizRequest = getQuizForm()
+    const { toast } = useToast()
+    const router = useRouter()
+    const [image, setImage] = useState<{ value: File, error: boolean }>()
+    const [open, setOpen] = useState(false)
+    const [openConfirm, setOpenConfirm] = useState(false)
+    const [current, setCurrent] = useState(0)
+    const initQuiz: QuestionRequest = { question: "", question_type: QuestionType.SINGLE_CHOICE, answers: Array(4).fill({ answer: "", correct: false }) };
+    const quizDefault: QuizRequest = { title: "", quiz_level: QuizLevel.EASY, isCompleted: false, isShuffle: true, showAnswer: true, showResult: true, duration: 0, quiz_category_id: 0, access_modifier: AccessModifier.PRIVATE, description: "", questions: [initQuiz] }
+    const form = useForm<QuizRequest>({
+        resolver: zodResolver(quizSchema),
+        defaultValues: quizForm ?? quizDefault
+    })
+    const { fields: questionFields, append: appendQuiz, remove: removeQuiz } = useFieldArray({
         control: form.control,
-        name: `${quizName}.answers`,
-        rules: { minLength: 2 },
+        name: "questions",
     });
+    const questionErrors = useMemo(() => {
+        return form.formState.errors?.questions ?? [];
+    }, [form.formState.errors?.questions]);
+    const count = Math.max(questionFields.length - 1, 0)
     useEffect(() => {
-        if (quizType === QuizType.SINGLE_CHOICE) {
-            const answers = form.getValues(`${quizName}.answers`);
-            const correctAnswersIndex = answers.findIndex((answer) => answer.correct);
-            form.setValue(`${quizName}.answers`, answers.map((answer, answerIndex) => {
-                if (answerIndex === correctAnswersIndex) {
-                    return { ...answer, correct: true }
-                }
-                return { ...answer, correct: false }
-            }))
+        const subscription = form.watch((values) => {
+            localStorage.setItem("quizForm", JSON.stringify(values));
+        });
+        return () => subscription.unsubscribe();
+    }, [form]);
+    useEffect(() => {
+        if (_.isEqual(quizForm, quizDefault) && quiz) {
+            form.reset({ ...quiz, quiz_category_id: quiz?.quiz_category?.id })
         }
-    }, [quizType]);
-    const onRadioChange = (value: string) => {
-        const answers = form.getValues(`${quizName}.answers`);
-        form.setValue(`${quizName}.answers`, answers.map((answer, index) => {
-            if (index === Number(value)) {
-                return { ...answer, correct: true }
-            } return { ...answer, correct: false }
-        }));
+    }, [quiz])
+    useEffect(() => {
+        if (Array.isArray(questionErrors)) {
+            const index = questionErrors.findIndex(error => error !== undefined)
+            if (index !== -1) setCurrent(index)
+        }
+    }, [questionErrors])
+    const slideState = useMemo(() => {
+        return questionFields.map((item, index) => {
+            if (index === current && questionErrors[index]) return "warning";
+            if (index === current) return "selected";
+            if (questionErrors[index]) return "error";
+            return "unselected";
+        })
+    }, [questionErrors, current, questionFields]);
+    const onSubmit = async (value: QuizRequest) => {
+        if (quiz) {
+            try {
+                const res = await QuizService.update(quiz.info.id, value, image?.value);
+                if (res.success) {
+                    setOpen(false)
+                    toast({ title: "Update success" })
+                    router.push(`/profile?id=${res.data.author.info.id}&tab=quiz`)
+                } else {
+                    toast({ title: "Update failed", description: FunctionUtil.showError(res.message_error), variant: "destructive" });
+                }
+            } catch (error) {
+                toast({ title: "Update failed", description: FunctionUtil.showError(error), variant: "destructive" });
+            }
+        } else if (image?.value) {
+            try {
+                const res = await QuizService.create(value, image.value);
+                if (res.success) {
+                    setOpen(false)
+                    toast({ title: "Create success" })
+                    router.push(`/profile?id=${res.data.author.info.id}&tab=quiz`)
+                } else {
+                    toast({ title: "Create failed", description: FunctionUtil.showError(res.message_error), variant: "destructive" });
+                }
+            } catch (error) {
+                toast({ title: "Create failed", description: FunctionUtil.showError(error), variant: "destructive" });
+            }
+        } else {
+            setImage({ value: new File([], ""), error: true })
+        }
+    }
+    const onAddQuiz = () => {
+        appendQuiz(initQuiz)
+        setCurrent((prev) => Math.max(count + 1, prev + 1))
+    }
+    const onRemoveQuiz = () => {
+        if (count === 0) return
+        removeQuiz(current)
+        setCurrent((prev) => Math.max(prev - 1, 0))
+    }
+    const onSelectedSlide = (index: number) => {
+        setCurrent(index)
+    }
+    const onCancel = () => {
+        setOpen(false)
+    }
+    const onChangeImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) setImage({ value: e.target.files?.[0], error: false })
+    }
+    const onReset = () => {
+        if (quiz) {
+            form.reset({ ...quiz, quiz_category_id: quiz?.quiz_category?.id })
+            setCurrent(0)
+        } else {
+            form.reset(quizDefault)
+            setCurrent(0)
+        }
     }
     return (
-        <div className='w-full flex flex-col gap-4'>
-            <FormField control={form.control} name={`${quizName}.question`} render={({ field }) => (
-                <FormItem className='w-full'>
-                    <FormLabel>Question</FormLabel>
-                    <FormControl >
-                        <Input type='text' placeholder="Question" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-            )} />
-            <FormField
-                control={form.control}
-                name={`${quizName}.quiz_type`}
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Quiz type</FormLabel>
-                        <FormControl>
-                            <RadioGroup
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                                className="flex space-y-1"
-                            >
-                                {Object.entries(QuizType).map((item, index) => (
-                                    <FormItem key={index} className="flex items-center space-x-3 space-y-0">
+        <>
+            <Form {...form}>
+                <form className='w-[100vh' onSubmit={form.handleSubmit(onSubmit)}>
+                    <div className='flex justify-between'>
+                        <Button variant={'destructive'} type='button' onClick={() => onReset()}>Reset</Button>
+                        <div className="py-2 text-center text-sm text-muted-foreground">
+                            Slide {current + 1} of {count + 1}
+                        </div>
+                        <Button type='button' className='bg-blue-600 hover:bg-blue-500' onClick={() => setOpen(true)}>{quiz ? "Update" : " Create"}</Button>
+                    </div>
+                    <Modal scroll onCancel={onCancel} open={open} title={quiz ? "Update Exam" : "Create Exam"}>
+                        <FormField control={form.control} name='title' render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Title</FormLabel>
+                                <FormControl>
+                                    <Input type='text' placeholder="Title" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                        <FormField control={form.control} name='quiz_category_id' render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Exam category</FormLabel>
+                                <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={`${field.value}`}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a verified email to display" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {quizCategories.map(quizCategory => (
+                                            <SelectItem key={quizCategory.id} value={`${quizCategory.id}`}>{quizCategory.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                        <FormField
+                            control={form.control}
+                            name="quiz_level"
+                            render={({ field }) => (
+                                <FormItem className="space-y-3">
+                                    <FormLabel>Level</FormLabel>
+                                    <FormControl>
+                                        <RadioGroup
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                            className="flex space-y-1"
+                                        >
+                                            {Object.entries(QuizLevel).map((item) => (
+                                                <FormItem key={item[0]} className="flex items-center space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <RadioGroupItem value={item[0]} />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">
+                                                        {item[1]}
+                                                    </FormLabel>
+                                                </FormItem>
+                                            ))}
+                                        </RadioGroup>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <div className='grid grid-cols-2 gap-4'>
+                            <FormField
+                                control={form.control}
+                                name="isCompleted"
+                                render={({ field }) => (
+                                    <FormItem className='flex flex-col'>
+                                        <FormLabel>Completed</FormLabel>
                                         <FormControl>
-                                            <RadioGroupItem value={item[0]} />
+                                            <Switch
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
                                         </FormControl>
-                                        <FormLabel className="font-normal">
-                                            {item[1]}
-                                        </FormLabel>
                                     </FormItem>
-                                ))}
-                            </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-            <FormItem>
-                <div className='flex items-center gap-x-2'>
-                    <Button type='button' className='bg-green-600 hover:bg-green-500' onClick={() => appendAnswer(initAnswer)}><FilePlus2 /></Button>
-                    <FormLabel className='flex items-center gap-x-2'> Answers</FormLabel>
-                </div>
-                {form.formState.errors.quizzes?.[quizIndex]?.answers?.root && <FormMessage>{form.formState.errors.quizzes[quizIndex].answers.root.message}</FormMessage>}
-                {quizType === QuizType.MULTIPLE_CHOICE ?
-                    <>
-                        {answerFields.map((answer, answerIndex) => (
-                            <AnswerForm key={`${quizIndex}${answerIndex}`} quizType={quizType} answerIndex={answerIndex} quizIndex={quizIndex} onDelete={() => removeAnswer(answerIndex)} form={form} />
-                        ))}
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="showAnswer"
+                                render={({ field }) => (
+                                    <FormItem className='flex flex-col'>
+                                        <FormLabel>Show answer</FormLabel>
+                                        <FormControl>
+                                            <Switch
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="showResult"
+                                render={({ field }) => (
+                                    <FormItem className='flex flex-col'>
+                                        <FormLabel>Show answer</FormLabel>
+                                        <FormControl>
+                                            <Switch
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="isShuffle"
+                                render={({ field }) => (
+                                    <FormItem className='flex flex-col'>
+                                        <FormLabel>Shuffle question and answer</FormLabel>
+                                        <FormControl>
+                                            <Switch
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        {/* <FormField
+                            control={form.control}
+                            name="quiz_status"
+                            render={({ field }) => (
+                                <FormItem className="space-y-3">
+                                    <FormLabel>Exam status</FormLabel>
+                                    <FormControl>
+                                        <RadioGroup
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                            className="flex space-y-1"
+                                        >
+                                            {Object.entries(ExamStatus).map((item) => (
+                                                <FormItem key={item[1]} className="flex items-center space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <RadioGroupItem value={item[1]} />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">
+                                                        {item[1]}
+                                                    </FormLabel>
+                                                </FormItem>
+                                            ))}
+                                        </RadioGroup>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        /> */}
+                        <FormField
+                            control={form.control}
+                            name="access_modifier"
+                            render={({ field }) => (
+                                <FormItem className="space-y-3">
+                                    <FormLabel>Access modifier</FormLabel>
+                                    <FormControl>
+                                        <RadioGroup
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                            className="flex space-y-1"
+                                        >
+                                            {Object.entries(AccessModifier).map((item) => (
+                                                <FormItem key={item[0]} className="flex items-center space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <RadioGroupItem value={item[0]} />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">
+                                                        {item[1]}
+                                                    </FormLabel>
+                                                </FormItem>
+                                            ))}
+                                        </RadioGroup>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField control={form.control} name='duration' render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Duration</FormLabel>
+                                <FormControl>
+                                    <Input type='number' min={5} placeholder="Duration" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                        <FormField control={form.control} name='description' render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Description</FormLabel>
+                                <FormControl>
+                                    <Textarea placeholder='Description' {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                        <FormItem>
+                            <FormLabel>Image</FormLabel>
+                            <FormControl>
+                                <Input type='file' accept='image/*' name='image' placeholder='Image' required
+                                    onChange={onChangeImage}
+                                />
+                            </FormControl>
+                            {image?.error && <FormMessage />}
+                        </FormItem>
+                        <div className="flex justify-end">
+                            {form.formState.isSubmitting ? <Button disabled>
+                                <Loader2 className="animate-spin" />
+                                Please wait
+                            </Button> :
+                                <Label htmlFor='submit' className='cursor-pointer p-4 bg-blue-600 hover:bg-blue-500 border rounded text-white'>submit</Label>}
+                        </div>
+                    </Modal>
+                    <Button className='hidden' id='submit' type='submit'>Submit</Button>
+                    <Carousel count={count} current={current} className='max-w-[100vh]' onNextSlide={() => setCurrent(current + 1)} onPrevSlide={() => setCurrent(current - 1)} > <>
+                        {
+                            questionFields.map((question, questionIndex: number) => (
+                                <div key={question.id}>
+                                    <Card className='w-[100vh] p-10'>
+                                        <CardHeader>
+                                            <div className='flex justify-between'>
+                                                <Button type='button' className='bg-green-600 hover:bg-green-500' onClick={onAddQuiz}><FolderPlus /></Button>
+                                                <CardTitle>Question {questionIndex + 1}</CardTitle>
+                                                <Button variant={'destructive'} disabled={count === 0 ? true : false} type='button' onClick={() => setOpenConfirm(true)}><FolderX /></Button>
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent className="flex justify-center">
+                                            <QuestionForm questionIndex={questionIndex} form={form} />
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            ))
+                        }
                     </>
-                    :
-                    <RadioGroup onValueChange={(value) => onRadioChange(value)}>
-                        {answerFields.map((answer, answerIndex) => (
-                            <AnswerForm key={answer.id} quizType={quizType} answerIndex={answerIndex} quizIndex={quizIndex} onDelete={(() => removeAnswer(answerIndex))} form={form} />
-                        ))}
-                    </RadioGroup>
-                }
-            </FormItem>
-        </div>
+                    </Carousel>
+                </form>
+            </Form >
+            <Confirm onCancel={() => setOpenConfirm(false)} open={openConfirm} onContinue={() => onRemoveQuiz()} title='Do you want to delete this question?' />
+            <QuizMenuElement onIndexClick={onSelectedSlide} states={
+                slideState} />
+        </>
     )
 }
 

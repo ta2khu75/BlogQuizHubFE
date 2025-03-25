@@ -3,8 +3,7 @@ import Modal from '@/components/elements/util/Modal'
 import AccountInfoForm from '@/components/form/AccountInfoForm'
 import AccountPasswordForm from '@/components/form/AccountPasswordForm'
 import BlogSearch from '@/components/search/BlogSearch'
-import ExamResultSearch from '@/components/search/ExamResultSearch'
-import ExamSearch from '@/components/search/ExamSearch'
+import ExamResultSearch from '@/components/search/QuizResultSearch'
 import FollowList from '@/components/search/FollowList'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -20,6 +19,7 @@ import FunctionUtil from '@/util/FunctionUtil'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useMemo, useState } from 'react'
+import QuizSearch from '@/components/search/QuizSearch'
 const ProfilePage = () => {
     const { toast } = useToast();
     const dispatch = useAppDispatch()
@@ -168,11 +168,11 @@ const ProfilePage = () => {
                             </CardTitle>
                             Blogs
                         </TabsTrigger>
-                        <TabsTrigger className='flex flex-col items-center' value="exam">
+                        <TabsTrigger className='flex flex-col items-center' value="quiz">
                             <CardTitle>
-                                {account?.exam_count}
+                                {account?.quiz_count}
                             </CardTitle>
-                            Exams
+                            Quizzes
                         </TabsTrigger>
                         <TabsTrigger className='flex flex-col items-center' value="follower">
                             <CardTitle>
@@ -181,7 +181,7 @@ const ProfilePage = () => {
                             Follower
                         </TabsTrigger>
                         {isAuthor &&
-                            <TabsTrigger className='flex flex-col items-center p-4' value="examResult">
+                            <TabsTrigger className='flex flex-col items-center p-4' value="quizResult">
                                 Exam result
                             </TabsTrigger>
                         }
@@ -196,18 +196,18 @@ const ProfilePage = () => {
                 </div>
                 <BlogSearch isAuthor={isAuthor} />
             </TabsContent>
-            <TabsContent value='exam'>
+            <TabsContent value='quiz'>
                 <div className='flex justify-between'>
-                    <CardTitle>Exam</CardTitle>
+                    <CardTitle>Quiz</CardTitle>
                     {isAuthor &&
-                        <Button><Link href={"/exam/create"}>Create</Link></Button>}
+                        <Button><Link href={"/quiz/create"}>Create</Link></Button>}
                 </div>
-                <ExamSearch isAuthor={isAuthor} />
+                <QuizSearch isAuthor={isAuthor} />
             </TabsContent>
             <TabsContent value='follower'>
                 <FollowList />
             </TabsContent>
-            <TabsContent value='examResult'>
+            <TabsContent value='quizResult'>
                 <ExamResultSearch />
             </TabsContent>
         </Tabs >

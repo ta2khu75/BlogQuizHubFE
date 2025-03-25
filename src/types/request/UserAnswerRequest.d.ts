@@ -1,4 +1,4 @@
- interface UserAnswerRequest{
-    quiz_id:number;
-    answer_ids:number[];
+interface UserAnswerRequest {
+    question_id: number;
+    answer_ids: number[];
 }

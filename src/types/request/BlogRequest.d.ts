@@ -1,4 +1,4 @@
 interface BlogRequest extends BlogBase {
     content: string;
-    exam_ids?: string[];
+    quiz_ids?: string[];
 }

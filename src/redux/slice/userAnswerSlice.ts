@@ -1,20 +1,20 @@
-import { QuizType } from "@/types/QuizType";
+import { QuestionType } from "@/types/QuestionType";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-interface ExamAnswer {
-  examId: string;
-  quizId: number;
-  quizType: QuizType
+interface QuizAnswer {
+  quizId: string;
+  questionId: number;
+  questionType: QuestionType
   answerId: number
   // answerIds: number[];
 }
-export interface QuizListState {
+export interface QuestionListState {
   [key: number]: number[];
 }
-export interface ExamListState {
-  [key: string]: QuizListState;
+export interface QuizListState {
+  [key: string]: QuestionListState;
 }
 // luu cac dap an cua bai thi
-const initialState: ExamListState = {};
+const initialState: QuizListState = {};
 export const userAnswer = createSlice({
   name: "userAnswer",
   initialState,
@@ -23,11 +23,11 @@ export const userAnswer = createSlice({
     //   state = initialState,
     //   action: PayloadAction<ExamAnswer>
     // ) => {
-    //   const { examId, quizId, answerIds } = action.payload;
-    //   state[examId] = state[examId] ?? {};
-    //   state[examId][quizId] = answerIds;
+    //   const { quizId, questionId, answerIds } = action.payload;
+    //   state[quizId] = state[quizId] ?? {};
+    //   state[quizId][questionId] = answerIds;
     //   if (!answerIds.length) {
-    //     delete state[examId][quizId];
+    //     delete state[quizId][questionId];
     //   }
     // },
     init: (state) => {
@@ -37,27 +37,27 @@ export const userAnswer = createSlice({
       }
       return state
     },
-    add: (state, action: PayloadAction<ExamAnswer>) => {
-      const { examId, quizId, answerId, quizType } = action.payload;
-      state[examId] = state[examId] ?? {};
-      if (QuizType.MULTIPLE_CHOICE === quizType) {
-        state[examId][quizId] = [...(state[examId]?.[quizId] ?? []), answerId]
+    add: (state, action: PayloadAction<QuizAnswer>) => {
+      const { quizId, questionId, answerId, questionType } = action.payload;
+      state[quizId] = state[quizId] ?? {};
+      if (QuestionType.MULTIPLE_CHOICE === questionType) {
+        state[quizId][questionId] = [...(state[quizId]?.[questionId] ?? []), answerId]
       } else {
-        state[examId][quizId] = [answerId]
+        state[quizId][questionId] = [answerId]
       }
     },
-    remove: (state, action: PayloadAction<ExamAnswer>) => {
-      const { examId, quizId, answerId, quizType } = action.payload;
-      if (quizType === QuizType.SINGLE_CHOICE) {
-        delete state[examId][quizId];
+    remove: (state, action: PayloadAction<QuizAnswer>) => {
+      const { quizId, questionId, answerId, questionType } = action.payload;
+      if (questionType === QuestionType.SINGLE_CHOICE) {
+        delete state[quizId][questionId];
       } else {
-        state[examId][quizId] = state[examId][quizId].filter(id => id !== answerId);
-        if (state[examId][quizId].length === 0 && QuizType.MULTIPLE_CHOICE) {
-          delete state[examId][quizId];
+        state[quizId][questionId] = state[quizId][questionId].filter(id => id !== answerId);
+        if (state[quizId][questionId].length === 0 && QuestionType.MULTIPLE_CHOICE) {
+          delete state[quizId][questionId];
         }
       }
-      if (Object.keys(state[examId]).length === 0) {
-        delete state[examId]; // Xóa examId nếu không còn quiz nào
+      if (Object.keys(state[quizId]).length === 0) {
+        delete state[quizId]; // Xóa quizId nếu không còn quiz nào
       }
     },
     delete: (state, action: PayloadAction<string>) => {

@@ -3,7 +3,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { RadioGroupItem } from '@/components/ui/radio-group';
-import { QuizType } from '@/types/QuizType';
+import { QuestionType } from '@/types/QuestionType';
 import { FileX2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { UseFormReturn } from 'react-hook-form';
@@ -14,20 +14,20 @@ export const answerSchema = z.object({
     id: z.number().optional(),
 })
 type Props = {
-    quizIndex: number,
+    questionIndex: number,
     answerIndex: number,
-    quizType: QuizType,
+    questionType: QuestionType,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    form: UseFormReturn<ExamRequest, any, undefined>
+    form: UseFormReturn<QuizRequest, any, undefined>
     onDelete: () => void
 }
-const AnswerForm = ({ answerIndex, quizIndex, form, quizType, onDelete }: Props) => {
-    const answersName: `quizzes.${number}.answers` = `quizzes.${quizIndex}.answers`;
-    const answerName: `quizzes.${number}.answers.${number}` = `${answersName}.${answerIndex}`;
+const AnswerForm = ({ answerIndex, questionIndex, form, questionType, onDelete }: Props) => {
+    const answersName: `questions.${number}.answers` = `questions.${questionIndex}.answers`;
+    const answerName: `questions.${number}.answers.${number}` = `${answersName}.${answerIndex}`;
     const answersLength = form.getValues(answersName).length
     const correct = form.watch(`${answerName}.correct`);
     useEffect(() => {
-        if (correct && form.formState.errors?.quizzes?.[quizIndex]?.answers) {
+        if (correct && form.formState.errors?.questions?.[questionIndex]?.answers) {
             form.clearErrors(`${answersName}.root`);
         }
     }, [correct])
@@ -39,7 +39,7 @@ const AnswerForm = ({ answerIndex, quizIndex, form, quizType, onDelete }: Props)
                         render={({ field }) => (
                             <FormItem>
                                 <FormControl>
-                                    {quizType === QuizType.MULTIPLE_CHOICE ?
+                                    {questionType === QuestionType.MULTIPLE_CHOICE ?
                                         <Checkbox checked={correct} onCheckedChange={field.onChange} /> :
                                         <RadioGroupItem checked={correct} value={`${answerIndex}`} onSelect={field.onChange} />
                                     }

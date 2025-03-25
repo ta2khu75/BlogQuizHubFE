@@ -1,5 +1,5 @@
 'use client'
-import useRemoveStorage from '@/hooks/useBeforeUnload';
+import useRemoveStorage from '@/hooks/userRemoveStorage';
 // import { rootReducer } from '@/redux/rootReducer'
 // import { AuthActions } from '@/redux/slice/authSlide'
 // import { ExamAnswerActions } from '@/redux/slice/examAnswerSlice'

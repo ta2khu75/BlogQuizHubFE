@@ -1,5 +1,8 @@
 interface QuizResponse extends QuizBase {
-    id: number;
-    file_path?: string;
-    answers: AnswerResponse[]
+    image_path: string,
+    author: AccountResponse
+    quiz_category: QuizCategoryResponse
+    info: InfoResponse,
+    blog?: BlogResponse,
+    questions: QuestionResponse[]
 }

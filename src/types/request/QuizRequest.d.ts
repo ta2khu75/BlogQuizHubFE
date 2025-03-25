@@ -1,4 +1,4 @@
 interface QuizRequest extends QuizBase {
-    id?: number;
-    answers:AnswerRequest[];
+  quiz_category_id: number;
+  questions: QuestionRequest[];
 }
