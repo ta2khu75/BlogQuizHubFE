@@ -27,9 +27,9 @@ const NavLinks = ({ className }: { className?: string }) => {
                     </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <Link href="/exam" legacyBehavior passHref>
+                    <Link href="/quiz" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                            Exam
+                            Quiz
                         </NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>

@@ -4,8 +4,8 @@ interface QuizBase {
     description: string;
     quiz_level: QuizLevel;
     access_modifier: AccessModifier;
-    showAnswer: boolean;
-    showResult: boolean;
-    isShuffle: boolean;
-    isCompleted: boolean;
+    show_answer: boolean;
+    show_result: boolean;
+    shuffle_question: boolean;
+    completed: boolean;
 }

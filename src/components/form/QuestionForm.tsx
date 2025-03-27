@@ -8,9 +8,11 @@ import React, { useEffect } from 'react'
 import { useFieldArray, UseFormReturn } from 'react-hook-form'
 import { z } from 'zod'
 import { FilePlus2 } from 'lucide-react';
+import { Switch } from '@/components/ui/switch'
 export const questionSchema = z.object({
     id: z.number().optional(),
     question: z.string().nonempty(),
+    shuffle_answer: z.boolean().default(false),
     question_type: z.nativeEnum(QuestionType),
     answers: z.array(answerSchema).refine((answers) => answers.some((answer) => answer.correct), { message: 'At least one answer must be correct' }),
 })
@@ -22,7 +24,7 @@ type Props = {
 const QuestionForm = ({ form, questionIndex }: Props) => {
     const questionName: `questions.${number}` = `questions.${questionIndex}`;
     const questionType = form.watch(`${questionName}.question_type`)
-    const initAnswer = { answer: "", correct: false }
+    const initAnswer: AnswerRequest = { answer: "", correct: false }
     const { fields: answerFields, append: appendAnswer, remove: removeAnswer } = useFieldArray({
         control: form.control,
         name: `${questionName}.answers`,
@@ -84,6 +86,21 @@ const QuestionForm = ({ form, questionIndex }: Props) => {
                             </RadioGroup>
                         </FormControl>
                         <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name={`${questionName}.shuffle_answer`}
+                render={({ field }) => (
+                    <FormItem className='flex flex-col'>
+                        <FormLabel>Shuffle answer</FormLabel>
+                        <FormControl>
+                            <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                            />
+                        </FormControl>
                     </FormItem>
                 )}
             />

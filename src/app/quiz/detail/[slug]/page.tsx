@@ -1,5 +1,5 @@
 "use client"
-import QuestionElement from '@/components/elements/content/quiz/QuestionElement'
+import QuestionElement from '@/components/elements/content/question/QuestionElement'
 import Carousel from '@/components/elements/util/Carousel'
 import Confirm from '@/components/elements/util/Confirm'
 import CountdownTimer, { CountdownTimerRef } from '@/components/elements/util/CountdownTimer'
@@ -81,7 +81,9 @@ const QuizDetailPage = ({ params }: { params: Promise<{ slug: string }> }) => {
                     <CardContent >
                         {quizResult?.quiz?.questions?.length &&
                             <Carousel count={quizResult?.quiz?.questions?.length - 1} current={current} className='max-w-[100vh]' onNextSlide={() => setCurrent(current + 1)} onPrevSlide={() => setCurrent(current - 1)} >
-                                {quizResult?.quiz.questions.map((question, index) => <QuestionElement quizId={quizResult.quiz.info.id} index={index} key={question.id} question={question} />)}
+                                <>
+                                    {quizResult?.quiz.questions.map((question, index) => <QuestionElement quizId={quizResult.quiz.info.id} index={index} key={question.id} question={question} />)}
+                                </>
                             </Carousel>
                         }
                     </CardContent>

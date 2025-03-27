@@ -21,10 +21,10 @@ import Confirm from '@/components/elements/util/Confirm';
 import { useRouter } from 'next/navigation';
 import { Switch } from '@/components/ui/switch';
 import { QuizLevel } from '@/types/QuizLevel';
-import QuizMenuElement from '@/components/elements/content/exam/QuizMenuElement';
 import { QuestionType } from '@/types/QuestionType';
 import QuizService from '@/services/QuizService';
 import QuestionForm, { questionSchema } from '@/components/form/QuestionForm';
+import QuizMenuElement from '@/components/elements/content/quiz/QuizMenuElement';
 const quizSchema = z.object({
     title: z.string().nonempty(),
     quiz_level: z.nativeEnum(QuizLevel),
@@ -32,10 +32,10 @@ const quizSchema = z.object({
     description: z.string().optional(),
     access_modifier: z.nativeEnum(AccessModifier),
     quiz_category_id: z.number(),
-    showAnswer: z.boolean().default(true),
-    showResult: z.boolean().default(true),
-    isShuffle: z.boolean().default(true),
-    isCompleted: z.boolean().default(false),
+    show_answer: z.boolean().default(true),
+    show_result: z.boolean().default(true),
+    shuffle_question: z.boolean().default(true),
+    completed: z.boolean().default(false),
     questions: z.array(questionSchema),
 })
 type quizSchema = z.infer<typeof quizSchema>;
@@ -57,8 +57,8 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
     const [open, setOpen] = useState(false)
     const [openConfirm, setOpenConfirm] = useState(false)
     const [current, setCurrent] = useState(0)
-    const initQuiz: QuestionRequest = { question: "", question_type: QuestionType.SINGLE_CHOICE, answers: Array(4).fill({ answer: "", correct: false }) };
-    const quizDefault: QuizRequest = { title: "", quiz_level: QuizLevel.EASY, isCompleted: false, isShuffle: true, showAnswer: true, showResult: true, duration: 0, quiz_category_id: 0, access_modifier: AccessModifier.PRIVATE, description: "", questions: [initQuiz] }
+    const initQuiz: QuestionRequest = { question: "", question_type: QuestionType.SINGLE_CHOICE, shuffle_answer: false, answers: Array(4).fill({ answer: "", correct: false }) };
+    const quizDefault: QuizRequest = { title: "", quiz_level: QuizLevel.EASY, completed: false, shuffle_question: true, show_answer: true, show_result: true, duration: 0, quiz_category_id: 0, access_modifier: AccessModifier.PRIVATE, description: "", questions: [initQuiz] }
     const form = useForm<QuizRequest>({
         resolver: zodResolver(quizSchema),
         defaultValues: quizForm ?? quizDefault
@@ -82,6 +82,12 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
             form.reset({ ...quiz, quiz_category_id: quiz?.quiz_category?.id })
         }
     }, [quiz])
+    console.log("quizForm", quizForm);
+    console.log("quizDefault", quizDefault);
+    console.log(
+        _.isEqual(quizForm, quizDefault)
+    );
+
     useEffect(() => {
         if (Array.isArray(questionErrors)) {
             const index = questionErrors.findIndex(error => error !== undefined)
@@ -224,7 +230,7 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                         <div className='grid grid-cols-2 gap-4'>
                             <FormField
                                 control={form.control}
-                                name="isCompleted"
+                                name="completed"
                                 render={({ field }) => (
                                     <FormItem className='flex flex-col'>
                                         <FormLabel>Completed</FormLabel>
@@ -239,7 +245,7 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                             />
                             <FormField
                                 control={form.control}
-                                name="showAnswer"
+                                name="show_answer"
                                 render={({ field }) => (
                                     <FormItem className='flex flex-col'>
                                         <FormLabel>Show answer</FormLabel>
@@ -254,10 +260,10 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                             />
                             <FormField
                                 control={form.control}
-                                name="showResult"
+                                name="show_result"
                                 render={({ field }) => (
                                     <FormItem className='flex flex-col'>
-                                        <FormLabel>Show answer</FormLabel>
+                                        <FormLabel>Show result</FormLabel>
                                         <FormControl>
                                             <Switch
                                                 checked={field.value}
@@ -269,10 +275,10 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                             />
                             <FormField
                                 control={form.control}
-                                name="isShuffle"
+                                name="shuffle_question"
                                 render={({ field }) => (
                                     <FormItem className='flex flex-col'>
-                                        <FormLabel>Shuffle question and answer</FormLabel>
+                                        <FormLabel>Shuffle question</FormLabel>
                                         <FormControl>
                                             <Switch
                                                 checked={field.value}
@@ -283,34 +289,6 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                                 )}
                             />
                         </div>
-                        {/* <FormField
-                            control={form.control}
-                            name="quiz_status"
-                            render={({ field }) => (
-                                <FormItem className="space-y-3">
-                                    <FormLabel>Exam status</FormLabel>
-                                    <FormControl>
-                                        <RadioGroup
-                                            onValueChange={field.onChange}
-                                            value={field.value}
-                                            className="flex space-y-1"
-                                        >
-                                            {Object.entries(ExamStatus).map((item) => (
-                                                <FormItem key={item[1]} className="flex items-center space-x-3 space-y-0">
-                                                    <FormControl>
-                                                        <RadioGroupItem value={item[1]} />
-                                                    </FormControl>
-                                                    <FormLabel className="font-normal">
-                                                        {item[1]}
-                                                    </FormLabel>
-                                                </FormItem>
-                                            ))}
-                                        </RadioGroup>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        /> */}
                         <FormField
                             control={form.control}
                             name="access_modifier"
@@ -375,26 +353,27 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                         </div>
                     </Modal>
                     <Button className='hidden' id='submit' type='submit'>Submit</Button>
-                    <Carousel count={count} current={current} className='max-w-[100vh]' onNextSlide={() => setCurrent(current + 1)} onPrevSlide={() => setCurrent(current - 1)} > <>
-                        {
-                            questionFields.map((question, questionIndex: number) => (
-                                <div key={question.id}>
-                                    <Card className='w-[100vh] p-10'>
-                                        <CardHeader>
-                                            <div className='flex justify-between'>
-                                                <Button type='button' className='bg-green-600 hover:bg-green-500' onClick={onAddQuiz}><FolderPlus /></Button>
-                                                <CardTitle>Question {questionIndex + 1}</CardTitle>
-                                                <Button variant={'destructive'} disabled={count === 0 ? true : false} type='button' onClick={() => setOpenConfirm(true)}><FolderX /></Button>
-                                            </div>
-                                        </CardHeader>
-                                        <CardContent className="flex justify-center">
-                                            <QuestionForm questionIndex={questionIndex} form={form} />
-                                        </CardContent>
-                                    </Card>
-                                </div>
-                            ))
-                        }
-                    </>
+                    <Carousel count={count} current={current} className='max-w-[100vh]' onNextSlide={() => setCurrent(current + 1)} onPrevSlide={() => setCurrent(current - 1)} >
+                        <>
+                            {
+                                questionFields.map((question, questionIndex: number) => (
+                                    <div key={question.id}>
+                                        <Card className='w-[100vh] p-10'>
+                                            <CardHeader>
+                                                <div className='flex justify-between'>
+                                                    <Button type='button' className='bg-green-600 hover:bg-green-500' onClick={onAddQuiz}><FolderPlus /></Button>
+                                                    <CardTitle>Question {questionIndex + 1}</CardTitle>
+                                                    <Button variant={'destructive'} disabled={count === 0 ? true : false} type='button' onClick={() => setOpenConfirm(true)}><FolderX /></Button>
+                                                </div>
+                                            </CardHeader>
+                                            <CardContent className="flex justify-center">
+                                                <QuestionForm questionIndex={questionIndex} form={form} />
+                                            </CardContent>
+                                        </Card>
+                                    </div>
+                                ))
+                            }
+                        </>
                     </Carousel>
                 </form>
             </Form >

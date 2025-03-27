@@ -5,6 +5,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { UserAnswerActions } from '@/redux/slice/userAnswerSlice'
 import { QuestionType } from '@/types/QuestionType'
+import UserAnswerResponse from '@/types/response/UserAnswerResponse'
 import { Check, X } from 'lucide-react'
 type Props = {
     quizId: string
@@ -12,10 +13,11 @@ type Props = {
     index: number,
     showResult?: boolean,
     showAnswer?: boolean,
-    userAnswerResult?: number[]
+    userAnswerResult?: UserAnswerResponse
 }
-const QuestionElement = ({ question, index, quizId, showResult = false, showAnswer = false, userAnswerResult = [] }: Props) => {
+const QuestionElement = ({ question, index, quizId, showResult = false, showAnswer = false, userAnswerResult }: Props) => {
     const { id: questionId, question_type: questionType } = question
+    const userAnswerIds = userAnswerResult?.answers.map(answer => answer.id) ?? []
     const dispatch = useAppDispatch();
     const userAnswer = useAppSelector(state => state.userAnswer);
     const answerIds = userAnswer?.[quizId]?.[question.id] ?? [];
@@ -34,8 +36,8 @@ const QuestionElement = ({ question, index, quizId, showResult = false, showAnsw
             case QuestionType.MULTIPLE_CHOICE: {
                 const answers = question?.answers?.map((answer) => (
                     <div key={answer.id} className="flex items-center space-x-2">
-                        <Checkbox disabled={showResult} checked={showResult ? userAnswerResult.includes(answer.id) : answerIds.includes(answer.id)} onCheckedChange={checked => onCheckboxChange(checked, answer.id)} key={`a-${answer.id}`} value={answer.id} />
-                        <Label className={showAnswer && answer.correct ? "text-green-600" : ""} htmlFor={`a-${answer.id}`}>{answer.id}</Label>
+                        <Checkbox disabled={userAnswerResult !== undefined} checked={userAnswerResult !== undefined ? userAnswerIds.includes(answer.id) : answerIds.includes(answer.id)} onCheckedChange={checked => onCheckboxChange(checked, answer.id)} key={`a-${answer.id}`} value={answer.id} />
+                        <Label className={showAnswer && answer.correct ? "text-green-600" : ""} htmlFor={`a-${answer.id}`}>{answer.answer}</Label>
                     </div>
                 ))
                 return (
@@ -51,7 +53,7 @@ const QuestionElement = ({ question, index, quizId, showResult = false, showAnsw
                         <Label className={showAnswer && answer.correct ? "text-green-600" : ""} htmlFor={`a-${answer.id}`}>{answer.answer}</Label>
                     </div>
                 ))
-                return <RadioGroup disabled={showResult} defaultValue={showResult ? `${userAnswerResult?.[0]}` : `${answerIds?.[0]}`} onValueChange={(value) => onRadioChange(Number(value))}>
+                return <RadioGroup disabled={userAnswerResult !== undefined} defaultValue={userAnswerResult !== undefined ? `${userAnswerIds?.[0]}` : `${answerIds?.[0]}`} onValueChange={(value) => onRadioChange(Number(value))}>
                     {answers}
                 </RadioGroup>
             }
@@ -59,25 +61,17 @@ const QuestionElement = ({ question, index, quizId, showResult = false, showAnsw
                 return <p>Loại câu hỏi không được hỗ trợ</p>;
         }
     }
-    const isCorrect = () => {
-        if (questionType === QuestionType.MULTIPLE_CHOICE) {
-            return question.answers?.every(answer => !answer.correct || userAnswerResult.includes(answer.id));
-        } else {
-            return question.answers?.some(answer => answer.correct && answer.id === userAnswerResult[0]);
-        }
-    }
     return (
         <Card className='w-full'>
-            <CardHeader className=''>
+            <CardHeader>
                 <CardTitle className='flex justify-between'>
                     <span>{index + 1}. {question.question}</span>
                     {showResult &&
                         <span className='text-xl'>
-                            {isCorrect() ? <span className='text-green-500'>  <Check /></span> : <span className='text-red-500'><X /></span>}
+                            {userAnswerResult?.correct ? <span className='text-green-500'>  <Check /></span> : <span className='text-red-500'><X /></span>}
                         </span>
                     }
                 </CardTitle>
-                {/* <p>Đáp án đúng: {question.answers?.filter(answer => answer.correct).map(answer => answer.answer).join(', ')}</p> */}
                 <CardContent>
                     {renderAnswer()}
                 </CardContent>

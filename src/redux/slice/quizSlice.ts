@@ -1,35 +1,34 @@
+import { AccessModifier } from "@/types/AccessModifier";
+import { QuestionType } from "@/types/QuestionType";
+import { QuizLevel } from "@/types/QuizLevel";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-export interface QuizState {
-    value: QuizRequest[]
+const initialState: QuizRequest = {
+    title: "",
+    description: "",
+    duration: 0,
+    questions: [{ question: "", shuffleAnswer: false, question_type: QuestionType.SINGLE_CHOICE, answers: Array(4).fill({ answer: "", correct: false }) }],
+    quiz_level: QuizLevel.EASY,
+    quiz_category_id: 0,
+    completed: false,
+    shuffleQuestion: true,
+    showAnswer: true,
+    showResult: true,
+    access_modifier: AccessModifier.PRIVATE
 }
-const initialState: QuizState = {
-    value: []
-}
-// luu quizzes trong truong hop tao quiz
-export const quizSlice = createSlice({
-    name: "quiz",
+// luu danh sach quiz
+export const QuizSlice = createSlice({
+    name: "exam",
     initialState,
     reducers: {
-        set: (
-            state = initialState,
-            action: PayloadAction<QuizRequest[]>
+        set: (state,
+            action: PayloadAction<QuizRequest>
         ) => {
-            state.value = action.payload
+            Object.assign(state, action.payload);
         },
-        remove: (state, action: PayloadAction<number>) => {
-            state.value.splice(action.payload, 1);
-        },
-        add: (state, action: PayloadAction<QuizRequest>) => {
-            state.value.push(action.payload);
-        },
-        update: (state, action: PayloadAction<{ indexQuiz: number, quiz: QuizRequest }>) => {
-            const { indexQuiz, quiz } = action.payload;
-            state.value[indexQuiz] = quiz
-        },
-        resetQuiz: () => {
+        reset: () => {
             return initialState;
         },
     },
 });
-export const QuizActions = quizSlice.actions;
-export const QuizReducer = quizSlice.reducer;
+export const QuizActions = QuizSlice.actions;
+export const QuizReducer = QuizSlice.reducer;
