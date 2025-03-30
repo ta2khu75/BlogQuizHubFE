@@ -5,5 +5,5 @@ interface BlogResponse extends BlogBase {
     author: AccountResponse;
     info: InfoResponse;
     content?: string;
-    exam?: ExamResponse[];
+    quiz?: QuizResponse[];
 }

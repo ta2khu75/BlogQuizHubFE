@@ -25,6 +25,7 @@ import { QuestionType } from '@/types/QuestionType';
 import QuizService from '@/services/QuizService';
 import QuestionForm, { questionSchema } from '@/components/form/QuestionForm';
 import QuizMenuElement from '@/components/elements/content/quiz/QuizMenuElement';
+import { QuizResultMode } from '@/types/DisplayMode';
 const quizSchema = z.object({
     title: z.string().nonempty(),
     quiz_level: z.nativeEnum(QuizLevel),
@@ -32,8 +33,7 @@ const quizSchema = z.object({
     description: z.string().optional(),
     access_modifier: z.nativeEnum(AccessModifier),
     quiz_category_id: z.number(),
-    show_answer: z.boolean().default(true),
-    show_result: z.boolean().default(true),
+    quiz_result_mode: z.nativeEnum(QuizResultMode),
     shuffle_question: z.boolean().default(true),
     completed: z.boolean().default(false),
     questions: z.array(questionSchema),
@@ -58,7 +58,7 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
     const [openConfirm, setOpenConfirm] = useState(false)
     const [current, setCurrent] = useState(0)
     const initQuiz: QuestionRequest = { question: "", question_type: QuestionType.SINGLE_CHOICE, shuffle_answer: false, answers: Array(4).fill({ answer: "", correct: false }) };
-    const quizDefault: QuizRequest = { title: "", quiz_level: QuizLevel.EASY, completed: false, shuffle_question: true, show_answer: true, show_result: true, duration: 0, quiz_category_id: 0, access_modifier: AccessModifier.PRIVATE, description: "", questions: [initQuiz] }
+    const quizDefault: QuizRequest = { title: "", quiz_level: QuizLevel.EASY, completed: false, shuffle_question: true, duration: 0, quiz_category_id: 0, access_modifier: AccessModifier.PRIVATE, quiz_result_mode: QuizResultMode.ANSWER_VISIBLE, description: "", questions: [initQuiz] }
     const form = useForm<QuizRequest>({
         resolver: zodResolver(quizSchema),
         defaultValues: quizForm ?? quizDefault
@@ -163,7 +163,7 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
     return (
         <>
             <Form {...form}>
-                <form className='w-[100vh' onSubmit={form.handleSubmit(onSubmit)}>
+                <form className='w-[100vh]' onSubmit={form.handleSubmit(onSubmit)}>
                     <div className='flex justify-between'>
                         <Button variant={'destructive'} type='button' onClick={() => onReset()}>Reset</Button>
                         <div className="py-2 text-center text-sm text-muted-foreground">
@@ -171,7 +171,7 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                         </div>
                         <Button type='button' className='bg-blue-600 hover:bg-blue-500' onClick={() => setOpen(true)}>{quiz ? "Update" : " Create"}</Button>
                     </div>
-                    <Modal scroll onCancel={onCancel} open={open} title={quiz ? "Update Exam" : "Create Exam"}>
+                    <Modal scroll className='max-w-[800px]' onCancel={onCancel} open={open} title={quiz ? "Update Exam" : "Create Exam"}>
                         <FormField control={form.control} name='title' render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Title</FormLabel>
@@ -245,36 +245,6 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                             />
                             <FormField
                                 control={form.control}
-                                name="show_answer"
-                                render={({ field }) => (
-                                    <FormItem className='flex flex-col'>
-                                        <FormLabel>Show answer</FormLabel>
-                                        <FormControl>
-                                            <Switch
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                        </FormControl>
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="show_result"
-                                render={({ field }) => (
-                                    <FormItem className='flex flex-col'>
-                                        <FormLabel>Show result</FormLabel>
-                                        <FormControl>
-                                            <Switch
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                        </FormControl>
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
                                 name="shuffle_question"
                                 render={({ field }) => (
                                     <FormItem className='flex flex-col'>
@@ -289,6 +259,34 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                                 )}
                             />
                         </div>
+                        <FormField
+                            control={form.control}
+                            name="quiz_result_mode"
+                            render={({ field }) => (
+                                <FormItem className="space-y-3">
+                                    <FormLabel>Quiz result mode</FormLabel>
+                                    <FormControl>
+                                        <RadioGroup
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                            className="flex space-y-1"
+                                        >
+                                            {Object.entries(QuizResultMode).map((item) => (
+                                                <FormItem key={item[0]} className="flex items-center space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <RadioGroupItem value={item[0]} />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">
+                                                        {item[1]}
+                                                    </FormLabel>
+                                                </FormItem>
+                                            ))}
+                                        </RadioGroup>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                         <FormField
                             control={form.control}
                             name="access_modifier"

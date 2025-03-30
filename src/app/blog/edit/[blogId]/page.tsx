@@ -48,7 +48,7 @@ const BlogEditPage = ({ params }: { params: Promise<{ blogId: string }> }) => {
                 <CardTitle>Update blog</CardTitle>
             </CardHeader>
             <CardContent>
-                <BlogForm blog={blog} isEdit={true} onSubmit={onSubmit} />
+                <BlogForm blog={blog} onSubmit={onSubmit} />
             </CardContent>
         </Card>
     )

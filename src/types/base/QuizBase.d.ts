@@ -1,11 +1,11 @@
+
 interface QuizBase {
     title: string;
     duration: number;
     description: string;
     quiz_level: QuizLevel;
     access_modifier: AccessModifier;
-    show_answer: boolean;
-    show_result: boolean;
+    quiz_result_mode: QuizResultMode;
     shuffle_question: boolean;
     completed: boolean;
 }

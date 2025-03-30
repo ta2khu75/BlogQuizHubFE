@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { AccessModifier } from '@/types/AccessModifier'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2, Plus, X } from 'lucide-react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { z, ZodType } from 'zod'
 const formSchema: ZodType<BlogRequest> = z.object({
@@ -20,11 +20,11 @@ const formSchema: ZodType<BlogRequest> = z.object({
 type FormData = z.infer<typeof formSchema>;
 type Props = {
     onSubmit: (data: BlogRequest) => void,
-    isEdit?: boolean,
     blog?: BlogResponse
 }
 
-const BlogForm = ({ onSubmit, blog, isEdit = false }: Props) => {
+const BlogForm = ({ onSubmit, blog }: Props) => {
+    const [reset, setReset] = useState(false)
     const getBlogForm = () => {
         const blogForm = localStorage.getItem("blogForm")
         if (blogForm) {
@@ -62,7 +62,7 @@ const BlogForm = ({ onSubmit, blog, isEdit = false }: Props) => {
             form.reset({ ...blog })
         } else {
             form.reset(blogDefault)
-
+            setReset(!reset)
         }
     }
     return (
@@ -144,7 +144,7 @@ const BlogForm = ({ onSubmit, blog, isEdit = false }: Props) => {
                     <FormItem>
                         <FormLabel>Content</FormLabel>
                         <FormControl>
-                            <TextEditor onReset={() => console.log('reset')} isEdit={isEdit} name={field.name} initialValue={field.value} className='min-h-[200px]' placeholder="Content" onChange={field.onChange} />
+                            <TextEditor onReset={() => console.log('reset')} name={field.name} initialValue={field.value} className='min-h-[200px]' placeholder="Content" onChange={field.onChange} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

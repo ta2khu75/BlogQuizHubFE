@@ -3,11 +3,17 @@ import { Editor, Element, Range, Transforms } from "slate";
 import isUrl from 'is-url'
 import imageExtensions from 'image-extensions'
 export const isMarkActive = (editor: EditorType, format: TextEditorMark) => {
-    const marks = Editor.marks(editor)
-    return marks ? marks[format] === true : false
+    try {
+        const marks = Editor.marks(editor)
+        return marks ? marks[format] === true : false
+    } catch (error) {
+        console.log(error);
+        return false
+    }
 };
 
 export const toggleMark = (editor: EditorType, format: TextEditorMark) => {
+    if (!editor.selection) return;
     const isActive = isMarkActive(editor, format);
     if (isActive) editor.removeMark(format);
     else editor.addMark(format, true);
@@ -23,19 +29,38 @@ export const isBlockActive = (editor: EditorType, format: TextEditorBlock) => {
     const { selection } = editor;
     if (!selection) return false;
     const blockType = isAlignFormat(format) ? "align" : "type";
-    const match = Array.from(
-        Editor.nodes(editor, {
-            at: Editor.unhangRange(editor, selection),
-            match: (node) => {
-                return (
-                    !Editor.isEditor(node) &&
-                    Element.isElement(node) &&
-                    node[blockType] === format
-                );
-            },
-        })
-    );
-    return !!match?.[0];
+    try {
+
+        const match = Array.from(
+            Editor.nodes(editor, {
+                at: Editor.unhangRange(editor, selection),
+                match: (node) => {
+                    return (
+                        !Editor.isEditor(node) &&
+                        Element.isElement(node) &&
+                        node[blockType] === format
+                    );
+                },
+            })
+        );
+        return !!match?.[0];
+    } catch (error) {
+        console.log(error);
+        return false
+    }
+    // const match = Array.from(
+    //     Editor.nodes(editor, {
+    //         at: Editor.unhangRange(editor, selection),
+    //         match: (node) => {
+    //             return (
+    //                 !Editor.isEditor(node) &&
+    //                 Element.isElement(node) &&
+    //                 node[blockType] === format
+    //             );
+    //         },
+    //     })
+    // );
+    // return !!match?.[0];
 };
 
 export const toggleBlock = (editor: EditorType, format: TextEditorBlock) => {
@@ -76,11 +101,18 @@ export const toggleBlock = (editor: EditorType, format: TextEditorBlock) => {
     Transforms.setNodes<Editor>(editor, newProperties);
 }
 export const isLinkActive = (editor: EditorType) => {
-    const [link] = Editor.nodes(editor, {
-        match: n =>
-            !Editor.isEditor(n) && Element.isElement(n) && n.type === 'link',
-    })
-    return !!link
+    try {
+
+        const [link] = Editor.nodes(editor, {
+            match: n =>
+                !Editor.isEditor(n) && Element.isElement(n) && n.type === 'link',
+        })
+        return !!link
+    } catch (error) {
+        console.log(error);
+        return false
+    }
+    // return !!link
 }
 export const unwrapLink = (editor: EditorType) => {
     Transforms.unwrapNodes(editor, {

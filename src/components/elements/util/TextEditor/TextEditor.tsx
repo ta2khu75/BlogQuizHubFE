@@ -18,9 +18,8 @@ interface TextEditorProps {
     placeholder: string;
     initialValue: string;
     className?: string;
-    isEdit?: boolean;
     onChange: (value: string) => void;
-    onReset: () => void
+    // isReset?: boolean
 }
 
 declare module "slate" {
@@ -31,24 +30,21 @@ declare module "slate" {
     }
 }
 
-const TextEditor = ({ name, placeholder, isEdit = false, onChange, initialValue, className }: TextEditorProps) => {
+const TextEditor = ({ name, placeholder, onChange, initialValue, className }: TextEditorProps) => {
     const [editor] = useState(withImage(withInline(withHistory(withReact(createEditor())))));
     const defaultValue = [{ type: 'paragraph', children: [{ text: '' }] }]
+    const [key, setKey] = useState(0);
     const initValue = useMemo(() => {
         if (initialValue) {
             const initValue = JSON.parse(initialValue)
-            if (initValue.length === 0 && !isEdit) return defaultValue
+            if (initValue.length === 0) return defaultValue
+            setKey(prev => prev + 1);
             return initValue;
         } else {
-            if (!isEdit) return defaultValue
-            return []
+            setKey(prev => prev + 1);
+            return defaultValue
         }
     }, [initialValue]);
-    // const resetEditor = () => {
-    //     Transforms.delete(editor, { at: [0] }); // Remove existing content
-    //     Transforms.insertNodes(editor, defaultValue, { at: [0] }); // Insert default value
-    // };
-
     const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
         const key = event?.key?.toLowerCase();
         if (key === "b" && event?.ctrlKey) {
@@ -67,13 +63,12 @@ const TextEditor = ({ name, placeholder, isEdit = false, onChange, initialValue,
             editor.redo();
         }
     };
-    if (initValue.length === 0) return null
     return (
         <Slate
+            key={key}
             editor={editor}
             onValueChange={(value) => {
-                const valueString = JSON.stringify(value)
-                onChange(valueString);
+                onChange(JSON.stringify(value));
             }}
             initialValue={initValue.length === 0 ? [{ type: 'paragraph', children: [{ text: '' }] }] : initValue}
         >

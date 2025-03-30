@@ -17,9 +17,9 @@ export default class QuizResultService {
   ): Promise<ApiResponse<QuizResultResponse>> {
     return instance.get(`${basePath}/${id}`);
   }
-  static search(examResultSearch: QuizResultSearch): Promise<ApiResponse<PageResponse<QuizResultResponse>>> {
+  static search(quizResultSearch: QuizResultSearch): Promise<ApiResponse<PageResponse<QuizResultResponse>>> {
     return instance.get(basePath, {
-      params: { ...examResultSearch }, paramsSerializer: (params) => {
+      params: { ...quizResultSearch }, paramsSerializer: (params) => {
         return qs.stringify(params, { arrayFormat: 'repeat' });
       }
     })

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import QuizResultService from '@/services/QuizResultService';
+import { QuizResultMode } from '@/types/DisplayMode';
 import UserAnswerResponse from '@/types/response/UserAnswerResponse';
 import FunctionUtil from '@/util/FunctionUtil';
 import StringUtil from '@/util/StringUtil';
@@ -39,7 +40,7 @@ const QuizResultPage = ({ params }: { params: Promise<{ slug: string }> }) => {
                 <CardTitle>{quizResult?.quiz.title}</CardTitle>
                 <p>Correct: {quizResult?.correct_count}/{quizResult?.quiz?.questions?.length ?? 0}</p>
                 <p>Point: {quizResult?.point}</p>
-                {quizResult?.quiz.show_answer &&
+                {quizResult?.quiz.quiz_result_mode === QuizResultMode.ANSWER_VISIBLE &&
                     <Button onClick={() => setShowAnswer(!showAnswer)}>{showAnswer ? "Hide answer" : "Show answer"}</Button>
                 }
             </CardHeader>
@@ -47,7 +48,7 @@ const QuizResultPage = ({ params }: { params: Promise<{ slug: string }> }) => {
                 <CardContent >
                     {quizResult?.quiz?.questions?.length &&
                         <Carousel count={quizResult?.quiz?.questions?.length - 1} current={current} className='max-w-[100vh]' onNextSlide={() => setCurrent(current + 1)} onPrevSlide={() => setCurrent(current - 1)} >
-                            {quizResult?.quiz.questions.map((question, index) => <QuestionElement showResult={quizResult.quiz.show_result} showAnswer={showAnswer && quizResult.quiz.show_answer} quizId={quizResult.quiz.info.id} index={index} key={question.id} question={question}
+                            {quizResult?.quiz.questions.map((question, index) => <QuestionElement showResult={quizResult.quiz.quiz_result_mode === QuizResultMode.QUESTION_RESULT_VISIBLE} showAnswer={showAnswer && quizResult.quiz.quiz_result_mode === QuizResultMode.ANSWER_VISIBLE} quizId={quizResult.quiz.info.id} index={index} key={question.id} question={question}
                                 userAnswerResult={userAnswer.find(userAnswer => userAnswer.question.id === question.id)} />)}
                         </Carousel>
                     }

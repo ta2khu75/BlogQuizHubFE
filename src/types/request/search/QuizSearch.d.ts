@@ -1,8 +1,8 @@
-import { ExamLevel } from "../../QuizLevel";
+import { QuizLevel } from "@/types/QuizLevel";
 
 interface QuizSearch extends Search {
-    examLevels?: ExamLevel[],
-    examCategoryIds?: number[],
+    quizLevels?: QuizLevel[],
+    quizCategoryIds?: number[],
     minDuration?: number,
     maxDuration?: number,
     // authorId: string
