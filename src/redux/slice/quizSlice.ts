@@ -1,4 +1,5 @@
 import { AccessModifier } from "@/types/AccessModifier";
+import { QuizResultMode } from "@/types/DisplayMode";
 import { QuestionType } from "@/types/QuestionType";
 import { QuizLevel } from "@/types/QuizLevel";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
@@ -6,13 +7,12 @@ const initialState: QuizRequest = {
     title: "",
     description: "",
     duration: 0,
-    questions: [{ question: "", shuffleAnswer: false, question_type: QuestionType.SINGLE_CHOICE, answers: Array(4).fill({ answer: "", correct: false }) }],
+    questions: [{ question: "", shuffle_answer: false, question_type: QuestionType.SINGLE_CHOICE, answers: Array(4).fill({ answer: "", correct: false }) }],
     quiz_level: QuizLevel.EASY,
     quiz_category_id: 0,
     completed: false,
-    shuffleQuestion: true,
-    showAnswer: true,
-    showResult: true,
+    shuffle_question: true,
+    quiz_result_mode: QuizResultMode.ANSWER_VISIBLE,
     access_modifier: AccessModifier.PRIVATE
 }
 // luu danh sach quiz

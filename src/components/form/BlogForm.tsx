@@ -144,7 +144,7 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                     <FormItem>
                         <FormLabel>Content</FormLabel>
                         <FormControl>
-                            <TextEditor onReset={() => console.log('reset')} name={field.name} initialValue={field.value} className='min-h-[200px]' placeholder="Content" onChange={field.onChange} />
+                            <TextEditor name={field.name} initialValue={field.value} className='min-h-[200px]' placeholder="Content" onChange={field.onChange} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

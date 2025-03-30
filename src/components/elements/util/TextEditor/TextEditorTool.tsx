@@ -7,13 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAppSelector } from "@/redux/hooks";
 import { Image, Link, Redo, Undo, Unlink } from "lucide-react";
 import { useState } from "react";
 import { useSlate } from "slate-react";
 export default function TextEditorTool() {
     const [url, setUrl] = useState<string>("")
     const [openUrl, setOpenUrl] = useState(false)
-    const [imageUrls, setImageUrls] = useState<string[]>([]);
+    const imageUrls = useAppSelector(state => state.imageUrl)
     const [openImage, setOpenImage] = useState(false)
     const editor = useSlate();
 
@@ -108,7 +109,7 @@ export default function TextEditorTool() {
             <Modal open={openImage} className="max-w-max" onCancel={() => setOpenImage(false)} >
                 <UploadImage
                     // setOpen={setOpenImage} 
-                    onAdd={(url) => onAddImage(url)} imageUrls={imageUrls} setImageUrls={setImageUrls} />
+                    onAdd={(url) => onAddImage(url)} imageUrls={imageUrls} />
             </Modal>
         </div >
     );

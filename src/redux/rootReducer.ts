@@ -1,11 +1,12 @@
 import { AuthReducer } from '@/redux/slice/authSlide';
-// import { QuizReducer } from '@/redux/slice/quizSlice';
+import { ImageUrlReducer } from '@/redux/slice/imageUrlSlide';
 import { UserAnswerReducer } from '@/redux/slice/userAnswerSlice';
 import { combineReducers } from '@reduxjs/toolkit';
 
 export const rootReducer = combineReducers({
   auth: AuthReducer,
   userAnswer: UserAnswerReducer,
+  imageUrl: ImageUrlReducer,
   // exam: ExamReducer,
   // quiz: QuizReducer
 });
