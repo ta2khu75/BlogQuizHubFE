@@ -31,7 +31,7 @@ const items = [
   },
   {
     title: "Category",
-    url: "/admin/exam-category",
+    url: "/admin/quiz-category",
     icon: TypeOutline,
   },
   {

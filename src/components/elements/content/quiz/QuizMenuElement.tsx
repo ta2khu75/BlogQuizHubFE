@@ -4,11 +4,11 @@ import { cn } from '@/lib/utils'
 import React from 'react'
 type Props = {
     onIndexClick: (index: number) => void,
-    states: ("selected" | "unselected" | "error" | "warning")[]
+    states: ("selected" | "unselected" | "error" | "warning" | "correct")[]
 }
 const QuizMenuElement = ({ onIndexClick, states }: Props) => {
     const buttonProps: Record<
-        "selected" | "unselected" | "error" | "warning",
+        "selected" | "unselected" | "error" | "warning" | "correct",
         { className?: string; variant?: "default" | "outline" | "destructive" }> = {
         selected: {
             className: "bg-blue-600 hover:bg-blue-500 text-white shadow-md",
@@ -19,6 +19,9 @@ const QuizMenuElement = ({ onIndexClick, states }: Props) => {
         },
         error: {
             variant: "destructive",
+        },
+        correct: {
+            className: "bg-green-600 hover:bg-green-500 text-white shadow-md",
         },
         warning: {
             variant: "default",

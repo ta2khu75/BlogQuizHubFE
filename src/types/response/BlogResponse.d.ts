@@ -4,6 +4,6 @@ interface BlogResponse extends BlogBase {
     image_path: string;
     author: AccountResponse;
     info: InfoResponse;
-    content?: string;
+    content: string;
     quiz?: QuizResponse[];
 }

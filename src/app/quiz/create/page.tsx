@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react'
 
 const QuizCreatePage = () => {
     const { toast } = useToast()
-    const [examCategories, setQuizCategories] = useState<QuizCategoryResponse[]>([]);
+    const [quizCategories, setQuizCategories] = useState<QuizCategoryResponse[]>([]);
     useEffect(() => {
         fetchQuizCategoryList()
     }, [])
@@ -23,7 +23,7 @@ const QuizCreatePage = () => {
             toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
     }
     return (
-        <QuizForm quizCategories={examCategories} />
+        <QuizForm quizCategories={quizCategories} />
     )
 }
 

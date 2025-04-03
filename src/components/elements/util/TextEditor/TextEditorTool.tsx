@@ -14,7 +14,7 @@ import { useSlate } from "slate-react";
 export default function TextEditorTool() {
     const [url, setUrl] = useState<string>("")
     const [openUrl, setOpenUrl] = useState(false)
-    const imageUrls = useAppSelector(state => state.imageUrl)
+    const imageUrls = useAppSelector(state => state.imageUrls)
     const [openImage, setOpenImage] = useState(false)
     const editor = useSlate();
 

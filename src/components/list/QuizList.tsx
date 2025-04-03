@@ -13,7 +13,7 @@ const size = 10
 type Props = {
     isAuthor: boolean
 }
-const QuizSearch = ({ isAuthor }: Props) => {
+const QuizList = ({ isAuthor }: Props) => {
     const { toast } = useToast()
     const searchParams = useSearchParams()
     const authorId = searchParams.get("id")
@@ -39,7 +39,7 @@ const QuizSearch = ({ isAuthor }: Props) => {
                 <CardHeader>
                     <div className='flex justify-between items-center'>
                         <Link href={`/profile?id=${quiz.author.info.id}`}><AvatarElement account={quiz.author} /></Link>
-                        {isAuthor && !quiz.isCompleted && <>{quiz.access_modifier} <Button variant={"link"}><Link href={`/quiz/edit/${quiz.info.id}`}>Edit</Link></Button></>}
+                        {isAuthor && !quiz.completed && <>{quiz.access_modifier} <Button variant={"link"}><Link href={`/quiz/edit/${quiz.info.id}`}>Edit</Link></Button></>}
                     </div>
                     <CardTitle><Link href={`/quiz/about/${StringUtil.convertSlugUrl(quiz.title)}-id-${quiz.info.id}.html`} className='hover:underline'>{quiz.title}</Link> </CardTitle>
                 </CardHeader>
@@ -50,7 +50,7 @@ const QuizSearch = ({ isAuthor }: Props) => {
                     <CardDescription>Category: {quiz.quiz_category.name}</CardDescription>
                     <CardDescription>Duration: {quiz.duration} {quiz.duration > 1 ? "minutes" : "minute"}</CardDescription>
                     <CardDescription>Level: {quiz.quiz_level}</CardDescription>
-                    <CardDescription>Status: {quiz.isCompleted ? "Completed" : "Not completed"}</CardDescription>
+                    <CardDescription>Status: {quiz.completed ? "Completed" : "Not completed"}</CardDescription>
                 </CardFooter>
             </Card>)
             )}
@@ -58,4 +58,4 @@ const QuizSearch = ({ isAuthor }: Props) => {
     )
 }
 
-export default QuizSearch
+export default QuizList 

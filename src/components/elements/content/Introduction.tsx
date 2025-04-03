@@ -19,10 +19,10 @@ const Introduction = () => {
                 <div className="mx-auto max-w-2xl py-32 sm:py-12 lg:py-20">
                     <div className="text-center">
                         <h1 className="text-balance text-2xl font-semibold tracking-tight text-gray-900 sm:text-7xl">
-                            Making blogs and exams easy to write and learn!
+                            Making blogs and quizs easy to write and learn!
                         </h1>
                         <p className="mt-8 text-pretty text-lg font-medium text-gray-500 sm:text-xl/8">
-                            Welcome to Blog Exam Hub – your go-to destination for insightful articles, tips, and resources to excel in exams and learning!
+                            Welcome to Blog Quiz Hub – your go-to destination for insightful articles, tips, and resources to excel in quizs and learning!
                         </p>
                         <div className="mt-10 flex items-center justify-center gap-x-6">
                             <Link

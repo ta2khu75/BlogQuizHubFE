@@ -1,5 +1,6 @@
 "use client"
 import QuestionElement from '@/components/elements/content/question/QuestionElement'
+import QuizMenuElement from '@/components/elements/content/quiz/QuizMenuElement'
 import Carousel from '@/components/elements/util/Carousel'
 import Confirm from '@/components/elements/util/Confirm'
 import CountdownTimer, { CountdownTimerRef } from '@/components/elements/util/CountdownTimer'
@@ -23,17 +24,18 @@ const QuizDetailPage = ({ params }: { params: Promise<{ slug: string }> }) => {
     const auth = useAppSelector(state => state.auth)
     const [current, setCurrent] = useState(0)
     const quizId = useMemo(() => StringUtil.getIdFromSlugUrl(slug), [slug])
-    const quizAnswer = useAppSelector((state) => state.userAnswer?.[quizId ?? ""]) ?? [];
+    const userAnswer = useAppSelector((state) => state.userAnswer?.[quizId]) ?? [];
     const countdownRef = useRef<CountdownTimerRef>(null);
     const [quizResult, setQuizResult] = useState<QuizResultResponse>();
     const [openResult, setOpenResult] = useState(false)
     const [openConfirm, setOpenConfirm] = useState(false)
+    const [openAlert, setOpenAlert] = useState([false, false])
     useEffect(() => {
         fetchQuiz()
     }, [quizId])
     const fetchSubmitQuiz = async () => {
         if (!quizResult) return
-        const answerUser = !quizAnswer ? [] : Object.entries(quizAnswer).map(([question_id, answer_ids]) => ({
+        const answerUser = !userAnswer ? [] : Object.entries(userAnswer).map(([question_id, answer_ids]) => ({
             question_id: Number(question_id),
             answer_ids: Array.isArray(answer_ids) ? (answer_ids as number[]) : [],
         }));
@@ -67,6 +69,23 @@ const QuizDetailPage = ({ params }: { params: Promise<{ slug: string }> }) => {
     const onCancelResult = () => {
         router.push(`/profile?id=${auth.account?.info.id}&tab=quizResult`)
     }
+    const slideState = useMemo(() => {
+        if (quizResult) {
+            return quizResult?.quiz.questions?.map((item, index) => {
+                if (index === current) return "selected";
+                if (userAnswer?.[`${item.id}`]) return "correct"
+                if (openAlert[1]) return "error"
+                else return "unselected"
+            })
+        } return []
+    }, [current, quizResult, userAnswer, openAlert]);
+    const onContinue = () => {
+        if (Object.keys(userAnswer).length === quizResult?.quiz.questions?.length || openAlert[0]) {
+            fetchSubmitQuiz()
+        } else {
+            setOpenAlert([true, true])
+        }
+    }
     return (
         <>
             <Card className='w-full'>
@@ -89,6 +108,7 @@ const QuizDetailPage = ({ params }: { params: Promise<{ slug: string }> }) => {
                     </CardContent>
                 </Card>
             </Card>
+            <QuizMenuElement onIndexClick={(index) => setCurrent(index)} states={slideState} />
             <Modal open={openResult} onCancel={() => onCancelResult()}>
                 <Card className='w-full'>
                     <CardHeader className='flex-row justify-between'>
@@ -102,7 +122,8 @@ const QuizDetailPage = ({ params }: { params: Promise<{ slug: string }> }) => {
                     </CardContent>
                 </Card>
             </Modal>
-            <Confirm title='Do you want submit quiz?' onContinue={() => fetchSubmitQuiz()} onCancel={() => setOpenConfirm(false)} open={openConfirm} />
+            <Confirm title='Do you want submit quiz?' onContinue={() => onContinue()} onCancel={() => setOpenConfirm(false)} open={openConfirm} />
+            <Confirm title='You have not answer all question. Do you want submit quiz?' onContinue={() => onContinue()} onCancel={() => setOpenAlert(prev => [false, prev[1]])} open={openAlert[0]} />
         </>
     )
 }

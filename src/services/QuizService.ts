@@ -12,10 +12,10 @@ export default class QuizService {
         })
     }
     // static mySearchBlogNull(keyword: string, page = 1, size = 10): Promise<ApiResponse<PageResponse<QuizResponse>>> {
-    //     return instance.get(`${basePath}/my-exam/blog-null`, { params: { keyword, page, size } })
+    //     return instance.get(`${basePath}/mine/blog-null`, { params: { keyword, page, size } })
     // }
     // static myReadAllById(ids: string[]): Promise<ApiResponse<QuizResponse[]>> {
-    //     return instance.get(`${basePath}/my-exam/ids`, { params: { ids } })
+    //     return instance.get(`${basePath}/mine/ids`, { params: { ids } })
     // }
     static create(data: QuizRequest, image: File): Promise<ApiResponse<QuizResponse>> {
         const form = new FormData();
@@ -40,10 +40,4 @@ export default class QuizService {
     static read(id: string): Promise<ApiResponse<QuizResponse>> {
         return instance.get(`${basePath}/${id}`);
     }
-    // static countByAuthor(authorId: string): Promise<ApiResponse<CountResponse>> {
-    //     return instance.get(`${basePath}/${authorId}/count`);
-    // }
-    // static myCount(): Promise<ApiResponse<CountResponse>> {
-    //     return instance.get(`${basePath}/my-blog/count`);
-    // }
 }

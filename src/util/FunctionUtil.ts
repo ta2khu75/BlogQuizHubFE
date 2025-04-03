@@ -1,3 +1,4 @@
+import { CustomElement } from "@/components/elements/util/TextEditor/TextEditorType";
 import { z } from "zod";
 
 export default class FunctionUtil {
@@ -9,6 +10,10 @@ export default class FunctionUtil {
     }
 
     static capitalizeFirstLetter = (str: string) => (str.charAt(0).toUpperCase() + str.slice(1)).replace(/_/g, ' ');
+    static getImageUrlFromContent = (content: string) => {
+        const contentData: CustomElement[] = JSON.parse(content)
+        return contentData.filter((item) => item.type === "image" && item.url).map(item => item.url as string);
+    }
     static showError = (error: unknown) => {
         console.log(error);
 

@@ -171,7 +171,7 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                         </div>
                         <Button type='button' className='bg-blue-600 hover:bg-blue-500' onClick={() => setOpen(true)}>{quiz ? "Update" : " Create"}</Button>
                     </div>
-                    <Modal scroll className='max-w-[800px]' onCancel={onCancel} open={open} title={quiz ? "Update Exam" : "Create Exam"}>
+                    <Modal scroll className='max-w-[800px]' onCancel={onCancel} open={open} title={quiz ? "Update Quiz" : "Create Quiz"}>
                         <FormField control={form.control} name='title' render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Title</FormLabel>
@@ -183,7 +183,7 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                         )} />
                         <FormField control={form.control} name='quiz_category_id' render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Exam category</FormLabel>
+                                <FormLabel>Quiz category</FormLabel>
                                 <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={`${field.value}`}>
                                     <FormControl>
                                         <SelectTrigger>

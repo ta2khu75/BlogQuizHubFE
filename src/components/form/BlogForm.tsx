@@ -15,7 +15,7 @@ const formSchema: ZodType<BlogRequest> = z.object({
     content: z.string().min(10),
     blog_tags: z.array(z.string().nonempty()).min(1),
     access_modifier: z.nativeEnum(AccessModifier),
-    exam_ids: z.string().array().optional()
+    quiz_ids: z.string().array().optional()
 })
 type FormData = z.infer<typeof formSchema>;
 type Props = {

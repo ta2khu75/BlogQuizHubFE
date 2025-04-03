@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 const size = 20
-const QuizResultSearch = () => {
+const QuizResultList = () => {
     const { toast } = useToast()
     const searchParams = useSearchParams()
     const authorId = searchParams.get("id")
@@ -52,4 +52,4 @@ const QuizResultSearch = () => {
     )
 }
 
-export default QuizResultSearch; 
+export default QuizResultList; 

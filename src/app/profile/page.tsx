@@ -2,9 +2,7 @@
 import Modal from '@/components/elements/util/Modal'
 import AccountInfoForm from '@/components/form/AccountInfoForm'
 import AccountPasswordForm from '@/components/form/AccountPasswordForm'
-import BlogSearch from '@/components/search/BlogSearch'
-import ExamResultSearch from '@/components/search/QuizResultSearch'
-import FollowList from '@/components/search/FollowList'
+import FollowList from '@/components/list/FollowList'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,7 +17,9 @@ import FunctionUtil from '@/util/FunctionUtil'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useMemo, useState } from 'react'
-import QuizSearch from '@/components/search/QuizSearch'
+import QuizSearch from '@/components/list/QuizList'
+import BlogList from '@/components/list/BlogList'
+import QuizResultList from '@/components/list/QuizResultList'
 const ProfilePage = () => {
     const { toast } = useToast();
     const dispatch = useAppDispatch()
@@ -182,7 +182,7 @@ const ProfilePage = () => {
                         </TabsTrigger>
                         {isAuthor &&
                             <TabsTrigger className='flex flex-col items-center p-4' value="quizResult">
-                                Exam result
+                                Quiz result
                             </TabsTrigger>
                         }
                     </TabsList>
@@ -194,7 +194,7 @@ const ProfilePage = () => {
                     {isAuthor &&
                         <Button><Link href="/blog/create">Create</Link></Button>}
                 </div>
-                <BlogSearch isAuthor={isAuthor} />
+                <BlogList isAuthor={isAuthor} />
             </TabsContent>
             <TabsContent value='quiz'>
                 <div className='flex justify-between'>
@@ -208,7 +208,7 @@ const ProfilePage = () => {
                 <FollowList />
             </TabsContent>
             <TabsContent value='quizResult'>
-                <ExamResultSearch />
+                <QuizResultList />
             </TabsContent>
         </Tabs >
     )

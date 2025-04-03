@@ -3,8 +3,8 @@ import instance from "@/util/apiInstance";
 import qs from 'qs';
 const basePath = BasePath.QUIZ_RESULT;
 export default class QuizResultService {
-  static takeQuiz(examId: string): Promise<ApiResponse<QuizResultResponse>> {
-    return instance.get(`${basePath}/exam/${examId}`);
+  static takeQuiz(quizId: string): Promise<ApiResponse<QuizResultResponse>> {
+    return instance.get(`${basePath}/quiz/${quizId}`);
   }
   static submitQuiz(
     id: string,

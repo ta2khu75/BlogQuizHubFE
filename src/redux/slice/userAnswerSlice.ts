@@ -5,7 +5,6 @@ interface QuizAnswer {
   questionId: number;
   questionType: QuestionType
   answerId: number
-  // answerIds: number[];
 }
 export interface QuestionListState {
   [key: number]: number[];
@@ -19,24 +18,6 @@ export const userAnswer = createSlice({
   name: "userAnswer",
   initialState,
   reducers: {
-    // set: (
-    //   state = initialState,
-    //   action: PayloadAction<ExamAnswer>
-    // ) => {
-    //   const { quizId, questionId, answerIds } = action.payload;
-    //   state[quizId] = state[quizId] ?? {};
-    //   state[quizId][questionId] = answerIds;
-    //   if (!answerIds.length) {
-    //     delete state[quizId][questionId];
-    //   }
-    // },
-    init: (state) => {
-      const examAnswerJson = localStorage.getItem("examAnswer");
-      if (examAnswerJson) {
-        return JSON.parse(examAnswerJson);
-      }
-      return state
-    },
     add: (state, action: PayloadAction<QuizAnswer>) => {
       const { quizId, questionId, answerId, questionType } = action.payload;
       state[quizId] = state[quizId] ?? {};
