@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
-import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import { useAppDispatch } from '@/redux/hooks'
 import { AuthActions } from '@/redux/slice/authSlide'
 import AccountService from '@/services/AccountService'
 import AuthService from '@/services/AuthService'
@@ -16,17 +16,17 @@ import { FollowService } from '@/services/FollowService'
 import FunctionUtil from '@/util/FunctionUtil'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import React, { useEffect, useMemo, useState } from 'react'
-import QuizSearch from '@/components/list/QuizList'
-import BlogList from '@/components/list/BlogList'
+import React, { useEffect, useState } from 'react'
 import QuizResultList from '@/components/list/QuizResultList'
+import useIsAuthor from '@/components/util/useIsAuthor'
+import BlogSearch from '@/components/search/BlogSearch'
+import QuizSearch from '@/components/search/QuizSearch'
 const ProfilePage = () => {
     const { toast } = useToast();
     const dispatch = useAppDispatch()
     const [disableFollow, setDisableFollow] = useState(false)
     const router = useRouter()
     const searchParams = useSearchParams()
-    const auth = useAppSelector(state => state.auth.account);
     const id = searchParams.get('id')
     const tab = searchParams.get('tab') ?? 'blog'
     const pathname = usePathname();
@@ -34,7 +34,7 @@ const ProfilePage = () => {
     const [openChangePassword, setOpenChangePassword] = useState(false)
     const [openChangeInfo, setOpenChangeInfo] = useState(false)
     const [isFollow, setIsFollow] = useState(false);
-    const isAuthor = useMemo(() => { return id === auth?.info.id }, [auth, id])
+    const isAuthor = useIsAuthor()
     useEffect(() => {
         fetchAccount()
         fetchCheckFollow()
@@ -194,7 +194,7 @@ const ProfilePage = () => {
                     {isAuthor &&
                         <Button><Link href="/blog/create">Create</Link></Button>}
                 </div>
-                <BlogList isAuthor={isAuthor} />
+                <BlogSearch />
             </TabsContent>
             <TabsContent value='quiz'>
                 <div className='flex justify-between'>
@@ -202,7 +202,7 @@ const ProfilePage = () => {
                     {isAuthor &&
                         <Button><Link href={"/quiz/create"}>Create</Link></Button>}
                 </div>
-                <QuizSearch isAuthor={isAuthor} />
+                <QuizSearch />
             </TabsContent>
             <TabsContent value='follower'>
                 <FollowList />

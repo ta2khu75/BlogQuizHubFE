@@ -1,4 +1,4 @@
-interface BlogSearchRequest extends Search {
+interface BlogSearch extends Search {
     blogTagNames?: string[],
     minView?: number,
     maxView?: number,

@@ -3,16 +3,16 @@ import instance from "@/util/apiInstance";
 import qs from "qs";
 const basePath = BasePath.BLOG
 export class BlogService {
-    static search(blogSearchRequest: BlogSearchRequest): Promise<ApiResponse<PageResponse<BlogResponse>>> {
+    static search(blogSearchRequest: BlogSearch): Promise<ApiResponse<PageResponse<BlogResponse>>> {
         return instance.get(`${basePath}`, {
             params: { ...blogSearchRequest }, paramsSerializer: (params) => {
                 return qs.stringify(params, { arrayFormat: 'repeat' });  // support array query params like tags[]=tag1&tags[]=tag2
             }
         })
     }
-    static mySearch(blogSearchRequest: BlogSearchRequest): Promise<ApiResponse<PageResponse<BlogResponse>>> {
-        return instance.get(`${basePath}/mine`, { params: { ...blogSearchRequest } })
-    }
+    // static mySearch(blogSearchRequest: BlogSearch): Promise<ApiResponse<PageResponse<BlogResponse>>> {
+    //     return instance.get(`${basePath}/mine`, { params: { ...blogSearchRequest } })
+    // }
     static create(blog: BlogRequest, file?: File): Promise<ApiResponse<BlogResponse>> {
         const form = new FormData();
         if (file) {

@@ -1,5 +1,4 @@
 import { BasePath } from '@/env/BasePath';
-import { QuizSearch } from '@/types/request/search/QuizSearch';
 import instance from '@/util/apiInstance';
 import qs from 'qs';
 const basePath = BasePath.QUIZ

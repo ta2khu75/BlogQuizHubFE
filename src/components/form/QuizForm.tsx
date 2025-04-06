@@ -319,7 +319,10 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                             <FormItem>
                                 <FormLabel>Duration</FormLabel>
                                 <FormControl>
-                                    <Input type='number' min={5} placeholder="Duration" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                                    <Input type='number' min={5} placeholder="Duration"
+                                        value={field.value ?? ""}
+                                        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                                    />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

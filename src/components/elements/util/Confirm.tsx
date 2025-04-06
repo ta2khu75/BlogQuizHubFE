@@ -3,7 +3,7 @@ import React from 'react'
 type Props = {
     open: boolean,
     onCancel?: () => void
-    onContinue: () => void,
+    onContinue?: () => void,
     title: string,
     description?: string
 }

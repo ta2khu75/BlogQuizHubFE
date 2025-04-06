@@ -1,12 +1,15 @@
 "use client"
-import { useSearchParams } from 'next/navigation';
+import BlogList from '@/components/list/BlogList';
+import BlogSearch from '@/components/filter/BlogFilter';
+import React from 'react';
 
 const SearchPage = () => {
-    const searchParams = useSearchParams()
-
-    const keyword = searchParams.get('keyword')
+    const [blogPage, setBlogPage] = React.useState<PageResponse<BlogResponse>>()
     return (
-        <div>{keyword}</div>
+        <div className='flex'>
+            <BlogSearch setBlogPage={setBlogPage} />
+            <BlogList blogPage={blogPage} />
+        </div>
     )
 }
 
