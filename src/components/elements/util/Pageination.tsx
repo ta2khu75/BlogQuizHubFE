@@ -1,15 +1,16 @@
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
-import { usePathname, useSearchParams } from 'next/navigation'
-import React from 'react'
+import { useParams, usePathname, useSearchParams } from 'next/navigation'
+import React, { useMemo } from 'react'
 type Props<T> = {
     page: PageResponse<T>
 }
 const Pageination = <T,>({ page }: Props<T>) => {
     const { total_pages } = page
-    const pathname = usePathname()
+    const pathName = usePathname()
     const searchParams = useSearchParams()
-    const currentPage = Number(searchParams.get('page')) || 1;
-    const middlePage = Math.ceil(total_pages / 2);
+    const currentPage = useMemo(() => Number(searchParams.get('page')) || 1, [searchParams]);
+    const middlePage = useMemo(() => Math.ceil(total_pages / 2), [total_pages]);
+    const pathname = useMemo(() => `${pathName}?${searchParams.toString()}`, [searchParams])
     const calculatorRenderPage = () => {
         if (total_pages <= 2) return undefined
         if (currentPage <= middlePage) {

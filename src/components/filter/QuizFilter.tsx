@@ -60,11 +60,11 @@ const QuizFilter = ({ setQuizPage }: Props) => {
         fetchReadAllQuizCategory()
     }, [])
     useEffect(() => {
-        form.reset({ ...searchValues })
+        form.reset(searchValues)
         fetchSearch()
     }, [searchValues])
     const fetchSearch = () => {
-        QuizService.search(searchValues).then((res) => {
+        QuizService.search({ ...searchValues, authorId: searchValues.id }).then((res) => {
             if (res.success) {
                 setQuizPage(res.data)
             } else {

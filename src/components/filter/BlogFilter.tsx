@@ -87,6 +87,7 @@ const BlogFilter = ({ setBlogPage }: Props) => {
         if (blogTagNames && blogTagNames.length > 0) blogTagNames.forEach((tag) => stringParts.push(`blogTagNames=${tag}`))
         if (minView) stringParts.push(`minView=${minView}`)
         if (maxView) stringParts.push(`maxView=${maxView}`)
+        if (id) stringParts.push(`id=${id}`)
         if (stringParts.length > 0) {
             const queryString = stringParts.join("&")
             router.push(`${pathname}?${queryString}`)

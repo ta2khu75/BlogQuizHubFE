@@ -1,3 +1,4 @@
+import Pageination from '@/components/elements/util/Pageination'
 import QuizFilter from '@/components/filter/QuizFilter'
 import QuizList from '@/components/list/QuizList'
 import React from 'react'
@@ -8,6 +9,7 @@ const QuizSearch = () => {
         <div>
             <QuizFilter setQuizPage={setQuizPage} />
             <QuizList quizPage={quizPage} />
+            {quizPage && <Pageination<QuizResponse> page={quizPage} />}
         </div>
     )
 }
