@@ -9,7 +9,7 @@ import { BlogTagService } from '@/services/BlogTagService'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Label } from '@radix-ui/react-label'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { z, ZodType } from 'zod'
 
@@ -24,26 +24,40 @@ type Props = {
 }
 // Get a new searchParams string by merging the current
 // searchParams with a provided key/value pair
-// const createQueryString = useCallback(
-//     (name: string, value: string) => {
-//         const params = new URLSearchParams(searchParams.toString())
-//         params.set(name, value)
-//         return params.toString()
-//     },
-//     [searchParams]
-// )
 const BlogFilter = ({ setBlogPage }: Props) => {
     const { toast } = useToast()
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
-    const keyword = searchParams.get("keyword") ?? undefined
-    const blogTagNames = searchParams.getAll("blogTagNames")
-    const minView = searchParams.get("minView") ? Number(searchParams.get("minView")) : undefined
-    const maxView = searchParams.get("maxView") ? Number(searchParams.get("maxView")) : undefined
-    const page = searchParams.get("page") ?? 1
-    const id = searchParams.get("id") ?? undefined
+    const searchValues = useMemo(() => ({
+        keyword: searchParams.get("keyword") ?? undefined,
+        blogTagNames: searchParams.getAll("blogTagNames"),
+        minView: Number(searchParams.get("minView")) || undefined,
+        maxView: Number(searchParams.get("maxView")) || undefined,
+        page: Number(searchParams.get("page")) || 1,
+        authorId: searchParams.get("id") ?? undefined,
+    }), [searchParams])
     const [blogTagNamesList, setBlogTagNamesList] = React.useState<string[]>([])
+    const createQueryString = useCallback(
+        (search: BlogSearch) => {
+            console.log(search);
+
+            const params = new URLSearchParams(searchParams.toString())
+            Object.entries(search).forEach(([key, value]) => {
+                if (Array.isArray(value)) {
+                    params.delete(key)
+                    value.forEach(val => params.append(key, val))
+                } else if (value === undefined) {
+                    params.delete(key)
+                }
+                else {
+                    params.set(key, value as string)
+                }
+            })
+            return params.toString()
+        },
+        [searchParams]
+    )
     const form = useForm<BlogSearch>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -58,8 +72,9 @@ const BlogFilter = ({ setBlogPage }: Props) => {
         fetchBlogTagNames()
     }, [])
     useEffect(() => {
+        form.reset(searchValues)
         fetchSearch()
-    }, [keyword, JSON.stringify(blogTagNames), minView, maxView, page])
+    }, [searchValues])
     const fetchBlogTagNames = () => {
         BlogTagService.readAll().then((res) => {
             setBlogTagNamesList(res.data.map((tag) => tag.name))
@@ -68,11 +83,7 @@ const BlogFilter = ({ setBlogPage }: Props) => {
         })
     }
     const fetchSearch = () => {
-        if (keyword) form.setValue("keyword", keyword)
-        if (blogTagNames && blogTagNames.length > 0) form.setValue("blogTagNames", blogTagNames)
-        if (minView) form.setValue("minView", Number(minView))
-        if (maxView) form.setValue("maxView", Number(maxView))
-        BlogService.search({ keyword, blogTagNames, minView, maxView, page: Number(page), authorId: id }).then((res) => {
+        BlogService.search(searchValues).then((res) => {
             if (res.success) {
                 setBlogPage(res.data)
             } else {
@@ -81,19 +92,23 @@ const BlogFilter = ({ setBlogPage }: Props) => {
         })
     }
     const onFilter = (data: BlogSearch) => {
-        const { keyword, blogTagNames, minView, maxView } = data
-        const stringParts: string[] = []
-        if (keyword) stringParts.push(`keyword=${keyword}`)
-        if (blogTagNames && blogTagNames.length > 0) blogTagNames.forEach((tag) => stringParts.push(`blogTagNames=${tag}`))
-        if (minView) stringParts.push(`minView=${minView}`)
-        if (maxView) stringParts.push(`maxView=${maxView}`)
-        if (id) stringParts.push(`id=${id}`)
-        if (stringParts.length > 0) {
-            const queryString = stringParts.join("&")
-            router.push(`${pathname}?${queryString}`)
-        } else {
-            router.push(pathname)
-        }
+        // const { keyword, blogTagNames, minView, maxView } = data
+        // const stringParts: string[] = []
+        // if (keyword) stringParts.push(`keyword=${keyword}`)
+        // if (blogTagNames && blogTagNames.length > 0) blogTagNames.forEach((tag) => stringParts.push(`blogTagNames=${tag}`))
+        // if (minView) stringParts.push(`minView=${minView}`)
+        // if (maxView) stringParts.push(`maxView=${maxView}`)
+        // if (id) stringParts.push(`id=${id}`)
+        // if (stringParts.length > 0) {
+        //     const queryString = stringParts.join("&")
+        //     router.push(`${pathname}?${queryString}`)
+        // } else {
+        //     router.push(pathname)
+        // }
+        const queryString = createQueryString(data)
+        console.log(queryString);
+
+        router.push(`${pathname}?${queryString}`)
     }
 
     return (

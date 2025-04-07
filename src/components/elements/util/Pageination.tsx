@@ -1,5 +1,5 @@
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
-import { useParams, usePathname, useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import React, { useMemo } from 'react'
 type Props<T> = {
     page: PageResponse<T>
@@ -10,7 +10,17 @@ const Pageination = <T,>({ page }: Props<T>) => {
     const searchParams = useSearchParams()
     const currentPage = useMemo(() => Number(searchParams.get('page')) || 1, [searchParams]);
     const middlePage = useMemo(() => Math.ceil(total_pages / 2), [total_pages]);
-    const pathname = useMemo(() => `${pathName}?${searchParams.toString()}`, [searchParams])
+    const fullPath = useMemo(() => `${pathName}?${searchParams.toString()}`, [searchParams])
+    const getNewQueryString = (page: number) => {
+        console.log(fullPath);
+        if (fullPath.includes('page')) {
+            return fullPath.replace(/page=\d+/, `page=${page}`)
+        } else if (fullPath.includes('?')) {
+            return `${fullPath}&page=${page}`
+        } else {
+            return `${fullPath}?page=${page}`
+        }
+    }
     const calculatorRenderPage = () => {
         if (total_pages <= 2) return undefined
         if (currentPage <= middlePage) {
@@ -19,19 +29,19 @@ const Pageination = <T,>({ page }: Props<T>) => {
                     {
                         currentPage - 1 > 1 &&
                         <PaginationItem>
-                            <PaginationLink href={`${pathname}?page=${currentPage - 1}`}>{currentPage - 1}</PaginationLink>
+                            <PaginationLink href={getNewQueryString(currentPage - 1)}>{currentPage - 1}</PaginationLink>
                         </PaginationItem>
                     }
                     {
                         currentPage !== 1 &&
                         <PaginationItem>
-                            <PaginationLink isActive={true} href={`${pathname}?page=${currentPage}`}>{currentPage}</PaginationLink>
+                            <PaginationLink isActive={true} href={getNewQueryString(currentPage)}>{currentPage}</PaginationLink>
                         </PaginationItem>
                     }
                     {
                         currentPage + 1 !== total_pages &&
                         <PaginationItem>
-                            <PaginationLink href={`${pathname}?page=${currentPage + 1}`}>{currentPage + 1}</PaginationLink>
+                            <PaginationLink href={getNewQueryString(currentPage + 1)}>{currentPage + 1}</PaginationLink>
                         </PaginationItem>
                     }
                     {
@@ -53,17 +63,17 @@ const Pageination = <T,>({ page }: Props<T>) => {
                 }
                 {currentPage - 1 > 1 &&
                     <PaginationItem>
-                        <PaginationLink href={`${pathname}?page=${currentPage - 1}`}>{currentPage - 1}</PaginationLink>
+                        <PaginationLink href={getNewQueryString(currentPage - 1)}>{currentPage - 1}</PaginationLink>
                     </PaginationItem>
                 }
                 {currentPage !== total_pages &&
                     <PaginationItem>
-                        <PaginationLink isActive={true} href={`${pathname}?page=${currentPage}`}>{currentPage}</PaginationLink>
+                        <PaginationLink isActive={true} href={getNewQueryString(currentPage)}>{currentPage}</PaginationLink>
                     </PaginationItem>
                 }
                 {currentPage + 1 < total_pages &&
                     <PaginationItem>
-                        <PaginationLink href={`${pathname}?page=${currentPage + 1}`}>{currentPage + 1}</PaginationLink>
+                        <PaginationLink href={getNewQueryString(currentPage + 1)}>{currentPage + 1}</PaginationLink>
                     </PaginationItem>
                 }
             </>
@@ -76,22 +86,22 @@ const Pageination = <T,>({ page }: Props<T>) => {
                 {
                     currentPage !== 1 &&
                     <PaginationItem>
-                        <PaginationPrevious href={`${pathname}?page=${currentPage - 1}`} />
+                        <PaginationPrevious href={getNewQueryString(currentPage - 1)} />
                     </PaginationItem>
                 }
                 <PaginationItem>
-                    <PaginationLink isActive={currentPage === 1} href={`${pathname}`}>1</PaginationLink>
+                    <PaginationLink isActive={currentPage === 1} href={getNewQueryString(1)}>1</PaginationLink>
                 </PaginationItem>
                 {calculatorRenderPage()}
                 {total_pages > 1 &&
                     < PaginationItem >
-                        <PaginationLink isActive={currentPage === total_pages} href={`${pathname}?page=${page?.total_pages}`}>{page?.total_pages}</PaginationLink>
+                        <PaginationLink isActive={currentPage === total_pages} href={getNewQueryString(total_pages)}>{page?.total_pages}</PaginationLink>
                     </PaginationItem>
                 }
                 {
                     currentPage !== total_pages &&
                     <PaginationItem>
-                        <PaginationNext href={`${pathname}?page=${currentPage + 1}`} />
+                        <PaginationNext href={getNewQueryString(currentPage + 1)} />
                     </PaginationItem>
                 }
             </PaginationContent>

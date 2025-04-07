@@ -13,7 +13,7 @@ import { QuizLevel } from '@/types/QuizLevel'
 import FunctionUtil from '@/util/FunctionUtil'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import React, { useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { z, ZodType } from 'zod'
 
@@ -29,21 +29,21 @@ type Props = {
     setQuizPage: React.Dispatch<React.SetStateAction<PageResponse<QuizResponse> | undefined>>
 }
 const QuizFilter = ({ setQuizPage }: Props) => {
+    const [quizCategories, setQuizCategories] = React.useState<QuizCategoryResponse[]>([])
     const { toast } = useToast()
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const searchValues = useMemo(() => ({
         keyword: searchParams.get("keyword") ?? undefined,
-        quizCategoryIds: searchParams.getAll("quizCategoryIds").map(Number),
+        quizCategoryIds: searchParams.getAll("quizCategoryIds").filter((value) => !Number.isNaN(value)).map(Number),
         quizLevels: searchParams.getAll("quizLevels") as QuizLevel[],
-        minDuration: searchParams.get("minDuration") ? Number(searchParams.get("minDuration")) : undefined,
-        maxDuration: searchParams.get("maxDuration") ? Number(searchParams.get("maxDuration")) : undefined,
-        completed: searchParams.get("completed") ? searchParams.get("completed") === "true" : undefined,
-        page: searchParams.get("page") ? Number(searchParams.get("page")) : 1,
+        completed: Boolean(searchParams.get("completed")) || undefined,
+        minDuration: Number(searchParams.get("minDuration")) || undefined,
+        maxDuration: Number(searchParams.get("maxDuration")) || undefined,
+        page: Number(searchParams.get("page")) || 1,
         id: searchParams.get("id") ?? undefined,
     }), [searchParams])
-    const [quizCategories, setQuizCategories] = React.useState<QuizCategoryResponse[]>([])
     const form = useForm<QuizSearch>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -60,9 +60,28 @@ const QuizFilter = ({ setQuizPage }: Props) => {
         fetchReadAllQuizCategory()
     }, [])
     useEffect(() => {
-        form.reset(searchValues)
+        form.reset({ ...searchValues, authorId: searchValues.id })
         fetchSearch()
     }, [searchValues])
+
+    const createQueryString = useCallback(
+        (search: QuizSearch) => {
+            const params = new URLSearchParams(searchParams.toString())
+            Object.entries(search).forEach(([key, value]) => {
+                if (Array.isArray(value)) {
+                    params.delete(key)
+                    value.forEach(val => params.append(key, val))
+                } else if (value === undefined) {
+                    params.delete(key)
+                }
+                else {
+                    params.set(key, value as string)
+                }
+            })
+            return params.toString()
+        },
+        [searchParams]
+    )
     const fetchSearch = () => {
         QuizService.search({ ...searchValues, authorId: searchValues.id }).then((res) => {
             if (res.success) {
@@ -82,28 +101,7 @@ const QuizFilter = ({ setQuizPage }: Props) => {
         }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
     }
     const onFilter = (data: QuizSearch) => {
-        const params = new URLSearchParams()
-        if (data.keyword) {
-            params.set("keyword", data.keyword)
-        }
-        if (data.quizCategoryIds && data.quizCategoryIds.length > 0) {
-            data.quizCategoryIds.forEach((id) => params.append("quizCategoryIds", `${id}`))
-        }
-        if (data.minDuration) {
-            params.set("minDuration", `${data.minDuration}`)
-        }
-        if (data.maxDuration) {
-            params.set("maxDuration", `${data.maxDuration}`)
-        }
-        if (data.quizLevels && data.quizLevels.length > 0) {
-            data.quizLevels.forEach((level) => params.append("quizLevels", level))
-        }
-        params.set("completed", `${data.completed}`)
-        if (searchValues.id) {
-            params.set("id", searchValues.id)
-        }
-        params.set("page", "1")
-        router.push(`${pathname}?${params.toString()}`)
+        router.push(`${pathname}?${createQueryString(data)}`)
     }
     return (
         <Card>
