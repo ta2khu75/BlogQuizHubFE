@@ -10,6 +10,10 @@ import { Loader2, Plus, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { z, ZodType } from 'zod'
+import useDebounce from '@/hooks/useDebounce'
+import { BlogTagService } from '@/services/BlogTagService'
+import { Combobox } from '@/components/elements/util/Combobox'
+// import { ComboboxDemo } from '@/components/elements/util/ComboboxTest'
 const formSchema: ZodType<BlogRequest> = z.object({
     title: z.string().min(3),
     content: z.string().min(10),
@@ -25,6 +29,8 @@ type Props = {
 
 const BlogForm = ({ onSubmit, blog }: Props) => {
     const [reset, setReset] = useState(false)
+    const [searchBlogTag, setSearchBlogTag] = useState("")
+    const debounceBlogTag = useDebounce(searchBlogTag, 500)
     const getBlogForm = () => {
         const blogForm = localStorage.getItem("blogForm")
         if (blogForm) {
@@ -65,6 +71,25 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
             setReset(!reset)
         }
     }
+    const [blogTags, setBlogTags] = useState<{ value: string, label: string }[]>([])
+    const fetchBlogTag = async () => {
+        BlogTagService.search(debounceBlogTag).then((res) => {
+            if (res.success) {
+                const tags = res.data.map((tag) => ({
+                    value: tag.name,
+                    label: tag.name,
+                }))
+                setBlogTags(tags)
+            }
+        }).catch((err) => {
+            console.log(err)
+        })
+    }
+    useEffect(() => {
+        if (debounceBlogTag) {
+            fetchBlogTag()
+        }
+    }, [debounceBlogTag])
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
@@ -92,7 +117,7 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                                     <FormItem>
                                         <div className='flex'>
                                             <FormControl>
-                                                <Input {...field} placeholder="Nhập tag..." />
+                                                <Combobox array={blogTags} value={field.value} onSelectChange={(value) => { field.onChange(value); setSearchBlogTag("") }} onInputChange={setSearchBlogTag} />
                                             </FormControl>
                                             <Button
                                                 type="button"

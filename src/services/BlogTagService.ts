@@ -6,4 +6,7 @@ export class BlogTagService {
     static readAll(): Promise<ApiResponse<BlogTagResponse[]>> {
         return instance.get(basePath);
     }
+    static search(keyword: string): Promise<ApiResponse<BlogTagResponse[]>> {
+        return instance.get(`${basePath}/${keyword}`);
+    }
 }

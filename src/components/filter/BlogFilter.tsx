@@ -92,22 +92,7 @@ const BlogFilter = ({ setBlogPage }: Props) => {
         })
     }
     const onFilter = (data: BlogSearch) => {
-        // const { keyword, blogTagNames, minView, maxView } = data
-        // const stringParts: string[] = []
-        // if (keyword) stringParts.push(`keyword=${keyword}`)
-        // if (blogTagNames && blogTagNames.length > 0) blogTagNames.forEach((tag) => stringParts.push(`blogTagNames=${tag}`))
-        // if (minView) stringParts.push(`minView=${minView}`)
-        // if (maxView) stringParts.push(`maxView=${maxView}`)
-        // if (id) stringParts.push(`id=${id}`)
-        // if (stringParts.length > 0) {
-        //     const queryString = stringParts.join("&")
-        //     router.push(`${pathname}?${queryString}`)
-        // } else {
-        //     router.push(pathname)
-        // }
         const queryString = createQueryString(data)
-        console.log(queryString);
-
         router.push(`${pathname}?${queryString}`)
     }
 

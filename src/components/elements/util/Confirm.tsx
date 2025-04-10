@@ -18,8 +18,8 @@ const Confirm = ({ open, onCancel, onContinue, title, description }: Props) => {
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={onContinue}>Continue</AlertDialogAction>
+                    {onCancel && <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>}
+                    {onContinue && <AlertDialogAction onClick={onContinue}>Continue</AlertDialogAction>}
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

@@ -59,9 +59,10 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
     const [current, setCurrent] = useState(0)
     const initQuiz: QuestionRequest = { question: "", question_type: QuestionType.SINGLE_CHOICE, shuffle_answer: false, answers: Array(4).fill({ answer: "", correct: false }) };
     const quizDefault: QuizRequest = { title: "", quiz_level: QuizLevel.EASY, completed: false, shuffle_question: true, duration: 0, quiz_category_id: 0, access_modifier: AccessModifier.PRIVATE, quiz_result_mode: QuizResultMode.ANSWER_VISIBLE, description: "", questions: [initQuiz] }
+
     const form = useForm<QuizRequest>({
         resolver: zodResolver(quizSchema),
-        defaultValues: quizForm ?? quizDefault
+        defaultValues: quizForm ?? quizDefault,
     })
     const { fields: questionFields, append: appendQuiz, remove: removeQuiz } = useFieldArray({
         control: form.control,
@@ -70,6 +71,17 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
     const questionErrors = useMemo(() => {
         return form.formState.errors?.questions ?? [];
     }, [form.formState.errors?.questions]);
+    const hasQuizError = useMemo(() => {
+        return (questionErrors.length ?? 0) > 0;
+    }, [questionErrors.length])
+    const [showQuestionError, setShowQuestionError] = useState(false)
+    useEffect(() => {
+        if ((questionErrors.length ?? 0) > 0) {
+            setOpen(false)
+            setShowQuestionError(true)
+        }
+    }
+        , [questionErrors.length])
     const count = Math.max(questionFields.length - 1, 0)
     useEffect(() => {
         const subscription = form.watch((values) => {
@@ -82,11 +94,6 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
             form.reset({ ...quiz, quiz_category_id: quiz?.quiz_category?.id })
         }
     }, [quiz])
-    console.log("quizForm", quizForm);
-    console.log("quizDefault", quizDefault);
-    console.log(
-        _.isEqual(quizForm, quizDefault)
-    );
 
     useEffect(() => {
         if (Array.isArray(questionErrors)) {
@@ -169,9 +176,9 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                         <div className="py-2 text-center text-sm text-muted-foreground">
                             Slide {current + 1} of {count + 1}
                         </div>
-                        <Button type='button' className='bg-blue-600 hover:bg-blue-500' onClick={() => setOpen(true)}>{quiz ? "Update" : " Create"}</Button>
+                        <Button disabled={hasQuizError} variant={hasQuizError ? "secondary" : "default"} type='button' className='bg-blue-600 hover:bg-blue-500' onClick={() => setOpen(true)}>{quiz ? "Update" : " Create"}</Button>
                     </div>
-                    <Modal scroll className='max-w-[800px]' onCancel={onCancel} open={open} title={quiz ? "Update Quiz" : "Create Quiz"}>
+                    <Modal scroll className='max-w-[800px]' onCancel={onCancel} open={open && questionErrors.length === 0} title={quiz ? "Update Quiz" : "Create Quiz"}>
                         <FormField control={form.control} name='title' render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Title</FormLabel>
@@ -379,8 +386,8 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                 </form>
             </Form >
             <Confirm onCancel={() => setOpenConfirm(false)} open={openConfirm} onContinue={() => onRemoveQuiz()} title='Do you want to delete this question?' />
-            <QuizMenuElement onIndexClick={onSelectedSlide} states={
-                slideState} />
+            <QuizMenuElement onIndexClick={onSelectedSlide} states={slideState} />
+            <Confirm open={showQuestionError} onCancel={() => setShowQuestionError(false)} title='Questions have errors, you must fix them before submit' />
         </>
     )
 }
