@@ -6,10 +6,10 @@ export default class RoleService {
         return instance.get(basePath);
     }
     static create(role: RoleRequest): Promise<ApiResponse<RoleResponse>> {
-        return instance.post(basePath, { ...role, permission_ids: [...role.permission_ids] });
+        return instance.post(basePath, { role });
     }
     static update(id: number, role: RoleRequest): Promise<ApiResponse<RoleResponse>> {
-        return instance.put(`${basePath}/${id}`, { ...role, permission_ids: [...role.permission_ids] });
+        return instance.put(`${basePath}/${id}`, { role });
     }
     static delete(id: number): Promise<ApiResponse<RoleResponse>> {
         return instance.delete(`${basePath}/${id}`);

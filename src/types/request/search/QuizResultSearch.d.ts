@@ -1,5 +1,5 @@
 interface QuizResultSearch extends Search {
-    fromDate?: Date,
-    toDate?: Date,
+    fromDate?: string,
+    toDate?: string,
     quizCategoryIds?: number[],
 }

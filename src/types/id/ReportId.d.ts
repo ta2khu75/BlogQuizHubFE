@@ -1,0 +1,3 @@
+interface ReportId {
+    info: InfoResponse;
+}

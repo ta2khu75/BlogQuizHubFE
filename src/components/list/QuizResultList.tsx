@@ -1,32 +1,12 @@
 import AvatarElement from '@/components/elements/header/AvatarElement';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
-import QuizResultService from '@/services/QuizResultService';
-import FunctionUtil from '@/util/FunctionUtil';
 import StringUtil from '@/util/StringUtil';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
-const size = 20
-const QuizResultList = () => {
-    const { toast } = useToast()
-    const searchParams = useSearchParams()
-    const authorId = searchParams.get("id")
-    const [quizResultPage, setQuizResultPage] = useState<PageResponse<QuizResultResponse>>()
-    useEffect(() => {
-        fetchSearchBlog()
-    }, [authorId])
-    const fetchSearchBlog = () => {
-        if (!authorId) return;
-        QuizResultService.search({ page: 1, size, authorId: authorId }).then(res => {
-            if (res.success) {
-                setQuizResultPage(res.data);
-            } else {
-                toast({ variant: "destructive", description: res.message_error })
-            }
-        }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
-    }
+type Props = {
+    quizResultPage: PageResponse<QuizResultResponse> | undefined
+}
+const QuizResultList = ({ quizResultPage }: Props) => {
     return (
         <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4`}>
             {quizResultPage?.content?.map(quizResult =>

@@ -1,4 +1,5 @@
 "use client"
+import ReportElement from '@/components/elements/content/blog/ReportElement';
 import CommentPagination from '@/components/elements/content/comment/CommentPagination';
 import { serializeToHtml } from '@/components/elements/util/TextEditor/TextEditorConvert';
 import CommentForm from '@/components/form/CommentForm';
@@ -10,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAppSelector } from '@/redux/hooks';
 import { BlogService } from '@/services/BlogService';
 import { CommentService } from '@/services/CommentService';
+import { TargetType } from '@/types/TargetType';
 import FunctionUtil from '@/util/FunctionUtil';
 import StringUtil from '@/util/StringUtil';
 import { Plus } from 'lucide-react';
@@ -27,7 +29,7 @@ const BlogAboutPage = ({ params }: { params: Promise<{ slug: string }> }) => {
     const auth = useAppSelector(state => state.auth)
     const blogId = useMemo(() => StringUtil.getIdFromSlugUrl(slug), [slug])
     const [commentPage, setCommentPage] = useState<PageResponse<CommentResponse>>();
-    const [blog, setBlog] = useState<BlogDetailsResponse>();
+    const [blog, setBlog] = useState<BlogResponse>();
     useEffect(() => {
         fetchBlog()
         fetchPageComment()
@@ -83,6 +85,7 @@ const BlogAboutPage = ({ params }: { params: Promise<{ slug: string }> }) => {
                     blog?.content &&
                     <CardContent className="my-4" dangerouslySetInnerHTML={{ __html: (JSON.parse(blog.content) as Descendant[]).map(n => serializeToHtml(n)).join("") }}></CardContent>
                 }
+                <ReportElement targetId={blogId} targetType={TargetType.BLOG} />
                 <CardFooter className='flex flex-col'>
                     <div className='w-full mb-4'>
                         <CardTitle>

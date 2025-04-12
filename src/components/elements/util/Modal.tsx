@@ -7,7 +7,7 @@ type Props = {
     children: React.ReactNode
     open: boolean,
     onCancel: () => void,
-    onConfirm?: () => void
+    onConfirm: () => void
     className?: string
     title?: string,
     description?: string,
@@ -28,13 +28,12 @@ const Modal = ({ children, open, onCancel, className, title, description, scroll
                         {children}
                     </ScrollArea>}
                 {!scroll && <>{children}</>}
+                {onConfirm && < DialogFooter >
+                    <Button onClick={onConfirm}>Confirm</Button>
+                    <Button onClick={onCancel}>Cancel</Button>
+                </DialogFooter>}
             </DialogContent>
-            {onConfirm && <DialogFooter>
-                <Button onClick={onConfirm}>Confirm</Button>
-                <Button onClick={onCancel}>Cancel</Button>
-            </DialogFooter>
-            }
-        </Dialog>
+        </Dialog >
     )
 }
 

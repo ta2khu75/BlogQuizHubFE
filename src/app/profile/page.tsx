@@ -17,10 +17,10 @@ import FunctionUtil from '@/util/FunctionUtil'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
-import QuizResultList from '@/components/list/QuizResultList'
 import useIsAuthor from '@/components/util/useIsAuthor'
 import BlogSearch from '@/components/search/BlogSearch'
 import QuizSearch from '@/components/search/QuizSearch'
+import QuizResultSearch from '@/components/search/QuizResultSearch'
 const ProfilePage = () => {
     const { toast } = useToast();
     const dispatch = useAppDispatch()
@@ -208,7 +208,7 @@ const ProfilePage = () => {
                 <FollowList />
             </TabsContent>
             <TabsContent value='quizResult'>
-                <QuizResultList />
+                <QuizResultSearch />
             </TabsContent>
         </Tabs >
     )

@@ -154,7 +154,7 @@ const QuizFilter = ({ setQuizPage }: Props) => {
                             render={() => (
                                 <FormItem>
                                     <div className="mb-4">
-                                        <FormLabel className="text-base">Blog tag</FormLabel>
+                                        <FormLabel className="text-base">Quiz Categories</FormLabel>
                                     </div>
                                     <div className='grid grid-cols-2'>
                                         {quizCategories.map((category) => (
