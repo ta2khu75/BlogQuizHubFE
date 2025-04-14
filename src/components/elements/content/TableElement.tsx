@@ -19,6 +19,10 @@ type Props<T> = {
     handleEditClick?: (t: T) => void;
     handleDeleteClick?: (t: T) => void;
     visibleColumns?: (keyof T)[];
+    actions?: {
+        label: string;
+        onClick: (t: T) => void;
+    }[]
 };
 const TableElement = <T extends object>({
     showIndex,
@@ -27,6 +31,7 @@ const TableElement = <T extends object>({
     handleViewClick,
     array,
     visibleColumns,
+    actions
 }: Props<T>) => {
     const [columns, setColumns] = useState<(keyof T)[]>([]);
     useEffect(() => {
@@ -75,6 +80,7 @@ const TableElement = <T extends object>({
                             {handleViewClick && <Button onClick={() => handleViewClick(item)}>View</Button>}
                             {handleEditClick && <Button onClick={() => handleEditClick(item)} variant={"outline"}>Edit</Button>}
                             {handleDeleteClick && <Button onClick={() => handleDeleteClick(item)} variant={"destructive"}>Delete</Button>}
+                            {actions && actions.map((action, j) => <Button key={j} onClick={() => action.onClick(item)}>{action.label}</Button>)}
                         </TableCell>
                     </TableRow>
                 ))}

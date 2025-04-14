@@ -7,7 +7,7 @@ type Props = {
     children: React.ReactNode
     open: boolean,
     onCancel: () => void,
-    onConfirm: () => void
+    onConfirm?: () => void
     className?: string
     title?: string,
     description?: string,

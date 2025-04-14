@@ -1,3 +1,4 @@
 interface ReportId {
-    info: InfoResponse;
+    author_id: string,
+    target_id: string
 }

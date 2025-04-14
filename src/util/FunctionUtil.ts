@@ -39,7 +39,7 @@ export default class FunctionUtil {
     static showError(error: unknown) {
         return error instanceof Error ? error.message : "An unexpected error occurred";
     }
-    static isInfoResponse(object: object): object is InfoResponse {
+    static isInfoResponse(object: object): object is InfoResponse<object> {
         const infoSchema = z.object({
             id: z.string(),
             created_at: z.string(),

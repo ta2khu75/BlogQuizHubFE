@@ -1,4 +1,5 @@
 import { BasePath } from "@/env/BasePath";
+import { ReportSearch } from "@/types/request/search/ReportSearch";
 import instance from "@/util/apiInstance";
 const basePath = BasePath.REPORT
 export default class ReportService {
@@ -13,5 +14,8 @@ export default class ReportService {
     }
     static delete(targetId: string): Promise<void> {
         return instance.delete(`${basePath}/${targetId}`);
+    }
+    static search(reportSearch: ReportSearch): Promise<ApiResponse<PageResponse<ReportResponse>>> {
+        return instance.get(basePath, { params: { ...reportSearch } });
     }
 }

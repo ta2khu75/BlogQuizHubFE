@@ -1,5 +1,5 @@
 "use client"
-import ReportElement from '@/components/elements/content/blog/ReportElement';
+import ReportElement from '@/components/elements/content/report/ReportElement';
 import CommentPagination from '@/components/elements/content/comment/CommentPagination';
 import { serializeToHtml } from '@/components/elements/util/TextEditor/TextEditorConvert';
 import CommentForm from '@/components/form/CommentForm';
