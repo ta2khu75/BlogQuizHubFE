@@ -38,7 +38,7 @@ const BlogAboutPage = ({ params }: { params: Promise<{ slug: string }> }) => {
         fetchPageComment()
     }, [page])
     const fetchBlog = () => {
-        BlogService.readDetails(blogId).then(res => {
+        BlogService.readDetail(blogId).then(res => {
             if (res.success) {
                 setBlog(res.data)
             } else {

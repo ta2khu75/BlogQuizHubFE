@@ -1,4 +1,5 @@
 import { BasePath } from "@/env/BasePath";
+import { ReportStatus } from "@/types/ReportStatus";
 import { ReportSearch } from "@/types/request/search/ReportSearch";
 import instance from "@/util/apiInstance";
 const basePath = BasePath.REPORT
@@ -17,5 +18,8 @@ export default class ReportService {
     }
     static search(reportSearch: ReportSearch): Promise<ApiResponse<PageResponse<ReportResponse>>> {
         return instance.get(basePath, { params: { ...reportSearch } });
+    }
+    static updateStatus(id: ReportId, report_status: ReportStatus): Promise<ApiResponse<ReportResponse>> {
+        return instance.patch(`${basePath}/status`, { id, report_status });
     }
 }

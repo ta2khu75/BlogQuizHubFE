@@ -19,7 +19,7 @@ const BlogEditPage = ({ params }: { params: Promise<{ blogId: string }> }) => {
         fetchBlog()
     }, [blogId])
     const fetchBlog = () => {
-        BlogService.readDetails(blogId).then(res => {
+        BlogService.readDetail(blogId).then(res => {
             if (res.success) {
                 setBlog(res.data)
                 const imageUrlsUse = FunctionUtil.getImageUrlFromContent(res.data.content)
