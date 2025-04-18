@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover"
 
-type Option = {
+export type ComboboxOption = {
     value: string
     label: string
 }
 
 type Props = {
-    array: Option[]
+    array: ComboboxOption[]
     value: string
     onSelectChange: (value: string) => void
     onInputChange?: (value: string) => void
@@ -49,7 +49,7 @@ export function Combobox({ array, value, onSelectChange, onInputChange }: Props)
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <Button
+                <Button type="button"
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
@@ -61,7 +61,7 @@ export function Combobox({ array, value, onSelectChange, onInputChange }: Props)
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[240px] p-0">
+            <PopoverContent forceMount className="w-[240px] p-0">
                 <Command>
                     <CommandInput
                         placeholder="Nhập tag..."

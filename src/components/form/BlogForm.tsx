@@ -12,8 +12,8 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { z, ZodType } from 'zod'
 import useDebounce from '@/hooks/useDebounce'
 import { BlogTagService } from '@/services/BlogTagService'
-import { Combobox } from '@/components/elements/util/Combobox'
-// import { ComboboxDemo } from '@/components/elements/util/ComboboxTest'
+import { Combobox, ComboboxOption } from '@/components/elements/util/Combobox'
+import QuizService from '@/services/QuizService'
 const formSchema: ZodType<BlogRequest> = z.object({
     title: z.string().min(3),
     content: z.string().min(10),
@@ -30,7 +30,11 @@ type Props = {
 const BlogForm = ({ onSubmit, blog }: Props) => {
     const [reset, setReset] = useState(false)
     const [searchBlogTag, setSearchBlogTag] = useState("")
+    const [searchQuiz, setSearchQuiz] = useState("")
     const debounceBlogTag = useDebounce(searchBlogTag, 500)
+    const [blogTags, setBlogTags] = useState<ComboboxOption[]>([])
+    const [quizzes, setQuizzes] = useState<ComboboxOption[]>([])
+    const debounceQuiz = useDebounce(searchQuiz, 500)
     const getBlogForm = () => {
         const blogForm = localStorage.getItem("blogForm")
         if (blogForm) {
@@ -38,7 +42,7 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
         } return undefined;
     }
     const blogForm = getBlogForm()
-    const blogDefault = { title: "", content: "", blog_tags: [""], access_modifier: AccessModifier.PRIVATE }
+    const blogDefault = { title: "", content: "", quiz_ids: [], blog_tags: [""], access_modifier: AccessModifier.PRIVATE }
     const form = useForm<BlogRequest>({
         resolver: zodResolver(formSchema),
         defaultValues: blogForm ?? blogDefault,
@@ -48,8 +52,15 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
         control: form.control,
         name: "blog_tags",
     });
+    const { fields: quizFields, append: appendQuiz, remove: removeQuiz } = useFieldArray<FormData>({
+        control: form.control,
+        name: "quiz_ids",
+    });
     useEffect(() => {
-        if (_.isEqual(blogForm, blogDefault) && blog) form.reset({ ...blog })
+        if (_.isEqual(blogForm, blogDefault) && blog) {
+            form.reset({ ...blog, quiz_ids: blog?.quizzes?.map((quiz) => quiz.info.id) });
+            setQuizzes(blog?.quizzes?.map((quiz) => ({ value: quiz.info.id, label: quiz.title })) ?? [])
+        }
     }, [blog])
     useEffect(() => {
         if (tagFields.length === 0) {
@@ -65,13 +76,13 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
 
     const onReset = () => {
         if (blog) {
-            form.reset({ ...blog })
+            form.reset({ ...blog, quiz_ids: blog?.quizzes?.map((quiz) => quiz.info.id) })
+            setQuizzes(blog?.quizzes?.map((quiz) => ({ value: quiz.info.id, label: quiz.title })) ?? [])
         } else {
             form.reset(blogDefault)
             setReset(!reset)
         }
     }
-    const [blogTags, setBlogTags] = useState<{ value: string, label: string }[]>([])
     const fetchBlogTag = async () => {
         BlogTagService.search(debounceBlogTag).then((res) => {
             if (res.success) {
@@ -85,8 +96,24 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
             console.log(err)
         })
     }
+    const fetchQuiz = () => {
+        QuizService.readAllByKeyword(debounceQuiz).then((res) => {
+            if (res.success) {
+                const quizzes = res.data.map((quiz) => ({
+                    value: quiz.info.id,
+                    label: quiz.title,
+                }))
+                setQuizzes(quizzes)
+            }
+        })
+    }
     useEffect(() => {
-        if (debounceBlogTag) {
+        if (debounceQuiz.trim().length > 0) {
+            fetchQuiz()
+        }
+    }, [debounceQuiz])
+    useEffect(() => {
+        if (debounceBlogTag.trim().length > 0) {
             fetchBlogTag()
         }
     }, [debounceBlogTag])
@@ -102,6 +129,41 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                         <FormMessage />
                     </FormItem>
                 )} />
+                <FormItem>
+                    <Button type="button" className='bg-green-600 hover:bg-green-700' onClick={() => appendQuiz("")}>
+                        <Plus />
+                    </Button>
+                    <FormLabel>Quiz</FormLabel>
+                    <div className='flex flex-wrap gap-4'>
+                        {quizFields.map((field, index) => (
+                            <FormField
+                                key={field.id}
+                                control={form.control}
+                                name={`quiz_ids.${index}`}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <div className='flex'>
+                                            <FormControl>
+                                                <Combobox array={quizzes} value={field.value} onSelectChange={(value) => { field.onChange(value); setSearchQuiz("") }} onInputChange={setSearchQuiz} />
+                                            </FormControl>
+                                            <Button
+                                                type="button"
+                                                variant="destructive"
+                                                size="icon"
+                                                onClick={() => removeQuiz(index)}
+                                                disabled={tagFields.length === 1} // Không xóa nếu chỉ còn 1 input
+                                            >
+                                                <X />
+                                            </Button>
+                                        </div>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        ))}
+                    </div>
+                    <FormMessage />
+                </FormItem>
                 <FormItem>
                     <Button type="button" className='bg-green-600 hover:bg-green-700' onClick={() => appendTag("")}>
                         <Plus />

@@ -10,9 +10,10 @@ export default class QuizService {
             }
         })
     }
-    // static mySearchBlogNull(keyword: string, page = 1, size = 10): Promise<ApiResponse<PageResponse<QuizResponse>>> {
-    //     return instance.get(`${basePath}/mine/blog-null`, { params: { keyword, page, size } })
-    // }
+
+    static readAllByKeyword(keyword: string): Promise<ApiResponse<QuizResponse[]>> {
+        return instance.get(`${basePath}/mine/${keyword}`)
+    }
     // static myReadAllById(ids: string[]): Promise<ApiResponse<QuizResponse[]>> {
     //     return instance.get(`${basePath}/mine/ids`, { params: { ids } })
     // }

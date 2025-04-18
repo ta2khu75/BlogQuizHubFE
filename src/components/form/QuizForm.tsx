@@ -1,5 +1,4 @@
 import Modal from '@/components/elements/util/Modal';
-import _ from "lodash";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -26,9 +25,13 @@ import QuizService from '@/services/QuizService';
 import QuestionForm, { questionSchema } from '@/components/form/QuestionForm';
 import QuizMenuElement from '@/components/elements/content/quiz/QuizMenuElement';
 import { QuizResultMode } from '@/types/DisplayMode';
+import useDebounce from '@/hooks/useDebounce';
+import { BlogService } from '@/services/BlogService';
+import _ from 'lodash';
 const quizSchema = z.object({
     title: z.string().nonempty(),
     quiz_level: z.nativeEnum(QuizLevel),
+    blog_id: z.string().optional(),
     duration: z.number().min(5),
     description: z.string().optional(),
     access_modifier: z.nativeEnum(AccessModifier),
@@ -58,8 +61,10 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
     const [openConfirm, setOpenConfirm] = useState(false)
     const [current, setCurrent] = useState(0)
     const initQuiz: QuestionRequest = { question: "", question_type: QuestionType.SINGLE_CHOICE, shuffle_answer: false, answers: Array(4).fill({ answer: "", correct: false }) };
-    const quizDefault: QuizRequest = { title: "", quiz_level: QuizLevel.EASY, completed: false, shuffle_question: true, duration: 0, quiz_category_id: 0, access_modifier: AccessModifier.PRIVATE, quiz_result_mode: QuizResultMode.ANSWER_VISIBLE, description: "", questions: [initQuiz] }
-
+    const quizDefault: QuizRequest = { title: "", quiz_level: QuizLevel.EASY, blog_id: "", completed: false, shuffle_question: true, duration: 0, quiz_category_id: 0, access_modifier: AccessModifier.PRIVATE, quiz_result_mode: QuizResultMode.ANSWER_VISIBLE, description: "", questions: [initQuiz] }
+    const [search, setSearch] = useState("")
+    const [blogs, setBlogs] = useState<BlogResponse[]>([])
+    const debouncedSearch = useDebounce(search)
     const form = useForm<QuizRequest>({
         resolver: zodResolver(quizSchema),
         defaultValues: quizForm ?? quizDefault,
@@ -76,6 +81,20 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
     }, [questionErrors.length])
     const [showQuestionError, setShowQuestionError] = useState(false)
     useEffect(() => {
+        if (debouncedSearch.trim().length > 0) {
+            fetchBlogByKeyword()
+        }
+    }, [debouncedSearch])
+    const fetchBlogByKeyword = () => {
+        BlogService.readAllByKeyword(debouncedSearch).then((res) => {
+            if (res.data) {
+                setBlogs(res.data)
+            } else {
+                toast({ description: res.message_error, variant: "destructive" })
+            }
+        }).catch(err => toast({ description: FunctionUtil.showError(err), variant: "destructive" }))
+    }
+    useEffect(() => {
         if ((questionErrors.length ?? 0) > 0) {
             setOpen(false)
             setShowQuestionError(true)
@@ -91,7 +110,9 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
     }, [form]);
     useEffect(() => {
         if (_.isEqual(quizForm, quizDefault) && quiz) {
-            form.reset({ ...quiz, quiz_category_id: quiz?.quiz_category?.id })
+            form.reset({ ...quiz, quiz_category_id: quiz?.quiz_category?.id, blog_id: quiz?.blog?.info?.id })
+            if (quiz.blog)
+                setBlogs([quiz?.blog])
         }
     }, [quiz])
 
@@ -160,7 +181,9 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
     }
     const onReset = () => {
         if (quiz) {
-            form.reset({ ...quiz, quiz_category_id: quiz?.quiz_category?.id })
+            form.reset({ ...quiz, quiz_category_id: quiz?.quiz_category?.id, blog_id: quiz?.blog?.info?.id })
+            if (quiz.blog)
+                setBlogs([quiz?.blog])
             setCurrent(0)
         } else {
             form.reset(quizDefault)
@@ -186,6 +209,26 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                                     <Input type='text' placeholder="Title" {...field} />
                                 </FormControl>
                                 <FormMessage />
+                            </FormItem>
+                        )} />
+                        <FormField control={form.control} name='blog_id' render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Blog</FormLabel>
+                                <div className='flex items-center gap-2'>
+                                    <Input value={search} onChange={(e) => setSearch(e.target.value)} />
+                                    <Select onValueChange={(value) => field.onChange(value)} defaultValue={`${field.value}`}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select blog" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {blogs.map(blog => (
+                                                <SelectItem key={blog.info.id} value={`${blog.info.id}`}>{blog.title}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </FormItem>
                         )} />
                         <FormField control={form.control} name='quiz_category_id' render={({ field }) => (

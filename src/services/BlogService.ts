@@ -10,6 +10,9 @@ export class BlogService {
             }
         })
     }
+    static readAllByKeyword(keyword: string): Promise<ApiResponse<BlogResponse[]>> {
+        return instance.get(`${basePath}/mine/${keyword}`);
+    }
     // static mySearch(blogSearchRequest: BlogSearch): Promise<ApiResponse<PageResponse<BlogResponse>>> {
     //     return instance.get(`${basePath}/mine`, { params: { ...blogSearchRequest } })
     // }
