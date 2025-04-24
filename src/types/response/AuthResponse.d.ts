@@ -1,6 +1,4 @@
-interface AuthResponse{
-    account?:AccountResponse;
-    access_token?:string;
-    refresh_token?:string;
-    authenticated:boolean;
+interface AuthResponse {
+    profile?: AccountProfileResponse;
+    access_token?: string;
 }

@@ -4,6 +4,6 @@ interface QuizResultResponse {
     quiz: QuizResponse;
     account: AccountResponse;
     end_time: string;
-    info: InfoResponse;
+    info: InfoResponse<string>;
     user_answers?: UserAnswerResponse[]
 }

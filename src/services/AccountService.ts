@@ -1,6 +1,3 @@
-// import { BasePath } from "../env/BasePath";
-// import instance from "../util/apiInstance";
-
 import { BasePath } from "@/env/BasePath";
 import instance from "@/util/apiInstance";
 

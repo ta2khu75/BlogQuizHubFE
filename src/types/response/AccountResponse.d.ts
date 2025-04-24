@@ -1,5 +1,5 @@
-interface AccountResponse extends AccountBase{
-    username:string;
-    email:string;
-    info:InfoResponse;
+interface AccountResponse {
+    info: InfoResponse<string>;
+    status: AccountStatusResponse;
+    profile: AccountProfileBase;
 }
