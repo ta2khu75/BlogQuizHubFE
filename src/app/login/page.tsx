@@ -29,12 +29,12 @@ const LoginPage = () => {
     const onLogin = async (value: AuthRequest) => {
         try {
             const response = await AuthService.login(value);
-            if (response.success) {
+            if (response.status_code < 400) {
                 dispatch(AuthActions.set(response.data));
                 router.push('/');
                 toast({ title: "Login successful" })
             } else {
-                toast({ title: "Login failed", description: response.message_error, variant: "destructive" });
+                toast({ title: "Login failed", description: response.message, variant: "destructive" });
             }
         } catch (err) {
             toast({ title: "Login failed", description: FunctionUtil.showError(err), variant: "destructive" });
@@ -59,7 +59,7 @@ const LoginPage = () => {
                         )} />
                         <FormField control={form.control} name='password' render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Username</FormLabel>
+                                <FormLabel>password</FormLabel>
                                 <FormControl>
                                     <Input type='password' placeholder="password" {...field} />
                                 </FormControl>

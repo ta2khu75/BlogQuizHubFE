@@ -4,6 +4,6 @@ interface ReportResponse {
     report_type: ReportType
     target_type: ReportTarget
     report_status: ReportStatus
-    account: AccountResponse
+    account: AccountProfileResponse
     target: BlogResponse | QuizResponse
 }

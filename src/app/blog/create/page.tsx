@@ -25,9 +25,9 @@ const BlogCreatePage = () => {
             const res = await BlogService.create(data)
             if (res.success) {
                 toast({ title: "Create success" })
-                router.push(`/profile?id=${res.data.author.info.id}&tab=blog`)
+                router.push(`/profile?id=${res.data.author.id}&tab=blog`)
             } else {
-                toast({ title: "Create failed", description: res.message_error, variant: "destructive" })
+                toast({ title: "Create failed", description: res.message, variant: "destructive" })
             }
         } catch (error) {
             toast({ title: "Create failed", description: FunctionUtil.showError(error), variant: "destructive" })

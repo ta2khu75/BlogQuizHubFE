@@ -42,7 +42,7 @@ const BlogAboutPage = ({ params }: { params: Promise<{ slug: string }> }) => {
             if (res.success) {
                 setBlog(res.data)
             } else {
-                toast({ variant: "destructive", description: res.message_error })
+                toast({ variant: "destructive", description: res.message })
             }
         }).catch(err => (
             toast({ variant: "destructive", description: FunctionUtil.showError(err) })
@@ -53,7 +53,7 @@ const BlogAboutPage = ({ params }: { params: Promise<{ slug: string }> }) => {
             if (res.success) {
                 setCommentPage(res.data)
             } else {
-                toast({ variant: "destructive", description: res.message_error })
+                toast({ variant: "destructive", description: res.message })
             }
         }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
     }
@@ -75,10 +75,10 @@ const BlogAboutPage = ({ params }: { params: Promise<{ slug: string }> }) => {
                 <CardHeader>
                     <CardTitle className='text-7xl text-center'>{blog?.title}</CardTitle>
                     <CardTitle className='text-4xl text-center'>
-                        Author:<Link href={"/profile?id=" + blog?.author.info.id} className={"hover:underline"}> {blog?.author.username}</Link>
+                        Author:<Link href={"/profile?id=" + blog?.author.id} className={"hover:underline"}> {blog?.author.username}</Link>
                     </CardTitle>
                     <CardTitle className='flex flex-wrap justify-center'>
-                        {blog?.blog_tags.map(tag => <Badge key={tag} className='text-3xl'><Link href={"/blog/search?tag=" + tag}>{tag}</Link></Badge>)}
+                        {blog?.tags.map(tag => <Badge key={tag} className='text-3xl'><Link href={"/blog/search?tag=" + tag}>{tag}</Link></Badge>)}
                     </CardTitle>
                 </CardHeader>
                 {

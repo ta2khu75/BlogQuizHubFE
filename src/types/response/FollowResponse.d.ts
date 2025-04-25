@@ -1,4 +1,4 @@
 interface FollowResponse {
-    following: AccountResponse
-    follower: AccountResponse
+    following: AccountProfileResponse
+    follower: AccountProfileResponse
 }

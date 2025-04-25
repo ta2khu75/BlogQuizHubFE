@@ -7,7 +7,7 @@
 
 import { BasePath } from "@/env/BasePath";
 import { AuthRequest } from "@/types/request/AuthRequest";
-import instance from "@/util/apiInstance";
+import instance from "@/util/AxiosInstance";
 
 // import { BasePath } from "../env/BasePath";
 const basePath = BasePath.AUTH

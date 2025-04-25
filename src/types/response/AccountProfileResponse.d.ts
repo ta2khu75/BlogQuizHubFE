@@ -1,4 +1,4 @@
-interface AccountProfileResponse {
+interface AccountProfileResponse extends AccountProfileBase {
     id: number;
     display_name: string;
     blog_count?: number;

@@ -1,5 +1,5 @@
 import { BasePath } from "@/env/BasePath";
-import instance from "@/util/apiInstance";
+import instance from "@/util/AxiosInstance";
 import qs from 'qs';
 const basePath = BasePath.QUIZ_RESULT;
 export default class QuizResultService {

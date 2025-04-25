@@ -17,7 +17,7 @@ import QuizService from '@/services/QuizService'
 const formSchema: ZodType<BlogRequest> = z.object({
     title: z.string().min(3),
     content: z.string().min(10),
-    blog_tags: z.array(z.string().nonempty()).min(1),
+    tags: z.array(z.string().nonempty()).min(1),
     access_modifier: z.nativeEnum(AccessModifier),
     quiz_ids: z.string().array().optional()
 })
@@ -50,7 +50,7 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
     })
     const { fields: tagFields, append: appendTag, remove: removeTag } = useFieldArray<FormData>({
         control: form.control,
-        name: "blog_tags",
+        name: "tags",
     });
     const { fields: quizFields, append: appendQuiz, remove: removeQuiz } = useFieldArray<FormData>({
         control: form.control,
@@ -174,7 +174,7 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                             <FormField
                                 key={field.id}
                                 control={form.control}
-                                name={`blog_tags.${index}`}
+                                name={`tags.${index}`}
                                 render={({ field }) => (
                                     <FormItem>
                                         <div className='flex'>

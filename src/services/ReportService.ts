@@ -1,7 +1,7 @@
 import { BasePath } from "@/env/BasePath";
 import { ReportStatus } from "@/types/ReportStatus";
 import { ReportSearch } from "@/types/request/search/ReportSearch";
-import instance from "@/util/apiInstance";
+import instance from "@/util/AxiosInstance";
 const basePath = BasePath.REPORT
 export default class ReportService {
     static create(date: ReportRequest): Promise<ApiResponse<PageResponse<ReportResponse>>> {

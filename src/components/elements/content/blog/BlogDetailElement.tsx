@@ -12,10 +12,10 @@ const BlogDetailElement = ({ blog }: Props) => {
             <CardHeader>
                 <CardTitle className='text-7xl text-center'>{blog?.title}</CardTitle>
                 <CardTitle className='text-4xl text-center'>
-                    Author:{blog?.author.username}
+                    Author:{blog?.author.display_name}
                 </CardTitle>
                 <CardTitle className='flex flex-wrap justify-center'>
-                    {blog?.blog_tags.map(tag => <Badge key={tag} className='text-3xl'>{tag}</Badge>)}
+                    {blog?.tags.map(tag => <Badge key={tag} className='text-3xl'>{tag}</Badge>)}
                 </CardTitle>
             </CardHeader>
             {

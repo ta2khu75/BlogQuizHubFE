@@ -1,5 +1,5 @@
-interface BlogBase{
+interface BlogBase {
     title: string;
-    blog_tags: string[];
+    tags: string[];
     access_modifier: AccessModifier;
 }

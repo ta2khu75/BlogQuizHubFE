@@ -1,3 +1,3 @@
-interface AccountProfileRequest extends AccountBase {
+interface AccountProfileRequest extends AccountProfileBase {
     display_name: string;
 }

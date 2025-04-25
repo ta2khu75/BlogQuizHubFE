@@ -30,7 +30,7 @@ const ProfilePage = () => {
     const id = searchParams.get('id')
     const tab = searchParams.get('tab') ?? 'blog'
     const pathname = usePathname();
-    const [account, setAccount] = useState<AccountDetailsResponse>()
+    const [account, setAccount] = useState<AccountProfileResponse>()
     const [openChangePassword, setOpenChangePassword] = useState(false)
     const [openChangeInfo, setOpenChangeInfo] = useState(false)
     const [isFollow, setIsFollow] = useState(false);
@@ -48,7 +48,7 @@ const ProfilePage = () => {
             if (res.success) {
                 setIsFollow(res.data.result)
             } else {
-                toast({ variant: "destructive", description: res.message_error })
+                toast({ variant: "destructive", description: res.message })
             }
         }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
     }
@@ -61,7 +61,7 @@ const ProfilePage = () => {
                 setDisableFollow(false)
                 setAccount(prev => ({ ...prev!, follow_count: (prev?.follow_count ?? 0) + 1 }))
             } else {
-                toast({ variant: "destructive", description: res.message_error })
+                toast({ variant: "destructive", description: res.message })
             }
         }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
     }
@@ -74,7 +74,7 @@ const ProfilePage = () => {
                 setDisableFollow(false)
                 setAccount(prev => ({ ...prev!, follow_count: (prev?.follow_count ?? 1) - 1 }))
             } else {
-                toast({ variant: "destructive", description: res.message_error })
+                toast({ variant: "destructive", description: res.message })
             }
         }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
     }
@@ -83,9 +83,9 @@ const ProfilePage = () => {
             AccountService.readById(id).then(res => {
                 if (res.success) {
                     setAccount(res.data)
-                    dispatch(AuthActions.setAccount(res.data))
+                    dispatch(AuthActions.setProfile(res.data))
                 } else {
-                    console.log(res.message_error);
+                    console.log(res.message);
                 }
             }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
         }
@@ -97,22 +97,22 @@ const ProfilePage = () => {
                 toast({ title: "Change password success" })
                 setOpenChangePassword(false)
             } else {
-                toast({ variant: "destructive", description: res.message_error })
+                toast({ variant: "destructive", description: res.message })
             }
         } catch (err) {
             toast({ variant: "destructive", description: FunctionUtil.showError(err) })
         }
     }
-    const fetchChangeInfo = async (data: AccountInfoRequest) => {
+    const fetchChangeInfo = async (data: AccountProfileRequest) => {
         try {
             const res = await AccountService.updateInfo(data)
             if (res.success) {
                 toast({ title: "Change info success" });
                 setOpenChangeInfo(false)
-                dispatch(AuthActions.setAccount(res.data))
-                setAccount(prev => { return { ...prev!, username: res.data.username, first_name: res.data.first_name, last_name: res.data.last_name, birthday: res.data.birthday } })
+                dispatch(AuthActions.setProfile(res.data))
+                setAccount(res.data)
             } else {
-                toast({ variant: "destructive", description: res.message_error })
+                toast({ variant: "destructive", description: res.message })
             }
         } catch (err) {
             toast({ variant: "destructive", description: FunctionUtil.showError(err) })
@@ -128,12 +128,12 @@ const ProfilePage = () => {
                             <CardTitle>
                                 <Avatar>
                                     <AvatarFallback>
-                                        {account?.username[0].toUpperCase()}
+                                        {account?.display_name[0].toUpperCase()}
                                     </AvatarFallback>
                                 </Avatar>
                             </CardTitle>
                             <CardTitle>
-                                {account?.username}
+                                {account?.display_name}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className='flex flex-col items-center'>

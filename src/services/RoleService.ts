@@ -1,5 +1,5 @@
 import { BasePath } from "../env/BasePath";
-import instance from "../util/apiInstance";
+import instance from "../util/AxiosInstance";
 const basePath = BasePath.ROLE;
 export default class RoleService {
     static readAll(): Promise<ApiResponse<RoleResponse[]>> {

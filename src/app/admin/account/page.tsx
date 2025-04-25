@@ -101,7 +101,7 @@ const AccountPage = () => {
             <Modal open={openEdit} onCancel={onCancelEdit} title={"Edit account status"} description="Edit account status here. Click submit when you are done.">
                 {account && <AccountStatusForm account={account} roles={roles} onSubmit={onUpdate} />}
             </Modal>
-            <TableElement<ManagedAccountResponse> handleEditClick={handleEditClick} showIndex visibleColumns={["email", "username", "birthday", "enabled", "non_locked", "role"]} array={accountPage?.content ?? []} />
+            <TableElement<AccountResponse> handleEditClick={handleEditClick} showIndex visibleColumns={["", "username", "birthday", "enabled", "non_locked", "role"]} array={accountPage?.content ?? []} />
         </>
     )
 }

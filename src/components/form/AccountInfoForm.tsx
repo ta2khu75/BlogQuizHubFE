@@ -8,20 +8,20 @@ import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { z, ZodType } from "zod"
 
-const formSchema: ZodType<AccountInfoRequest> = z.object({
+const formSchema: ZodType<AccountProfileRequest> = z.object({
     first_name: z.string().min(3),
     last_name: z.string().min(3),
     birthday: z.string().nonempty(),
-    username: z.string().min(3),
+    display_name: z.string().min(3),
 })
 type Props = {
-    onSubmit: (value: AccountInfoRequest) => void
-    account?: AccountResponse
+    onSubmit: (value: AccountProfileRequest) => void
+    account?: AccountProfileResponse
 }
 const AccountInfoForm = ({ onSubmit, account }: Props) => {
-    const form = useForm<AccountInfoRequest>({
+    const form = useForm<AccountProfileRequest>({
         resolver: zodResolver(formSchema),
-        defaultValues: { first_name: '', last_name: '', birthday: new Date().toISOString().split('T')[0], username: '' }
+        defaultValues: { first_name: '', last_name: '', birthday: new Date().toISOString().split('T')[0], display_name: '' }
     })
     useEffect(() => {
         if (account) {
@@ -31,7 +31,7 @@ const AccountInfoForm = ({ onSubmit, account }: Props) => {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
-                <FormField control={form.control} name='username' render={({ field }) => (
+                <FormField control={form.control} name='display_name' render={({ field }) => (
                     <FormItem>
                         <FormLabel>Username</FormLabel>
                         <FormControl>

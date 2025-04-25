@@ -17,7 +17,7 @@ const BlogList = ({ blogPage }: Props) => {
                 blogPage?.content?.map(blog => (
                     <Card key={blog.info.id}>
                         <CardHeader className='flex flex-row justify-between items-center'>
-                            <Link href={`/profile?id=${blog.author.info.id}`}><AvatarElement account={blog.author} /></Link>
+                            <Link href={`/profile?id=${blog.author.id}`}><AvatarElement account={blog.author} /></Link>
                             {
                                 isAuthor &&
                                 <>
@@ -31,7 +31,7 @@ const BlogList = ({ blogPage }: Props) => {
                                 <Link href={`/blog/${StringUtil.convertSlugUrl(blog.title)}-id-${blog.info.id}.html`} className={"hover:underline"}>{blog.title}</Link>
                             </CardTitle>
                             <div className='flex flex-wrap'>
-                                {blog.blog_tags.map(tag => <Badge key={tag}>{tag}</Badge>)}
+                                {blog.tags.map(tag => <Badge key={tag}>{tag}</Badge>)}
                             </div>
                         </CardContent>
                         <CardFooter className='flex gap-x-4'>
