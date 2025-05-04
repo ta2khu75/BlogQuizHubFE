@@ -30,12 +30,12 @@ import { BlogService } from '@/services/BlogService';
 import _ from 'lodash';
 const quizSchema = z.object({
     title: z.string().nonempty(),
-    quiz_level: z.nativeEnum(QuizLevel),
+    level: z.nativeEnum(QuizLevel),
     blog_id: z.string().optional(),
     duration: z.number().min(5),
     description: z.string().optional(),
     access_modifier: z.nativeEnum(AccessModifier),
-    quiz_category_id: z.number(),
+    category_id: z.number(),
     quiz_result_mode: z.nativeEnum(QuizResultMode),
     shuffle_question: z.boolean().default(true),
     completed: z.boolean().default(false),
@@ -60,8 +60,8 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
     const [open, setOpen] = useState(false)
     const [openConfirm, setOpenConfirm] = useState(false)
     const [current, setCurrent] = useState(0)
-    const initQuiz: QuestionRequest = { question: "", question_type: QuestionType.SINGLE_CHOICE, shuffle_answer: false, answers: Array(4).fill({ answer: "", correct: false }) };
-    const quizDefault: QuizRequest = { title: "", quiz_level: QuizLevel.EASY, blog_id: "", completed: false, shuffle_question: true, duration: 0, quiz_category_id: 0, access_modifier: AccessModifier.PRIVATE, quiz_result_mode: QuizResultMode.ANSWER_VISIBLE, description: "", questions: [initQuiz] }
+    const initQuiz: QuestionRequest = { content: "", type: QuestionType.SINGLE_CHOICE, shuffle_answer: false, answers: Array(4).fill({ answer: "", correct: false }) };
+    const quizDefault: QuizRequest = { title: "", level: QuizLevel.EASY, blog_id: "", completed: false, shuffle_question: true, duration: 0, category_id: 0, access_modifier: AccessModifier.PRIVATE, quiz_result_mode: QuizResultMode.ANSWER_VISIBLE, description: "", questions: [initQuiz] }
     const [search, setSearch] = useState("")
     const [blogs, setBlogs] = useState<BlogResponse[]>([])
     const debouncedSearch = useDebounce(search)
@@ -90,17 +90,17 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
             if (res.data) {
                 setBlogs(res.data)
             } else {
-                toast({ description: res.message_error, variant: "destructive" })
+                toast({ description: res.message, variant: "destructive" })
             }
         }).catch(err => toast({ description: FunctionUtil.showError(err), variant: "destructive" }))
     }
     useEffect(() => {
         if ((questionErrors.length ?? 0) > 0) {
             setOpen(false)
+            console.log(questionErrors);
             setShowQuestionError(true)
         }
-    }
-        , [questionErrors.length])
+    }, [questionErrors.length])
     const count = Math.max(questionFields.length - 1, 0)
     useEffect(() => {
         const subscription = form.watch((values) => {
@@ -110,7 +110,7 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
     }, [form]);
     useEffect(() => {
         if (_.isEqual(quizForm, quizDefault) && quiz) {
-            form.reset({ ...quiz, quiz_category_id: quiz?.quiz_category?.id, blog_id: quiz?.blog?.info?.id })
+            form.reset({ ...quiz, category_id: quiz?.category?.id, blog_id: quiz?.blog?.info?.id })
             if (quiz.blog)
                 setBlogs([quiz?.blog])
         }
@@ -137,9 +137,9 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                 if (res.success) {
                     setOpen(false)
                     toast({ title: "Update success" })
-                    router.push(`/profile?id=${res.data.author.info.id}&tab=quiz`)
+                    router.push(`/profile?id=${res.data.author.id}&tab=quiz`)
                 } else {
-                    toast({ title: "Update failed", description: FunctionUtil.showError(res.message_error), variant: "destructive" });
+                    toast({ title: "Update failed", description: FunctionUtil.showError(res.message), variant: "destructive" });
                 }
             } catch (error) {
                 toast({ title: "Update failed", description: FunctionUtil.showError(error), variant: "destructive" });
@@ -150,9 +150,9 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                 if (res.success) {
                     setOpen(false)
                     toast({ title: "Create success" })
-                    router.push(`/profile?id=${res.data.author.info.id}&tab=quiz`)
+                    router.push(`/profile?id=${res.data.author.id}&tab=quiz`)
                 } else {
-                    toast({ title: "Create failed", description: FunctionUtil.showError(res.message_error), variant: "destructive" });
+                    toast({ title: "Create failed", description: FunctionUtil.showError(res.message), variant: "destructive" });
                 }
             } catch (error) {
                 toast({ title: "Create failed", description: FunctionUtil.showError(error), variant: "destructive" });
@@ -181,7 +181,7 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
     }
     const onReset = () => {
         if (quiz) {
-            form.reset({ ...quiz, quiz_category_id: quiz?.quiz_category?.id, blog_id: quiz?.blog?.info?.id })
+            form.reset({ ...quiz, category_id: quiz?.category?.id, blog_id: quiz?.blog?.info?.id })
             if (quiz.blog)
                 setBlogs([quiz?.blog])
             setCurrent(0)
@@ -231,7 +231,7 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                                 </div>
                             </FormItem>
                         )} />
-                        <FormField control={form.control} name='quiz_category_id' render={({ field }) => (
+                        <FormField control={form.control} name='category_id' render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Quiz category</FormLabel>
                                 <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={`${field.value}`}>
@@ -251,7 +251,7 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                         )} />
                         <FormField
                             control={form.control}
-                            name="quiz_level"
+                            name="level"
                             render={({ field }) => (
                                 <FormItem className="space-y-3">
                                     <FormLabel>Level</FormLabel>

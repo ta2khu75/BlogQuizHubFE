@@ -1,6 +1,4 @@
 
-interface CommentResponse extends CommentBase {
-    file_path: string;
+interface CommentResponse extends CommentBase, BaseResponse<string> {
     author: AccountProfileResponse;
-    info: InfoResponse;
 }

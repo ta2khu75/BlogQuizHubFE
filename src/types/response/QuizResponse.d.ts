@@ -1,8 +1,7 @@
-interface QuizResponse extends QuizBase {
+interface QuizResponse extends QuizBase, BaseResponse<string> {
     image_path: string,
     author: AccountProfileResponse
     category: QuizCategoryResponse
-    info: InfoResponse<string>,
     blog?: BlogResponse,
     questions: QuestionResponse[]
 }

@@ -1,4 +1,4 @@
-import AvatarElement from '@/components/elements/header/AvatarElement';
+import AvatarElement from '@/components/common/AvatarElement';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import StringUtil from '@/util/StringUtil';
 import Image from 'next/image';

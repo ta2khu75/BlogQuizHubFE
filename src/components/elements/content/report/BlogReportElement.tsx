@@ -1,4 +1,4 @@
-import AvatarElement from '@/components/elements/header/AvatarElement'
+import AvatarElement from '@/components/common/AvatarElement'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'

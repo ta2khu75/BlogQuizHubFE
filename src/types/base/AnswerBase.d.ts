@@ -1,4 +1,4 @@
-interface AnswerBase{
-    answer:string;
-    correct:boolean;
+interface AnswerBase {
+    content: string;
+    correct: boolean;
 }

@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 export const answerSchema = z.object({
-    answer: z.string().nonempty(),
+    content: z.string().nonempty(),
     correct: z.boolean().default(false),
     id: z.number().optional(),
 })
@@ -32,7 +32,7 @@ const AnswerForm = ({ answerIndex, questionIndex, form, questionType, onDelete }
         }
     }, [correct])
     return (
-        <FormField control={form.control} name={`${answerName}.answer`} render={({ field: fieldInput }) => (
+        <FormField control={form.control} name={`${answerName}.content`} render={({ field: fieldInput }) => (
             <div>
                 <div className='flex items-center gap-4'>
                     <FormField control={form.control} name={`${answerName}.correct`}

@@ -1,5 +1,5 @@
 interface QuestionBase {
-    question: string;
+    content: string;
     shuffle_answer: boolean;
-    question_type: QuestionType
+    type: QuestionType
 }

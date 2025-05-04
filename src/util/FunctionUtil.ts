@@ -36,21 +36,7 @@ export default class FunctionUtil {
         const contentData: CustomElement[] = JSON.parse(content)
         return contentData.filter((item) => item.type === "image" && item.url).map(item => item.url as string);
     }
-    static showError(error: unknown) {
+    static getErrorMessage(error: unknown) {
         return error instanceof Error ? error.message : "An unexpected error occurred";
-    }
-    static isInfoResponse(object: object): object is InfoResponse<object> {
-        const infoSchema = z.object({
-            id: z.string(),
-            created_at: z.string(),
-            updated_at: z.string().optional(),
-        });
-        const parsedUser = infoSchema.safeParse(object);
-
-        if (parsedUser.success) {
-            return true;
-        } else {
-            return false;
-        }
     }
 }

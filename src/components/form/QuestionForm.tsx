@@ -11,9 +11,9 @@ import { FilePlus2 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch'
 export const questionSchema = z.object({
     id: z.number().optional(),
-    question: z.string().nonempty(),
+    content: z.string().nonempty(),
     shuffle_answer: z.boolean().default(false),
-    question_type: z.nativeEnum(QuestionType),
+    type: z.nativeEnum(QuestionType),
     answers: z.array(answerSchema).refine((answers) => answers.some((answer) => answer.correct), { message: 'At least one answer must be correct' }),
 })
 type Props = {
@@ -23,8 +23,8 @@ type Props = {
 }
 const QuestionForm = ({ form, questionIndex }: Props) => {
     const questionName: `questions.${number}` = `questions.${questionIndex}`;
-    const questionType = form.watch(`${questionName}.question_type`)
-    const initAnswer: AnswerRequest = { answer: "", correct: false }
+    const questionType = form.watch(`${questionName}.type`)
+    const initAnswer: AnswerRequest = { content: "", correct: false }
     const { fields: answerFields, append: appendAnswer, remove: removeAnswer } = useFieldArray({
         control: form.control,
         name: `${questionName}.answers`,
@@ -52,7 +52,7 @@ const QuestionForm = ({ form, questionIndex }: Props) => {
     }
     return (
         <div className='w-full flex flex-col gap-4'>
-            <FormField control={form.control} name={`${questionName}.question`} render={({ field }) => (
+            <FormField control={form.control} name={`${questionName}.content`} render={({ field }) => (
                 <FormItem className='w-full'>
                     <FormLabel>Question</FormLabel>
                     <FormControl >
@@ -63,7 +63,7 @@ const QuestionForm = ({ form, questionIndex }: Props) => {
             )} />
             <FormField
                 control={form.control}
-                name={`${questionName}.question_type`}
+                name={`${questionName}.type`}
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>Question type</FormLabel>
@@ -73,13 +73,13 @@ const QuestionForm = ({ form, questionIndex }: Props) => {
                                 defaultValue={field.value}
                                 className="flex space-y-1"
                             >
-                                {Object.entries(QuestionType).map((item, index) => (
+                                {Object.values(QuestionType).map((item, index) => (
                                     <FormItem key={index} className="flex items-center space-x-3 space-y-0">
                                         <FormControl>
-                                            <RadioGroupItem value={item[0]} />
+                                            <RadioGroupItem value={item} />
                                         </FormControl>
                                         <FormLabel className="font-normal">
-                                            {item[1]}
+                                            {item}
                                         </FormLabel>
                                     </FormItem>
                                 ))}

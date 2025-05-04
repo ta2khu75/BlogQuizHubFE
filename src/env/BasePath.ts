@@ -1,4 +1,5 @@
 export class BasePath {
+    static readonly BASE_URL = "http://localhost:8080/api/v1"
     static readonly AUTH = "auth"
     static readonly ACCOUNT = "accounts"
     static readonly FOLLOW = "follows"

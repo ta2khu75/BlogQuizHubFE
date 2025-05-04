@@ -1,4 +1,4 @@
-import AvatarElement from '@/components/elements/header/AvatarElement'
+import AvatarElement from '@/components/common/AvatarElement'
 import Confirm from '@/components/elements/util/Confirm'
 import CommentForm from '@/components/form/CommentForm'
 import { Button } from '@/components/ui/button'

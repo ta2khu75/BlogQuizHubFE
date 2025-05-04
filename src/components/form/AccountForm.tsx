@@ -1,33 +1,27 @@
+import { DatePicker } from "@/components/common/DatePicker"
+import { accountRequestSchema } from "@/components/form/schema/account.request.schema"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
-import { z, ZodType } from "zod"
 
-const formSchema: ZodType<AccountRequest> = z.object({
-  email: z.string().email(),
-  password: z.string().min(3),
-  confirm_password: z.string().min(3),
-  first_name: z.string().min(3),
-  last_name: z.string().min(3),
-  birthday: z.string()
-}).refine(data => data.password === data.confirm_password, {
-  message: 'confirm password not match',
-  path: ['confirm_password']
-})
 type Props = {
   onSubmit: (value: AccountRequest) => void
 }
 const AccountForm = ({ onSubmit }: Props) => {
   const form = useForm<AccountRequest>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { email: "", password: '', confirm_password: '', first_name: '', last_name: '', birthday: new Date().toISOString().split('T')[0] }
+    resolver: zodResolver(accountRequestSchema),
+    defaultValues: { email: "", password: '', confirm_password: '', profile: { first_name: '', last_name: '', birthday: new Date() } }
   })
+  const onFormSubmit = (e: React.FormEvent) => {
+    if (form.formState.isSubmitting) return; // Nếu đang submit thì không gọi handleSubmit nữa
+    form.handleSubmit(onSubmit)(e); // Gọi handleSubmit nếu không phải đang submit
+  };
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+      <form onSubmit={onFormSubmit} className='space-y-4'>
         <FormField control={form.control} name='email' render={({ field }) => (
           <FormItem>
             <FormLabel>Email</FormLabel>
@@ -56,7 +50,7 @@ const AccountForm = ({ onSubmit }: Props) => {
               <FormMessage />
             </FormItem>
           )} />
-          <FormField control={form.control} name='first_name' render={({ field }) => (
+          <FormField control={form.control} name='profile.first_name' render={({ field }) => (
             <FormItem>
               <FormLabel>First name</FormLabel>
               <FormControl>
@@ -65,7 +59,7 @@ const AccountForm = ({ onSubmit }: Props) => {
               <FormMessage />
             </FormItem>
           )} />
-          <FormField control={form.control} name='last_name' render={({ field }) => (
+          <FormField control={form.control} name='profile.last_name' render={({ field }) => (
             <FormItem>
               <FormLabel>Last name</FormLabel>
               <FormControl>
@@ -77,18 +71,19 @@ const AccountForm = ({ onSubmit }: Props) => {
         </div>
         <FormField
           control={form.control}
-          name="birthday"
+          name="profile.birthday"
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Date of birth</FormLabel>
               <FormControl>
-                <Input type='date' placeholder='Birthday' {...field} />
+                <DatePicker {...field} />
+                {/* <Input type='date' placeholder='Birthday' {...field} /> */}
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className="flex justify-end">
+        <div className="flex justify-center">
           {form.formState.isSubmitting ? <Button disabled>
             <Loader2 className="animate-spin" />
             Please wait

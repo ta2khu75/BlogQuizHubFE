@@ -1,4 +1,5 @@
 interface AuthResponse {
-    profile?: AccountProfileResponse;
-    access_token?: string;
+    profile: AccountProfileResponse;
+    role: string;
+    access_token: string;
 }

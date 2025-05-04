@@ -1,5 +1,5 @@
 import StoreProvider from "@/app/StoreProvider";
-import Header from "@/components/fragments/Header";
+import Header from "@/components/fragments/Header/Header";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";

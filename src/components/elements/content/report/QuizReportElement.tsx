@@ -1,4 +1,4 @@
-import AvatarElement from '@/components/elements/header/AvatarElement'
+import AvatarElement from '@/components/common/AvatarElement'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
 import React from 'react'

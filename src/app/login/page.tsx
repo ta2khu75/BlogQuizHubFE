@@ -1,14 +1,12 @@
 "use client"
+import TitleContent from '@/components/common/TitleContent'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
 import { useAppDispatch } from '@/redux/hooks'
 import { AuthActions } from '@/redux/slice/authSlide'
-import AuthService from '@/services/AuthService'
 import { AuthRequest } from '@/types/request/AuthRequest'
-import FunctionUtil from '@/util/FunctionUtil'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -19,33 +17,27 @@ const formSchema: ZodType<AuthRequest> = z.object({
     password: z.string().min(3)
 })
 const LoginPage = () => {
+    const dispatch = useAppDispatch()
     const { toast } = useToast()
+    const router = useRouter()
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: { email: '', password: '' }
     })
-    const router = useRouter()
-    const dispatch = useAppDispatch()
     const onLogin = async (value: AuthRequest) => {
         try {
-            const response = await AuthService.login(value);
-            if (response.status_code < 400) {
-                dispatch(AuthActions.set(response.data));
-                router.push('/');
-                toast({ title: "Login successful" })
-            } else {
-                toast({ title: "Login failed", description: response.message, variant: "destructive" });
-            }
-        } catch (err) {
-            toast({ title: "Login failed", description: FunctionUtil.showError(err), variant: "destructive" });
+            await dispatch(AuthActions.fetchLogin(value)).unwrap();
+            router.push('/')
+        } catch (error) {
+            const err = error as ApiResponse<object>;
+            console.log(error);
+            toast({ variant: 'destructive', title: 'Login failed', description: err.message })
         }
     };
     return (
-        <Card className="w-[350px]">
-            <CardHeader>
-                <CardTitle>Login</CardTitle>
-            </CardHeader>
-            <CardContent>
+        <div className='w-full mx-auto flex flex-col items-center'>
+            <TitleContent className='mb-4'>Login</TitleContent>
+            <div className='max-w-xl w-full mx-auto px-4'>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onLogin)} className='space-y-4'>
                         <FormField control={form.control} name='email' render={({ field }) => (
@@ -59,15 +51,14 @@ const LoginPage = () => {
                         )} />
                         <FormField control={form.control} name='password' render={({ field }) => (
                             <FormItem>
-                                <FormLabel>password</FormLabel>
+                                <FormLabel>Password</FormLabel>
                                 <FormControl>
                                     <Input type='password' placeholder="password" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )} />
-
-                        <CardFooter className="flex justify-end">
+                        <div className='flex justify-center'>
                             {form.formState.isSubmitting ?
                                 <Button disabled>
                                     <Loader2 className="animate-spin" />
@@ -75,11 +66,11 @@ const LoginPage = () => {
                                 </Button> :
                                 <Button type='submit'>Submit</Button>
                             }
-                        </CardFooter>
+                        </div>
                     </form>
                 </Form>
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     )
 }
 

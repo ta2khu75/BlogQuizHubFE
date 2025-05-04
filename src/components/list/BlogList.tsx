@@ -1,5 +1,5 @@
 "use client"
-import AvatarElement from '@/components/elements/header/AvatarElement'
+import AvatarElement from '@/components/common/AvatarElement'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
