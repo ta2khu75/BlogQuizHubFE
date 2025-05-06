@@ -1,3 +1,8 @@
+import { RenderLeaf } from "@/components/common/TextEditor/TextEditorLeaf";
+import { RenderElement } from "@/components/common/TextEditor/TextEditorRender";
+import TextEditorTool from "@/components/common/TextEditor/TextEditorTool";
+import { CustomElement, CustomText, EditorType, TextEditorMark } from "@/components/common/TextEditor/TextEditorType";
+import { toggleMark, withImage, withInline } from "@/components/common/TextEditor/TextEditorUtil";
 import React, { memo, useMemo, useState } from "react";
 import { createEditor } from "slate";
 import { withHistory } from "slate-history";
@@ -7,11 +12,11 @@ import {
     withReact,
 } from "slate-react";
 
-import { toggleMark, withImage, withInline } from "@/components/elements/util/TextEditor/TextEditorUtil";
-import TextEditorTool from "@/components/elements/util/TextEditor/TextEditorTool";
-import { CustomElement, CustomText, EditorType, TextEditorMark } from "@/components/elements/util/TextEditor/TextEditorType";
-import { RenderElement } from "@/components/elements/util/TextEditor/TextEditorRender";
-import { RenderLeaf } from "@/components/elements/util/TextEditor/TextEditorLeaf";
+// import { toggleMark, withImage, withInline } from "@/components/elements/util/TextEditor/TextEditorUtil";
+// import TextEditorTool from "@/components/elements/util/TextEditor/TextEditorTool";
+// import { CustomElement, CustomText, EditorType, TextEditorMark } from "@/components/elements/util/TextEditor/TextEditorType";
+// import { RenderElement } from "@/components/elements/util/TextEditor/TextEditorRender";
+// import { RenderLeaf } from "@/components/elements/util/TextEditor/TextEditorLeaf";
 
 interface TextEditorProps {
     name: string;

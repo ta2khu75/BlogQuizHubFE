@@ -1,10 +1,10 @@
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
 import { usePathname, useSearchParams } from 'next/navigation'
 import React, { useMemo } from 'react'
-type Props<T> = {
-    page: PageResponse<T>
+type Props = {
+    page: PageResponse<object>
 }
-const Pageination = <T,>({ page }: Props<T>) => {
+const Paginator = ({ page }: Props) => {
     const { total_pages } = page
     const pathName = usePathname()
     const searchParams = useSearchParams()
@@ -109,4 +109,4 @@ const Pageination = <T,>({ page }: Props<T>) => {
     )
 }
 
-export default Pageination
+export default Paginator; 

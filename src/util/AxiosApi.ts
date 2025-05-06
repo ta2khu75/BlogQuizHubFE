@@ -57,17 +57,20 @@ const refreshTokenAndRetryRequest = async (error: AxiosError<ApiResponse<object>
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const handleTokenError = (error: AxiosError<ApiResponse<object>, any>, api: AxiosInstance) => {
   const status = error.response?.status;
-  const wwwAuth = error.response?.headers?.["www-authenticate"];
+  const wwwAuth = error.response?.headers['www-authenticate'];
+  console.log("error", wwwAuth);
 
   if (status === 401 && wwwAuth?.includes("Bearer")) {
     const match = /error="(.+?)",\s*error_description="(.+?)"/.exec(wwwAuth);
     if (match) {
       const errorCode = match[1];
       const description = match[2];
+      console.log("description", description);
+
 
       switch (errorCode) {
         case "invalid_token":
-          if (description === "Token expired") {
+          if (description.includes("Jwt expired")) {
             return refreshTokenAndRetryRequest(error, api);
           } else {
             store.dispatch(AuthActions.fetchLogout());

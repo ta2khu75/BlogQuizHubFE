@@ -1,4 +1,4 @@
-import AnswerForm, { answerSchema } from '@/components/form/AnswerForm'
+import AnswerForm from '@/components/form/AnswerForm'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -6,16 +6,10 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { QuestionType } from '@/types/QuestionType'
 import React, { useEffect } from 'react'
 import { useFieldArray, UseFormReturn } from 'react-hook-form'
-import { z } from 'zod'
 import { FilePlus2 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch'
-export const questionSchema = z.object({
-    id: z.number().optional(),
-    content: z.string().nonempty(),
-    shuffle_answer: z.boolean().default(false),
-    type: z.nativeEnum(QuestionType),
-    answers: z.array(answerSchema).refine((answers) => answers.some((answer) => answer.correct), { message: 'At least one answer must be correct' }),
-})
+import { QuizRequest } from '@/types/request/QuizRequest'
+import { AnswerDto } from '@/types/dto/AnswerDto'
 type Props = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     form: UseFormReturn<QuizRequest, any, undefined>
@@ -24,7 +18,7 @@ type Props = {
 const QuestionForm = ({ form, questionIndex }: Props) => {
     const questionName: `questions.${number}` = `questions.${questionIndex}`;
     const questionType = form.watch(`${questionName}.type`)
-    const initAnswer: AnswerRequest = { content: "", correct: false }
+    const initAnswer: AnswerDto = { content: "", correct: false }
     const { fields: answerFields, append: appendAnswer, remove: removeAnswer } = useFieldArray({
         control: form.control,
         name: `${questionName}.answers`,

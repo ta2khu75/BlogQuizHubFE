@@ -19,6 +19,6 @@ export default class StringUtil {
     }
     static getIdFromSlugUrl(url: string): string {
         const urlParts = url.split('.html');
-        return urlParts[0].split('-id-').pop() ?? "";
+        return urlParts[0].split('-').pop() ?? "";
     }
 }

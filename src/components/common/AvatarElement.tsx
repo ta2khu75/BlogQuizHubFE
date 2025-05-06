@@ -1,17 +1,17 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import React from 'react'
 type Props = {
-    account?: AccountProfileResponse
+    profile?: AccountProfileResponse
 }
-const AvatarElement = ({ account }: Props) => {
+const AvatarElement = ({ profile }: Props) => {
     return (
         <div className='flex items-center gap-x-2'>
             <Avatar >
                 <AvatarFallback>
-                    {account?.display_name[0].toUpperCase()}
+                    {profile?.display_name[0].toUpperCase()}
                 </AvatarFallback>
             </Avatar>
-            {account?.display_name}
+            {profile?.display_name}
         </div>
     )
 }

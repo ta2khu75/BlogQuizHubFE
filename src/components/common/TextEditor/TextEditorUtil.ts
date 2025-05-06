@@ -1,7 +1,7 @@
-import { CustomElement, EditorType, TextEditorAlign, TextEditorBlock, TextEditorList, TextEditorMark } from "@/components/elements/util/TextEditor/TextEditorType";
 import { Editor, Element, Range, Transforms } from "slate";
 import isUrl from 'is-url'
 import imageExtensions from 'image-extensions'
+import { CustomElement, EditorType, TextEditorAlign, TextEditorBlock, TextEditorList, TextEditorMark } from "@/components/common/TextEditor/TextEditorType";
 export const isMarkActive = (editor: EditorType, format: TextEditorMark) => {
     try {
         const marks = Editor.marks(editor)

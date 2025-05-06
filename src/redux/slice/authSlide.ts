@@ -1,7 +1,7 @@
 import { RootState } from "@/redux/store";
 import AuthService from "@/services/AuthService";
 import { AuthRequest } from "@/types/request/AuthRequest";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 type AuthState = {
   access_token?: string;
   profile?: AccountProfileResponse;
@@ -18,6 +18,8 @@ export const authSlide = createSlice({
     }).addCase(fetchRefreshToken.fulfilled, (state, action) => {
       return action.payload
     }).addCase(fetchLogout.fulfilled, () => {
+      return initialState
+    }).addCase(fetchLogout.rejected, () => {
       return initialState
     })
   }

@@ -1,5 +1,8 @@
 
 import { BasePath } from "@/env/BasePath";
+import { AccountPasswordRequest } from "@/types/request/account/AccountPasswordRequest";
+import { AccountProfileRequest } from "@/types/request/account/AccountProfileRequest";
+import { AccountRequest } from "@/types/request/account/AccountRequest";
 import { AuthRequest } from "@/types/request/AuthRequest";
 import api from "@/util/AxiosApi";
 import axios from "axios";
@@ -11,8 +14,11 @@ export default class AuthService {
   static register(account: AccountRequest): Promise<ApiResponse<AccountResponse>> {
     return api.post(`${basePath}/register`, account);
   }
-  static changePassword(account: AccountPasswordRequest): Promise<ApiResponse<AccountResponse>> {
-    return api.put(`${basePath}/change-password`, account);
+  static changePassword(password: AccountPasswordRequest): Promise<ApiResponse<AccountResponse>> {
+    return api.put(`${basePath}/change-password`, password);
+  }
+  static changeProfile(profile: AccountProfileRequest): Promise<ApiResponse<AccountResponse>> {
+    return api.put(`${basePath}/change-profile`, profile);
   }
   static refreshToken(): Promise<ApiResponse<AuthResponse>> {
     return axios.post(`${basePath}/refresh-token`, null, { withCredentials: true });

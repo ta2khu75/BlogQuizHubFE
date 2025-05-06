@@ -1,5 +1,7 @@
-import { CustomElement } from "@/components/elements/util/TextEditor/TextEditorType";
-import { z } from "zod";
+// import { CustomElement } from "@/components/elements/util/TextEditor/TextEditorType";
+// import { z } from "zod";
+
+import { CustomElement } from "@/components/common/TextEditor/TextEditorType";
 
 export default class FunctionUtil {
     static convertMaptoArray<T,>(object: object | undefined): T[] {

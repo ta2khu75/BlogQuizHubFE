@@ -1,8 +1,8 @@
 import { DatePicker } from "@/components/common/DatePicker"
-import { accountRequestSchema } from "@/components/form/schema/account.request.schema"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { AccountRequest, accountRequestSchema } from "@/types/request/account/AccountRequest"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -77,7 +77,6 @@ const AccountForm = ({ onSubmit }: Props) => {
               <FormLabel>Date of birth</FormLabel>
               <FormControl>
                 <DatePicker {...field} />
-                {/* <Input type='date' placeholder='Birthday' {...field} /> */}
               </FormControl>
               <FormMessage />
             </FormItem>

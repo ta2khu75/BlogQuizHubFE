@@ -1,13 +1,15 @@
-"use client"
 import NavLink from "@/components/common/NavLink"
+import NavAuth from "@/components/common/NavAuth"
 import TitleHeader from "@/components/elements/header/TitleHeader"
 import { Button } from "@/components/ui/button"
+import useIsAuth from "@/hooks/useIsAuth"
 import clsx from "clsx"
 import { Menu } from "lucide-react"
 import { useState } from "react"
 
 const MobileHeader = () => {
     const [isOpen, setIsOpen] = useState(false)
+    const isAuth = useIsAuth()
     const toggleMenu = () => {
         setIsOpen(!isOpen)
     }
@@ -18,6 +20,7 @@ const MobileHeader = () => {
                     <TitleHeader>Blog Quiz Hub</TitleHeader>
                 </div>
                 <div className="flex items-center">
+                    {isAuth && <NavAuth />}
                     <Button onClick={toggleMenu} variant={isOpen ? "default" : "ghost"} type="button" className="" id="mobile-menu-button">
                         <Menu />
                     </Button>
@@ -27,8 +30,13 @@ const MobileHeader = () => {
                 <NavLink href={"/"}>Home</NavLink>
                 <NavLink href={"/contract"}>Contact</NavLink>
                 <NavLink href={"/about"}>About</NavLink>
-                <NavLink href={"/login"}>Login</NavLink>
-                <NavLink href={"/register"}>Register</NavLink>
+                {
+                    !isAuth &&
+                    <>
+                        <NavLink href={"/login"}>Login</NavLink>
+                        <NavLink href={"/register"}>Register</NavLink>
+                    </>
+                }
             </nav>
         </header>
         // <header>

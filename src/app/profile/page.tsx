@@ -1,216 +1,54 @@
 "use client"
-import Modal from '@/components/elements/util/Modal'
-import AccountInfoForm from '@/components/form/AccountInfoForm'
-import AccountPasswordForm from '@/components/form/AccountPasswordForm'
-import FollowList from '@/components/list/FollowList'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useToast } from '@/hooks/use-toast'
-import { useAppDispatch } from '@/redux/hooks'
-import { AuthActions } from '@/redux/slice/authSlide'
-import AccountService from '@/services/AccountService'
-import AuthService from '@/services/AuthService'
-import { FollowService } from '@/services/FollowService'
-import FunctionUtil from '@/util/FunctionUtil'
-import Link from 'next/link'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import ChangePassword from '@/components/elements/content/profile/ChangePassword';
+import ChangeProfile from '@/components/elements/content/profile/ChangeProfile';
+import FollowProfile from '@/components/elements/content/profile/FollowProfile';
+import TabContent from '@/components/elements/content/profile/TabContent';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { toast } from '@/hooks/use-toast';
+import useIsOwner from '@/hooks/useIsOwn';
+import AccountService from '@/services/AccountService';
+import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
-import useIsAuthor from '@/components/util/useIsAuthor'
-import BlogSearch from '@/components/search/BlogSearch'
-import QuizSearch from '@/components/search/QuizSearch'
-import QuizResultSearch from '@/components/search/QuizResultSearch'
 const ProfilePage = () => {
-    const { toast } = useToast();
-    const dispatch = useAppDispatch()
-    const [disableFollow, setDisableFollow] = useState(false)
-    const router = useRouter()
     const searchParams = useSearchParams()
-    const id = searchParams.get('id')
-    const tab = searchParams.get('tab') ?? 'blog'
-    const pathname = usePathname();
-    const [account, setAccount] = useState<AccountProfileResponse>()
-    const [openChangePassword, setOpenChangePassword] = useState(false)
-    const [openChangeInfo, setOpenChangeInfo] = useState(false)
-    const [isFollow, setIsFollow] = useState(false);
-    const isAuthor = useIsAuthor()
+    const profile_id = searchParams.get('id')
+    const isOwner = useIsOwner();
+    const [profile, setProfile] = useState<AccountProfileResponse>()
     useEffect(() => {
-        fetchAccount()
-        fetchCheckFollow()
-    }, [id])
-    const onTabChange = (value: string) => {
-        router.push(`${pathname}?id=${id}&tab=${value}`)
+        fetchProfile()
+    }, [profile_id])
+    const fetchProfile = () => {
+        if (!profile_id) return
+        AccountService.readProfile(Number(profile_id)).then(res => {
+            setProfile(res.data)
+        }).catch(err => {
+            const error = err as ApiResponse<object>;
+            toast({ variant: 'destructive', title: 'Error', description: error.message })
+        })
     }
-    const fetchCheckFollow = () => {
-        if (!id) return;
-        FollowService.checkFollowing(id).then(res => {
-            if (res.success) {
-                setIsFollow(res.data.result)
-            } else {
-                toast({ variant: "destructive", description: res.message })
-            }
-        }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
-    }
-    const fetchFollow = () => {
-        if (!id) return;
-        setDisableFollow(true)
-        FollowService.follow(id).then(res => {
-            if (res.success) {
-                setIsFollow(true)
-                setDisableFollow(false)
-                setAccount(prev => ({ ...prev!, follow_count: (prev?.follow_count ?? 0) + 1 }))
-            } else {
-                toast({ variant: "destructive", description: res.message })
-            }
-        }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
-    }
-    const fetchUnfollow = () => {
-        if (!id) return;
-        setDisableFollow(true)
-        FollowService.unFollow(id).then(res => {
-            if (res.success) {
-                setIsFollow(false)
-                setDisableFollow(false)
-                setAccount(prev => ({ ...prev!, follow_count: (prev?.follow_count ?? 1) - 1 }))
-            } else {
-                toast({ variant: "destructive", description: res.message })
-            }
-        }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
-    }
-    const fetchAccount = () => {
-        if (id) {
-            AccountService.readById(id).then(res => {
-                if (res.success) {
-                    setAccount(res.data)
-                    dispatch(AuthActions.setProfile(res.data))
-                } else {
-                    console.log(res.message);
-                }
-            }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
-        }
-    }
-    const fetchChangePassword = async (data: AccountPasswordRequest) => {
-        try {
-            const res = await AuthService.changePassword(data)
-            if (res.success) {
-                toast({ title: "Change password success" })
-                setOpenChangePassword(false)
-            } else {
-                toast({ variant: "destructive", description: res.message })
-            }
-        } catch (err) {
-            toast({ variant: "destructive", description: FunctionUtil.showError(err) })
-        }
-    }
-    const fetchChangeInfo = async (data: AccountProfileRequest) => {
-        try {
-            const res = await AccountService.updateInfo(data)
-            if (res.success) {
-                toast({ title: "Change info success" });
-                setOpenChangeInfo(false)
-                dispatch(AuthActions.setProfile(res.data))
-                setAccount(res.data)
-            } else {
-                toast({ variant: "destructive", description: res.message })
-            }
-        } catch (err) {
-            toast({ variant: "destructive", description: FunctionUtil.showError(err) })
-        }
-    }
+
     return (
-        <Tabs defaultValue={tab} onValueChange={(value) => onTabChange(value)}>
-            <Card>
-                <div className='flex flex-row justify-evenly items-center'>
-                    {!isAuthor ? <Button disabled={disableFollow} onClick={isFollow ? fetchUnfollow : fetchFollow}>{isFollow ? "Unfollow" : "Follow"}</Button> : <div></div>}
-                    <div>
-                        <CardHeader className='flex flex-col items-center'>
-                            <CardTitle>
-                                <Avatar>
-                                    <AvatarFallback>
-                                        {account?.display_name[0].toUpperCase()}
-                                    </AvatarFallback>
-                                </Avatar>
-                            </CardTitle>
-                            <CardTitle>
-                                {account?.display_name}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className='flex flex-col items-center'>
-                            <CardDescription>
-                                First name: {account?.first_name}
-                            </CardDescription>
-                            <CardDescription>
-                                Last name: {account?.last_name}
-                            </CardDescription>
-                            <CardDescription>
-                                Birthday: {account?.birthday}
-                            </CardDescription>
-                        </CardContent>
-                    </div>
-                    <div className='flex flex-col gap-4'>
-                        {isAuthor && <><Button onClick={() => setOpenChangePassword(true)}>Change password</Button><Button onClick={() => setOpenChangeInfo(true)}>Change info</Button></>}
-                    </div>
-                    {isAuthor && <>
-                        <Modal open={openChangePassword} onCancel={() => setOpenChangePassword(false)} title="Change password">
-                            <AccountPasswordForm onSubmit={fetchChangePassword} />
-                        </Modal>
-                        <Modal open={openChangeInfo} onCancel={() => setOpenChangeInfo(false)} title="Change password">
-                            <AccountInfoForm account={account} onSubmit={fetchChangeInfo} />
-                        </Modal>
-                    </>}
+        <div>
+            <div className='flex justify-between items-center'>
+                <div className='flex gap-2 items-center'>
+                    <Avatar className='w-20 h-20'>
+                        <AvatarFallback className='text-2xl'>
+                            {profile?.display_name[0].toUpperCase()}
+                        </AvatarFallback>
+                    </Avatar>
+                    <div className='text-2xl'>{profile?.display_name}</div>
                 </div>
-                <CardFooter className="flex justify-around">
-                    <TabsList className={`grid w-full grid-cols-${isAuthor ? 4 : 3} h-16 lg:w-[150vh] md:w-[70vh]`}>
-                        <TabsTrigger className='flex flex-col items-center' value="blog">
-                            <CardTitle>
-                                {account?.blog_count}
-                            </CardTitle>
-                            Blogs
-                        </TabsTrigger>
-                        <TabsTrigger className='flex flex-col items-center' value="quiz">
-                            <CardTitle>
-                                {account?.quiz_count}
-                            </CardTitle>
-                            Quizzes
-                        </TabsTrigger>
-                        <TabsTrigger className='flex flex-col items-center' value="follower">
-                            <CardTitle>
-                                {account?.follow_count}
-                            </CardTitle>
-                            Follower
-                        </TabsTrigger>
-                        {isAuthor &&
-                            <TabsTrigger className='flex flex-col items-center p-4' value="quizResult">
-                                Quiz result
-                            </TabsTrigger>
-                        }
-                    </TabsList>
-                </CardFooter>
-            </Card>
-            <TabsContent value="blog">
-                <div className='flex justify-between'>
-                    <CardTitle>Blog</CardTitle>
-                    {isAuthor &&
-                        <Button><Link href="/blog/create">Create</Link></Button>}
+                <div className=' flex gap-4'>
+                    {
+                        isOwner ? <>
+                            <ChangeProfile profile={profile} />
+                            <ChangePassword />
+                        </> : <FollowProfile setProfile={setProfile} />
+                    }
                 </div>
-                <BlogSearch />
-            </TabsContent>
-            <TabsContent value='quiz'>
-                <div className='flex justify-between'>
-                    <CardTitle>Quiz</CardTitle>
-                    {isAuthor &&
-                        <Button><Link href={"/quiz/create"}>Create</Link></Button>}
-                </div>
-                <QuizSearch />
-            </TabsContent>
-            <TabsContent value='follower'>
-                <FollowList />
-            </TabsContent>
-            <TabsContent value='quizResult'>
-                <QuizResultSearch />
-            </TabsContent>
-        </Tabs >
+            </div>
+            <TabContent profile={profile} />
+        </div>
     )
 }
 

@@ -1,4 +1,3 @@
-import Modal from '@/components/elements/util/Modal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -10,38 +9,25 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FolderX, Loader2, FolderPlus } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form';
-import { z } from 'zod'
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import Carousel from '@/components/elements/util/Carousel';
 import { useToast } from '@/hooks/use-toast';
-import FunctionUtil from '@/util/FunctionUtil';
-import Confirm from '@/components/elements/util/Confirm';
 import { useRouter } from 'next/navigation';
 import { Switch } from '@/components/ui/switch';
 import { QuizLevel } from '@/types/QuizLevel';
 import { QuestionType } from '@/types/QuestionType';
 import QuizService from '@/services/QuizService';
-import QuestionForm, { questionSchema } from '@/components/form/QuestionForm';
+import QuestionForm from '@/components/form/QuestionForm';
 import QuizMenuElement from '@/components/elements/content/quiz/QuizMenuElement';
 import { QuizResultMode } from '@/types/DisplayMode';
 import useDebounce from '@/hooks/useDebounce';
 import { BlogService } from '@/services/BlogService';
 import _ from 'lodash';
-const quizSchema = z.object({
-    title: z.string().nonempty(),
-    level: z.nativeEnum(QuizLevel),
-    blog_id: z.string().optional(),
-    duration: z.number().min(5),
-    description: z.string().optional(),
-    access_modifier: z.nativeEnum(AccessModifier),
-    category_id: z.number(),
-    quiz_result_mode: z.nativeEnum(QuizResultMode),
-    shuffle_question: z.boolean().default(true),
-    completed: z.boolean().default(false),
-    questions: z.array(questionSchema),
-})
-type quizSchema = z.infer<typeof quizSchema>;
+import { QuizRequest, quizSchema } from '@/types/request/QuizRequest';
+import { QuestionDto } from '@/types/dto/QuestionDto';
+import Carousel from '@/components/common/Carousel';
+import Confirm from '@/components/common/Confirm';
+import Modal from '@/components/common/Modal';
 type Props = {
     quizCategories: QuizCategoryResponse[],
     quiz?: QuizResponse
@@ -60,7 +46,7 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
     const [open, setOpen] = useState(false)
     const [openConfirm, setOpenConfirm] = useState(false)
     const [current, setCurrent] = useState(0)
-    const initQuiz: QuestionRequest = { content: "", type: QuestionType.SINGLE_CHOICE, shuffle_answer: false, answers: Array(4).fill({ answer: "", correct: false }) };
+    const initQuiz: QuestionDto = { content: "", type: QuestionType.SINGLE_CHOICE, shuffle_answer: false, answers: Array(4).fill({ answer: "", correct: false }) };
     const quizDefault: QuizRequest = { title: "", level: QuizLevel.EASY, blog_id: "", completed: false, shuffle_question: true, duration: 0, category_id: 0, access_modifier: AccessModifier.PRIVATE, quiz_result_mode: QuizResultMode.ANSWER_VISIBLE, description: "", questions: [initQuiz] }
     const [search, setSearch] = useState("")
     const [blogs, setBlogs] = useState<BlogResponse[]>([])
@@ -89,10 +75,8 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
         BlogService.readAllByKeyword(debouncedSearch).then((res) => {
             if (res.data) {
                 setBlogs(res.data)
-            } else {
-                toast({ description: res.message, variant: "destructive" })
             }
-        }).catch(err => toast({ description: FunctionUtil.showError(err), variant: "destructive" }))
+        }).catch(error => toast({ variant: 'destructive', title: 'Error', description: error.message }))
     }
     useEffect(() => {
         if ((questionErrors.length ?? 0) > 0) {
@@ -110,7 +94,7 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
     }, [form]);
     useEffect(() => {
         if (_.isEqual(quizForm, quizDefault) && quiz) {
-            form.reset({ ...quiz, category_id: quiz?.category?.id, blog_id: quiz?.blog?.info?.id })
+            form.reset({ ...quiz, category_id: quiz?.category?.id, blog_id: quiz?.blog?.id })
             if (quiz.blog)
                 setBlogs([quiz?.blog])
         }
@@ -133,29 +117,23 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
     const onSubmit = async (value: QuizRequest) => {
         if (quiz) {
             try {
-                const res = await QuizService.update(quiz.info.id, value, image?.value);
-                if (res.success) {
-                    setOpen(false)
-                    toast({ title: "Update success" })
-                    router.push(`/profile?id=${res.data.author.id}&tab=quiz`)
-                } else {
-                    toast({ title: "Update failed", description: FunctionUtil.showError(res.message), variant: "destructive" });
-                }
+                const res = await QuizService.update(quiz.id, value, image?.value);
+                setOpen(false)
+                toast({ title: "Update success" })
+                router.push(`/profile?id=${res.data.author.id}&tab=quiz`)
             } catch (error) {
-                toast({ title: "Update failed", description: FunctionUtil.showError(error), variant: "destructive" });
+                const err = error as ApiResponse<object>;
+                toast({ title: "Update failed", description: err.message, variant: "destructive" });
             }
         } else if (image?.value) {
             try {
                 const res = await QuizService.create(value, image.value);
-                if (res.success) {
-                    setOpen(false)
-                    toast({ title: "Create success" })
-                    router.push(`/profile?id=${res.data.author.id}&tab=quiz`)
-                } else {
-                    toast({ title: "Create failed", description: FunctionUtil.showError(res.message), variant: "destructive" });
-                }
+                setOpen(false)
+                toast({ title: "Create success" })
+                router.push(`/profile?id=${res.data.author.id}&tab=quiz`)
             } catch (error) {
-                toast({ title: "Create failed", description: FunctionUtil.showError(error), variant: "destructive" });
+                const err = error as ApiResponse<object>;
+                toast({ title: "Create failed", description: err.message, variant: "destructive" });
             }
         } else {
             setImage({ value: new File([], ""), error: true })
@@ -181,7 +159,7 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
     }
     const onReset = () => {
         if (quiz) {
-            form.reset({ ...quiz, category_id: quiz?.category?.id, blog_id: quiz?.blog?.info?.id })
+            form.reset({ ...quiz, category_id: quiz?.category?.id, blog_id: quiz?.blog?.id })
             if (quiz.blog)
                 setBlogs([quiz?.blog])
             setCurrent(0)
@@ -224,7 +202,7 @@ const QuizForm = ({ quizCategories, quiz }: Props) => {
                                         </FormControl>
                                         <SelectContent>
                                             {blogs.map(blog => (
-                                                <SelectItem key={blog.info.id} value={`${blog.info.id}`}>{blog.title}</SelectItem>
+                                                <SelectItem key={blog.id} value={`${blog.id}`}>{blog.title}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>

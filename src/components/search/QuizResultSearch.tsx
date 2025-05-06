@@ -1,4 +1,4 @@
-import Pageination from '@/components/elements/util/Pageination'
+import Paginator from '@/components/common/Paginator'
 import QuizResultFilter from '@/components/filter/QuizResultFilter'
 import QuizResultList from '@/components/list/QuizResultList'
 import React from 'react'
@@ -13,7 +13,7 @@ const QuizResultSearch = () => {
             </div>
             <div className='w-2/3'>
                 <QuizResultList quizResultPage={quizResultPage} />
-                {quizResultPage && <Pageination<QuizResultResponse> page={quizResultPage} />}
+                {quizResultPage && <Paginator page={quizResultPage} />}
             </div>
         </div>
     )

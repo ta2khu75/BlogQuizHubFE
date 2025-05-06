@@ -1,25 +1,16 @@
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { AccountPasswordRequest, accountPasswordSchema, } from "@/types/request/account/AccountPasswordRequest"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
-import { z, ZodType } from "zod"
-
-const formSchema: ZodType<AccountPasswordRequest> = z.object({
-    password: z.string().min(3),
-    new_password: z.string().min(3),
-    confirm_password: z.string().min(3)
-}).refine(data => data.new_password === data.confirm_password, {
-    message: 'confirm password not match',
-    path: ['confirm_password']
-})
 type Props = {
     onSubmit: (value: AccountPasswordRequest) => void
 }
 const AccountPasswordForm = ({ onSubmit }: Props) => {
     const form = useForm<AccountPasswordRequest>({
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(accountPasswordSchema),
         defaultValues: { password: '', new_password: '', confirm_password: '' }
     })
     return (

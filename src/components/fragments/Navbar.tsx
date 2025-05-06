@@ -1,5 +1,5 @@
 "use client"
-import NavAuth from '@/components/elements/header/NavAuth';
+import NavAuth from '@/components/common/NavAuth';
 import SearchElement from '@/components/elements/header/Search';
 import { Button } from '@/components/ui/button';
 import { navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';

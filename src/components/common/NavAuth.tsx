@@ -25,14 +25,14 @@ const NavAuth = () => {
     <Popover>
       <PopoverTrigger asChild>
         <div className='cursor-pointer'>
-          <AvatarElement account={auth.profile} />
+          <AvatarElement profile={auth.profile} />
         </div>
       </PopoverTrigger>
       <PopoverContent className='flex flex-col gap-y-2 w-36'>
         <NavigationMenu>
           <NavigationMenuList className='flex flex-col'>
             <NavigationMenuItem>
-              <Link href={"/profile?id=" + auth.profile?.id} legacyBehavior passHref>
+              <Link href={`/profile?id=${auth.profile?.id}`} legacyBehavior passHref>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                   Profile
                 </NavigationMenuLink>

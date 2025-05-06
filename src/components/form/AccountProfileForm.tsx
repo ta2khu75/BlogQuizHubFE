@@ -1,33 +1,28 @@
 
+import { DatePicker } from "@/components/common/DatePicker"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { AccountProfileRequest, accountProfileRequestSchema } from "@/types/request/account/AccountProfileRequest"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
-import { z, ZodType } from "zod"
 
-const formSchema: ZodType<AccountProfileRequest> = z.object({
-    first_name: z.string().min(3),
-    last_name: z.string().min(3),
-    birthday: z.string().nonempty(),
-    display_name: z.string().min(3),
-})
 type Props = {
     onSubmit: (value: AccountProfileRequest) => void
-    account?: AccountProfileResponse
+    profile?: AccountProfileResponse
 }
-const AccountInfoForm = ({ onSubmit, account }: Props) => {
+const AccountProfileForm = ({ onSubmit, profile }: Props) => {
     const form = useForm<AccountProfileRequest>({
-        resolver: zodResolver(formSchema),
-        defaultValues: { first_name: '', last_name: '', birthday: new Date().toISOString().split('T')[0], display_name: '' }
+        resolver: zodResolver(accountProfileRequestSchema),
+        defaultValues: { first_name: '', last_name: '', birthday: new Date(), display_name: '' }
     })
     useEffect(() => {
-        if (account) {
-            form.reset(account)
+        if (profile) {
+            form.reset(profile)
         }
-    }, [account])
+    }, [profile, form])
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
@@ -65,7 +60,7 @@ const AccountInfoForm = ({ onSubmit, account }: Props) => {
                         <FormItem className="flex flex-col">
                             <FormLabel>Date of birth</FormLabel>
                             <FormControl>
-                                <Input type='date' placeholder='Birthday' {...field} />
+                                <DatePicker {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -83,4 +78,4 @@ const AccountInfoForm = ({ onSubmit, account }: Props) => {
     )
 }
 
-export default AccountInfoForm 
+export default AccountProfileForm 

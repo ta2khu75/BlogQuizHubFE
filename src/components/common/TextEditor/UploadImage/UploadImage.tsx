@@ -1,5 +1,5 @@
-import Confirm from '@/components/elements/util/Confirm'
-import ImageElement from '@/components/elements/util/TextEditor/UploadImage/ImageElement'
+import Confirm from '@/components/common/Confirm'
+import ImageElement from '@/components/common/TextEditor/UploadImage/ImageElement'
 import { Input } from '@/components/ui/input'
 import { useAppDispatch } from '@/redux/hooks'
 import { ImageUrlsActions } from '@/redux/slice/imageUrlsSlide'

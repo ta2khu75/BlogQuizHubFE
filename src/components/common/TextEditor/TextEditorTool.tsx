@@ -1,8 +1,8 @@
 "use client"
-import Modal from "@/components/elements/util/Modal";
-import { TEXT_BLOCKS, TextEditorMark, TEXT_MARKS, HEADINGS, TextEditorBlock } from "@/components/elements/util/TextEditor/TextEditorType";
-import { insertImage, insertLink, isBlockActive, isLinkActive, isMarkActive, toggleBlock, toggleMark, unwrapLink } from "@/components/elements/util/TextEditor/TextEditorUtil";
-import UploadImage from "@/components/elements/util/TextEditor/UploadImage/UploadImage";
+import Modal from "@/components/common/Modal";
+import { HEADINGS, TEXT_BLOCKS, TEXT_MARKS, TextEditorBlock, TextEditorMark } from "@/components/common/TextEditor/TextEditorType";
+import { insertImage, insertLink, isBlockActive, isLinkActive, isMarkActive, toggleBlock, toggleMark, unwrapLink } from "@/components/common/TextEditor/TextEditorUtil";
+import UploadImage from "@/components/common/TextEditor/UploadImage/UploadImage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -107,9 +107,7 @@ export default function TextEditorTool() {
                 </form>
             </Modal>
             <Modal open={openImage} className="max-w-max" onCancel={() => setOpenImage(false)} >
-                <UploadImage
-                    // setOpen={setOpenImage} 
-                    onAdd={(url) => onAddImage(url)} imageUrls={imageUrls} />
+                <UploadImage onAdd={(url) => onAddImage(url)} imageUrls={imageUrls} />
             </Modal>
         </div >
     );

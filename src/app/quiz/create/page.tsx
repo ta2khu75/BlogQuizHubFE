@@ -1,8 +1,8 @@
 "use client"
+import TitleContent from '@/components/common/TitleContent'
 import QuizForm from '@/components/form/QuizForm'
 import { useToast } from '@/hooks/use-toast'
 import QuizCategoryService from '@/services/QuizCategoryService'
-import FunctionUtil from '@/util/FunctionUtil'
 import React, { useEffect, useState } from 'react'
 
 const QuizCreatePage = () => {
@@ -14,16 +14,15 @@ const QuizCreatePage = () => {
 
     const fetchQuizCategoryList = () => {
         QuizCategoryService.readAll().then(res => {
-            if (res.success) {
-                setQuizCategories(res.data)
-            } else {
-                console.log(res.message_error)
-            }
+            setQuizCategories(res.data)
         }).catch(err =>
-            toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
+            toast({ variant: "destructive", description: err.message }))
     }
     return (
-        <QuizForm quizCategories={quizCategories} />
+        <>
+            <TitleContent className='text-center mb-8'>Create Quiz</TitleContent>
+            <QuizForm quizCategories={quizCategories} />
+        </>
     )
 }
 

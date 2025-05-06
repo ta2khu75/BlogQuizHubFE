@@ -1,4 +1,4 @@
-import Pageination from '@/components/elements/util/Pageination'
+import Paginator from '@/components/common/Paginator'
 import BlogFilter from '@/components/filter/BlogFilter'
 import BlogList from '@/components/list/BlogList'
 import React from 'react'
@@ -12,7 +12,7 @@ const BlogSearch = () => {
             </div>
             <div className='w-2/3'>
                 <BlogList blogPage={blogPage} />
-                {blogPage && <Pageination<BlogResponse> page={blogPage} />}
+                {blogPage && <Paginator page={blogPage} />}
             </div>
         </div>
     )

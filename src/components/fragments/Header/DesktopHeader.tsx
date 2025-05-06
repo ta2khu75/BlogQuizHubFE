@@ -1,10 +1,10 @@
 import NavLink from '@/components/common/NavLink'
-import NavAuth from '@/components/elements/header/NavAuth'
+import NavAuth from '@/components/common/NavAuth'
 import TitleHeader from '@/components/elements/header/TitleHeader'
-import { useAuth } from '@/hooks/use-auth'
+import useIsAuth from '@/hooks/useIsAuth'
 
 const DesktopHeader = () => {
-    const isAuth = useAuth()
+    const isAuth = useIsAuth()
     return (
         <header>
             <div className='flex justify-between items-center w-full h-16 px-4'>

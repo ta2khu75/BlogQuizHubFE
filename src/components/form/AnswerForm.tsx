@@ -4,15 +4,10 @@ import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/f
 import { Input } from '@/components/ui/input';
 import { RadioGroupItem } from '@/components/ui/radio-group';
 import { QuestionType } from '@/types/QuestionType';
+import { QuizRequest } from '@/types/request/QuizRequest';
 import { FileX2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { z } from 'zod';
-export const answerSchema = z.object({
-    content: z.string().nonempty(),
-    correct: z.boolean().default(false),
-    id: z.number().optional(),
-})
 type Props = {
     questionIndex: number,
     answerIndex: number,

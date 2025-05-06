@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import TextEditor from '@/components/elements/util/TextEditor/TextEditor'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -12,8 +11,9 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { z, ZodType } from 'zod'
 import useDebounce from '@/hooks/useDebounce'
 import { BlogTagService } from '@/services/BlogTagService'
-import { Combobox, ComboboxOption } from '@/components/elements/util/Combobox'
 import QuizService from '@/services/QuizService'
+import { Combobox, ComboboxOption } from '@/components/common/Combobox'
+import TextEditor from '@/components/common/TextEditor/TextEditor'
 const formSchema: ZodType<BlogRequest> = z.object({
     title: z.string().min(3),
     content: z.string().min(10),
