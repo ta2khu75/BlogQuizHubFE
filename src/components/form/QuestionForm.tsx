@@ -23,6 +23,7 @@ const QuestionForm = ({ form, questionIndex }: Props) => {
         control: form.control,
         name: `${questionName}.answers`,
         rules: { minLength: 2 },
+
     });
     useEffect(() => {
         if (questionType === QuestionType.SINGLE_CHOICE) {

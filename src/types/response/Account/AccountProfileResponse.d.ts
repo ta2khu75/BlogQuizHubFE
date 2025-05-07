@@ -1,3 +1,5 @@
+import { AccountProfileBase } from "@/types/base/AccountProfileBase";
+
 interface AccountProfileResponse extends AccountProfileBase {
     id: number;
     display_name: string;

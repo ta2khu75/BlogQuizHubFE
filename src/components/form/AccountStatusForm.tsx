@@ -1,33 +1,34 @@
 "use client"
-import { Button } from "@/components/ui/button"
+import ButtonSubmit from "@/components/common/ButtonSubmit"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
+import { AccountStatusRequest, accountStatusRequestSchema } from "@/types/request/account/AccountStatusRequest"
+import { AccountResponse } from "@/types/response/Account/AccountResponse"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2 } from "lucide-react"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
-import { z, ZodType } from "zod"
 
 type Props = {
     roles: RoleResponse[],
-    account: ManagedAccountResponse,
+    account: AccountResponse,
     onSubmit: (value: AccountStatusRequest) => void
 }
-const formSchema: ZodType<AccountStatusRequest> = z.object({
-    enabled: z.boolean(),
-    non_locked: z.boolean(),
-    role_id: z.number()
-})
 const AccountStatusForm = ({ account, onSubmit, roles }: Props) => {
+    const defaultValues: AccountStatusRequest = { enabled: false, non_locked: false, role_id: 0 }
     const form = useForm<AccountStatusRequest>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            enabled: account?.enabled ?? false,
-            non_locked: account?.non_locked ?? false,
-            role_id: account?.role?.id ?? 0
-        }
+        resolver: zodResolver(accountStatusRequestSchema),
+        defaultValues: defaultValues
     })
+    useEffect(() => {
+        form.reset({ ...account.status, role_id: account.status.role.id })
+    })
+    const onReset = () => {
+        if (account) form.reset({ ...account.status, role_id: account.status.role.id })
+        else
+            form.reset(defaultValues)
+    }
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
@@ -101,12 +102,7 @@ const AccountStatusForm = ({ account, onSubmit, roles }: Props) => {
                         </Select>
                     </FormItem>
                 )} />
-                {form.formState.isSubmitting ?
-                    <Button disabled>
-                        <Loader2 className="animate-spin" />
-                        Please wait
-                    </Button> :
-                    <Button type='submit'>Submit</Button>}
+                <ButtonSubmit onReset={onReset} isSubmitting={form.formState.isSubmitting} />
             </form>
         </Form >
     )

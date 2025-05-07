@@ -1,20 +1,14 @@
-// import { CustomElement } from "@/components/elements/util/TextEditor/TextEditorType";
-// import { z } from "zod";
-
 import { CustomElement } from "@/components/common/TextEditor/TextEditorType";
 
 export default class FunctionUtil {
     static convertMaptoArray<T,>(object: object | undefined): T[] {
         return object ? Object.values(object) : [];
     }
-    static isType<T extends object>(object: object, field: string): object is T {
-        return field in object
-    }
     static toISOString(date?: string) {
         if (!date) return undefined; // Trả về undefined nếu không có giá trị date
         return new Date(date).toISOString(); // Chuyển yyyy-MM-dd thành ISO string
     }
-    static createQueryString<T extends object>(
+    static createQueryString<T extends Search>(
         searchParams: URLSearchParams,
         search: T
     ): string {
@@ -33,12 +27,8 @@ export default class FunctionUtil {
         return params.toString();
     };
 
-    static capitalizeFirstLetter(str: string) { return (str.charAt(0).toUpperCase() + str.slice(1)).replace(/_/g, ' ') };
     static getImageUrlFromContent(content: string) {
         const contentData: CustomElement[] = JSON.parse(content)
         return contentData.filter((item) => item.type === "image" && item.url).map(item => item.url as string);
-    }
-    static getErrorMessage(error: unknown) {
-        return error instanceof Error ? error.message : "An unexpected error occurred";
     }
 }

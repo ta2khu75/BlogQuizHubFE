@@ -2,6 +2,7 @@ import { DatePicker } from "@/components/common/DatePicker"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { AccountRequest, accountRequestSchema } from "@/types/request/account/AccountRequest"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
@@ -9,8 +10,9 @@ import { useForm } from "react-hook-form"
 
 type Props = {
   onSubmit: (value: AccountRequest) => void
+  roles?: RoleResponse[]
 }
-const AccountForm = ({ onSubmit }: Props) => {
+const AccountForm = ({ onSubmit, roles }: Props) => {
   const form = useForm<AccountRequest>({
     resolver: zodResolver(accountRequestSchema),
     defaultValues: { email: "", password: '', confirm_password: '', profile: { first_name: '', last_name: '', birthday: new Date() } }
@@ -69,6 +71,27 @@ const AccountForm = ({ onSubmit }: Props) => {
             </FormItem>
           )} />
         </div>
+        {
+          roles &&
+          <FormField control={form.control} name='role_id' render={({ field }) => (
+            <FormItem>
+              <FormLabel>Quiz category</FormLabel>
+              <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={`${field.value}`}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a verified email to display" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {roles.map(role => (
+                    <SelectItem key={role.id} value={`${role.id}`}>{role.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )} />
+        }
         <FormField
           control={form.control}
           name="profile.birthday"

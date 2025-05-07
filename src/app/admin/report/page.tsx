@@ -3,7 +3,7 @@ import BlogDetailElement from '@/components/elements/content/blog/BlogDetailElem
 import QuizDetailElement from '@/components/elements/content/quiz/QuizDetailElement'
 import BlogReportElement from '@/components/elements/content/report/BlogReportElement'
 import QuizReportElement from '@/components/elements/content/report/QuizReportElement'
-import TableElement, { Column } from '@/components/elements/content/report/ReportTable'
+import TableElement, { Column } from '@/components/elements/content/report/TableElement'
 import Modal from '@/components/elements/util/Modal'
 import ReportFilter from '@/components/filter/ReportFilter'
 import { Button } from '@/components/ui/button'
