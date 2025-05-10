@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils"
 import { AccountStatusRequest, accountStatusRequestSchema } from "@/types/request/account/AccountStatusRequest"
 import { AccountResponse } from "@/types/response/Account/AccountResponse"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 
 type Props = {
@@ -19,10 +18,7 @@ const AccountStatusForm = ({ account, onSubmit, roles }: Props) => {
     const defaultValues: AccountStatusRequest = { enabled: false, non_locked: false, role_id: 0 }
     const form = useForm<AccountStatusRequest>({
         resolver: zodResolver(accountStatusRequestSchema),
-        defaultValues: defaultValues
-    })
-    useEffect(() => {
-        form.reset({ ...account.status, role_id: account.status.role.id })
+        defaultValues: { ...account.status }
     })
     const onReset = () => {
         if (account) form.reset({ ...account.status, role_id: account.status.role.id })

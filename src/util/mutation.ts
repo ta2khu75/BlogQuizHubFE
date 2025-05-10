@@ -6,23 +6,23 @@ export const handleMutation = async<T, R>(
     value: T,
     serviceFn: (val: T) => Promise<ApiResponse<R>>,
     onSuccess: (data: ApiResponse<R>) => void,
+    onError?: (error: ApiResponse<object>) => void,
     messages?: {
         success?: string;
         error?: string;
-    },
-    onError?: (error: ApiResponse<object>) => void,
+    }
 ) => {
     try {
         const response = await serviceFn(value);
-        toast({ title: messages?.success || 'Thao tác thành công' });
+        if (messages?.success) {
+            toast({ title: messages.success });
+        }
         onSuccess(response);
     } catch (error) {
         const err = error as ApiResponse<object>;
-        toast({
-            title: messages?.error || 'Thao tác thất bại',
-            description: err.message,
-            variant: 'destructive',
-        });
+        if (messages?.error) {
+            toast({ title: messages.error, description: err.message, variant: 'destructive' });
+        }
         onError?.(err);
     }
 };

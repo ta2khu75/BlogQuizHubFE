@@ -3,6 +3,7 @@ import TableElement, { Column } from '@/components/common/TableElement'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { AccountResponse } from '@/types/response/Account/AccountResponse'
+import clsx from 'clsx'
 import React, { useState } from 'react'
 type Props = {
     array?: AccountResponse[]
@@ -38,7 +39,7 @@ const AccountTable = ({ array, setAccount }: Props) => {
                 <CollapsibleContent>
                     <p>Fist Name: {data.profile.first_name}</p>
                     <p>Last Name: {data.profile.last_name}</p>
-                    <p>Birthday: {data.profile.birthday.toDateString()}</p>
+                    <p>Birthday: {new Date(data.profile.birthday).toDateString()}</p>
                 </CollapsibleContent>
             </Collapsible>)
         },
@@ -51,9 +52,9 @@ const AccountTable = ({ array, setAccount }: Props) => {
                 <Collapsible open={openRows.has(data.id)}>
                     <CollapsibleTrigger>Role: {data.status.role.name}</CollapsibleTrigger>
                     <CollapsibleContent>
-                        <p>Role: {data.status.role.name}</p>
-                        <p>Enabled: {<BooleanIcon value={data.status.enabled} />}</p>
-                        <p>Non Locked: {<BooleanIcon value={data.status.non_locked} />}</p>
+                        <div className='flex'>Enabled: {<BooleanIcon value={data.status.enabled} />}</div>
+                        <div className='flex'>Non Locked: {<BooleanIcon value={data.status.non_locked} />}</div>
+                        <p>Updated At: {new Date(data.status.updated_at).toDateString()}</p>
                     </CollapsibleContent>
                 </Collapsible>)
         }
@@ -61,12 +62,16 @@ const AccountTable = ({ array, setAccount }: Props) => {
     {
         key: "createBy",
         label: "Create By",
-        name: "createdBy",
+        render(data) {
+            return <>{data.createdBy}</>
+        },
     },
     {
         key: "createdAt",
         label: "Created At",
-        name: "createdAt",
+        render(data) {
+            return <>{data.createdAt && new Date(data.createdAt).toDateString()}</>
+        },
     },
     {
         key: "updatedAt",
@@ -75,9 +80,10 @@ const AccountTable = ({ array, setAccount }: Props) => {
     }, {
         key: "action",
         label: "Action",
+        className: clsx("flex items-start"),
         render: (data) => {
             return (
-                <div className='flex'>
+                <div className='flex ite'>
                     <Button onClick={() => setAccount(data)}>Edit</Button>
                     <Button onClick={() => toggleRow(data.id)} >
                         {openRows.has(data.id) ? "Hide" : "View"}

@@ -1,14 +1,10 @@
-import { Button } from '@/components/ui/button'
+import ButtonSubmit from '@/components/common/ButtonSubmit'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { QuizCategoryRequest, quizCategorySchema } from '@/types/request/QuizCategoryRequest'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2 } from 'lucide-react'
 import React from 'react'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-const quizCategorySchema = z.object({
-    name: z.string().min(3)
-})
 type Props = {
     onSubmit: (data: QuizCategoryRequest) => void,
     quizCategory?: QuizCategoryResponse
@@ -30,11 +26,7 @@ const QuizCategoryForm = ({ onSubmit, quizCategory }: Props) => {
                         <FormMessage />
                     </FormItem>
                 )} />
-                {form.formState.isSubmitting ? <Button disabled>
-                    <Loader2 className="animate-spin" />
-                    Please wait
-                </Button> :
-                    <Button type='submit'>Submit</Button>}
+                <ButtonSubmit isSubmitting={form.formState.isSubmitting} />
             </form>
         </Form>
     )

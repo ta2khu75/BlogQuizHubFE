@@ -2,10 +2,11 @@ import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, Pagi
 import { usePathname, useSearchParams } from 'next/navigation'
 import React, { useMemo } from 'react'
 type Props = {
-    page: PageResponse<object>
+    page?: PageResponse<object>
 }
 const Paginator = ({ page }: Props) => {
-    const { total_pages } = page
+    // const { total_pages } = page
+    const total_pages = page?.total_pages ?? 1
     const pathName = usePathname()
     const searchParams = useSearchParams()
     const currentPage = useMemo(() => Number(searchParams.get('page')) || 1, [searchParams]);

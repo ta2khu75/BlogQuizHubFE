@@ -17,6 +17,7 @@ api.interceptors.request.use(function (config) {
   if (auth.access_token) {
     config.headers.Authorization = "Bearer " + auth.access_token;
   }
+  console.log(config);
   return config;
 }, function (error) {
   return Promise.reject(error);
@@ -26,6 +27,7 @@ api.interceptors.response.use((response: AxiosResponse) => {
   if (response.status == 204) {
     return null
   }
+  console.log(response);
   return response.data;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }, async (error: AxiosError<ApiResponse<object>, any>) => {

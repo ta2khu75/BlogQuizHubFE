@@ -1,107 +1,43 @@
 "use client"
+import QuizCategoryCreate from '@/components/elements/content/admin/quiz-category/QuizCategoryCreate'
+import QuizCategoryDelete from '@/components/elements/content/admin/quiz-category/QuizCategoryDelete'
+import QuizCategoryTable from '@/components/elements/content/admin/quiz-category/QuizCategoryTable'
+import QuizCategoryUpdate from '@/components/elements/content/admin/quiz-category/QuizCategoryUpdate'
 import TitleElement from '@/components/elements/content/admin/TitleElement'
-import TableElement from '@/components/elements/content/TableElement'
-import Confirm from '@/components/elements/util/Confirm'
-import Modal from '@/components/elements/util/Modal'
-import QuizCategoryForm from '@/components/form/QuizCategoryForm'
-import { Button } from '@/components/ui/button'
-import { useToast } from '@/hooks/use-toast'
 import QuizCategoryService from '@/services/QuizCategoryService'
-import FunctionUtil from '@/util/FunctionUtil'
+import { handleMutation } from '@/util/mutation'
 import React, { useEffect, useState } from 'react'
 
 const QuizCategoryAdminPage = () => {
-    const { toast } = useToast();
-    const [open, setOpen] = useState(false);
-    const [openConfirm, setOpenConfirm] = useState(false);
+    const [openEdit, setOpenEdit] = useState(false);
+    const [openDelete, setOpenDelete] = useState(false);
     const [quizCategories, setQuizCategories] = useState<QuizCategoryResponse[]>([])
     const [quizCategory, setQuizCategory] = useState<QuizCategoryResponse>()
     useEffect(() => {
         fetchQuizCategoryList()
     }, [])
     const fetchQuizCategoryList = () => {
-        QuizCategoryService.readAll().then(res => {
-            if (res.success) {
-                setQuizCategories(res.data)
-            } else {
-                console.log(res.message_error)
-            }
-        }).then(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
+        handleMutation<void, QuizCategoryResponse[]>(undefined, () => QuizCategoryService.readAll(), (res) => setQuizCategories(res.data), err => console.log(err.data)
+            , { success: 'Read success' })
     }
     const handleEditClick = (value: QuizCategoryResponse) => {
         setQuizCategory(value)
+        setOpenEdit(true)
     }
     const handleDeleteClick = (value: QuizCategoryResponse) => {
         setQuizCategory(value)
-        setOpenConfirm(true)
-    }
-    const onSubmit = (value: QuizCategoryRequest) => {
-        if (quizCategory) {
-            update(quizCategory.id, value)
-        } else {
-            create(value)
-        }
-    }
-    const update = async (id: number, quizCategory: QuizCategoryRequest) => {
-        try {
-            const res = await QuizCategoryService.update(id, quizCategory)
-            if (res.success) {
-                toast({ title: 'Update successful' })
-                onCancel();
-                setQuizCategories(quizCategories.map(quizCategory => {
-                    if (quizCategory.id === res.data.id) return res.data
-                    return quizCategory;
-                }))
-            } else {
-                toast({ title: "Update failed", description: res.message_error, variant: "destructive" })
-            }
-        } catch (error) {
-            toast({ title: "Update failed", description: FunctionUtil.showError(error), variant: "destructive" })
-        }
-    }
-
-    const create = async (quizCategory: QuizCategoryRequest) => {
-        try {
-            const res = await QuizCategoryService.create(quizCategory)
-            if (res.success) {
-                setQuizCategories([res.data, ...quizCategories])
-                toast({ title: 'Create success' })
-                onCancel();
-            } else {
-                toast({ title: "Create failed", description: res.message_error, variant: "destructive" })
-            }
-        } catch (error) {
-            toast({ title: "Create failed", description: FunctionUtil.showError(error), variant: "destructive" })
-        }
-
-    }
-    const onContinue = () => {
-        QuizCategoryService.delete(quizCategory?.id ?? 0).then(res => {
-            if (res.success) {
-                setQuizCategories(quizCategories.filter(item => item.id !== quizCategory?.id))
-                toast({ title: "Delete successful" })
-                onCancel();
-            } else {
-                console.log(res.message_error);
-            }
-        }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
-    }
-    const onCancel = () => {
-        setOpen(false)
-        setOpenConfirm(false)
-        setQuizCategory(undefined)
+        setOpenDelete(true)
     }
     return (
         <>
             <div className="flex justify-between">
                 <TitleElement>Quiz Category Manager</TitleElement>
-                <Button onClick={() => setOpen(true)}>Create</Button>
+                <QuizCategoryCreate setQuizCategories={setQuizCategories} />
             </div>
-            <Modal open={open} onCancel={onCancel}>
-                <QuizCategoryForm onSubmit={onSubmit} quizCategory={quizCategory} />
-            </Modal>
-            <Confirm title='Delete quiz category' onContinue={onContinue} open={openConfirm} onCancel={onCancel} />
-            <TableElement<QuizCategoryResponse> array={quizCategories} handleEditClick={handleEditClick} handleDeleteClick={handleDeleteClick} />
+            {quizCategory && <QuizCategoryUpdate open={openEdit} setOpen={setOpenEdit} setQuizCategories={setQuizCategories} quizCategory={quizCategory} />}
+            {quizCategory && <QuizCategoryDelete open={openDelete} setOpen={setOpenDelete} setQuizCategories={setQuizCategories} quizCategory={quizCategory} />}
+            <QuizCategoryTable array={quizCategories} onEdit={handleEditClick} onDelete={handleDeleteClick} />
+            {/* <TableElement<QuizCategoryResponse> array={quizCategories} handleEditClick={handleEditClick} handleDeleteClick={handleDeleteClick} /> */}
         </>
     )
 }

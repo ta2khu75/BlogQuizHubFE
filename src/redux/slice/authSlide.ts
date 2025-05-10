@@ -1,6 +1,6 @@
-import { RootState } from "@/redux/store";
 import AuthService from "@/services/AuthService";
 import { AuthRequest } from "@/types/request/AuthRequest";
+import { AccountProfileResponse } from "@/types/response/Account/AccountProfileResponse";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 type AuthState = {
   access_token?: string;
@@ -24,7 +24,7 @@ export const authSlide = createSlice({
     })
   }
 });
-const fetchLogin = createAsyncThunk<AuthResponse, AuthRequest, { state: RootState }>("auth/login", async (auth: AuthRequest, thunkAPI) => {
+const fetchLogin = createAsyncThunk<AuthResponse, AuthRequest>("auth/login", async (auth: AuthRequest, thunkAPI) => {
   try {
     const response = await AuthService.login(auth)
     return response.data
@@ -32,7 +32,7 @@ const fetchLogin = createAsyncThunk<AuthResponse, AuthRequest, { state: RootStat
     return thunkAPI.rejectWithValue(error);
   }
 })
-const fetchRefreshToken = createAsyncThunk<AuthResponse, void, { state: RootState }>("auth/refreshToken", async (_, thunkAPI) => {
+const fetchRefreshToken = createAsyncThunk<AuthResponse, void>("auth/refreshToken", async (_, thunkAPI) => {
   try {
     const response = await AuthService.refreshToken()
     return response.data
@@ -40,7 +40,7 @@ const fetchRefreshToken = createAsyncThunk<AuthResponse, void, { state: RootStat
     return thunkAPI.rejectWithValue(error);
   }
 })
-const fetchLogout = createAsyncThunk<void, void, { state: RootState }>("auth/logout", async (_, thunkAPI) => {
+const fetchLogout = createAsyncThunk<void, void>("auth/logout", async (_, thunkAPI) => {
   try {
     await AuthService.logout()
   } catch (error) {

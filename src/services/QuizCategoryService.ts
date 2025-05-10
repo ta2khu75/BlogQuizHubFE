@@ -1,4 +1,5 @@
 import { BasePath } from "@/env/BasePath";
+import { QuizCategoryRequest } from "@/types/request/QuizCategoryRequest";
 import instance from "@/util/AxiosApi";
 
 const basePath = BasePath.QUIZ_CATEGORY

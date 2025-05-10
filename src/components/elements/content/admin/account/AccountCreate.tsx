@@ -5,7 +5,7 @@ import AccountService from '@/services/AccountService'
 import { AccountRequest } from '@/types/request/account/AccountRequest'
 import { AccountResponse } from '@/types/response/Account/AccountResponse'
 import { handleMutation } from '@/util/mutation'
-import StateHelpers from '@/util/S/StateHelpers'
+import StateHelpers from '@/util/StateHelpers'
 import React, { Dispatch, SetStateAction, useState } from 'react'
 type Props = {
     setAccountPage: Dispatch<SetStateAction<PageResponse<AccountResponse> | undefined>>,
@@ -18,8 +18,9 @@ const AccountCreate = ({ setAccountPage, roles }: Props) => {
             (val) => AccountService.create(val),
             (response) => {
                 setOpen(false)
-                StateHelpers.prependState(setAccountPage, response.data)
+                StateHelpers.prependStatePage(setAccountPage, response.data)
             },
+            undefined,
             { success: 'Create success', error: 'Create failed' })
     }
     return (

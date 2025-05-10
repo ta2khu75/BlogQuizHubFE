@@ -1,3 +1,0 @@
-interface QuizCategoryRequest {
-    name: string;
-}

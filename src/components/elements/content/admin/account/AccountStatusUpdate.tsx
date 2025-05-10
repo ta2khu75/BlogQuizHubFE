@@ -5,7 +5,7 @@ import { AccountStatusRequest } from '@/types/request/account/AccountStatusReque
 import { AccountResponse } from '@/types/response/Account/AccountResponse'
 import { AccountStatusResponse } from '@/types/response/Account/AccountStatusResponse'
 import { handleMutation } from '@/util/mutation'
-import StateHelpers from '@/util/S/StateHelpers'
+import StateHelpers from '@/util/StateHelpers'
 import React, { Dispatch, SetStateAction } from 'react'
 type Props = {
   setAccountPage: Dispatch<SetStateAction<PageResponse<AccountResponse> | undefined>>,
@@ -16,14 +16,15 @@ type Props = {
 }
 const AccountStatusUpdate = ({ setAccountPage, roles, account, open, setOpen }: Props) => {
   const onSubmit = (value: AccountStatusRequest) => {
-    if (account.status.id) {
-      handleMutation<AccountStatusRequest, AccountStatusResponse>(value,
-        (val) => AccountService.updateStatus(account.status.id, val),
-        (res) => {
-          StateHelpers.updateItemById(setAccountPage, { ...account, status: res.data })
-        }
-      )
+    handleMutation<AccountStatusRequest, AccountStatusResponse>(value,
+      (val) => AccountService.updateStatus(account.status.id, val),
+      (res) => {
+        StateHelpers.updateItemByIdPage(setAccountPage, { ...account, status: res.data })
+      }, undefined, {
+      error: 'Update failed',
+      success: 'Update success'
     }
+    )
   }
   return (
     <Modal open={open} onCancel={() => setOpen(false)} title="Update Account Status">

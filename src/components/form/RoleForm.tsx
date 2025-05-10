@@ -1,17 +1,12 @@
-import { Button } from "@/components/ui/button"
+import ButtonSubmit from "@/components/common/ButtonSubmit"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { RoleRequest, roleSchema } from "@/types/request/RoleRequest"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
 
-const formSchema = z.object({
-    name: z.string().min(3),
-    permission_ids: z.set(z.number()),
-})
 type Props = {
     role?: RoleResponse,
     permissionGroups: PermissionGroupResponse[],
@@ -19,7 +14,7 @@ type Props = {
 }
 const RoleForm = ({ role, onSubmit, permissionGroups }: Props) => {
     const form = useForm({
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(roleSchema),
         defaultValues: {
             name: role?.name ?? '',
             permission_ids: new Set(role?.permission_ids ?? [])
@@ -68,12 +63,19 @@ const RoleForm = ({ role, onSubmit, permissionGroups }: Props) => {
                                                                     <Checkbox
                                                                         checked={field.value?.has(permission.id) ?? false}
                                                                         onCheckedChange={(checked) => {
+                                                                            const newSet = new Set(field.value);
                                                                             if (checked) {
-                                                                                field.onChange(field.value.add(permission.id))
+                                                                                newSet.add(permission.id);
                                                                             } else {
-                                                                                field.value.delete(permission.id)
-                                                                                field.onChange(field.value);
+                                                                                newSet.delete(permission.id);
                                                                             }
+                                                                            field.onChange(newSet);
+                                                                            // if (checked) {
+                                                                            //     field.onChange(field.value.add(permission.id))
+                                                                            // } else {
+                                                                            //     field.value.delete(permission.id)
+                                                                            //     field.onChange(field.value);
+                                                                            // }
                                                                         }}
                                                                     />
                                                                 </FormControl>
@@ -93,11 +95,7 @@ const RoleForm = ({ role, onSubmit, permissionGroups }: Props) => {
                         )}
                     />
                 </ScrollArea>
-                {form.formState.isSubmitting ? <Button disabled>
-                    <Loader2 className="animate-spin" />
-                    Please wait
-                </Button> :
-                    <Button type='submit'>Submit</Button>}
+                <ButtonSubmit isSubmitting={form.formState.isSubmitting} />
             </form>
         </Form>
     )

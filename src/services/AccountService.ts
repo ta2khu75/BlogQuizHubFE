@@ -11,8 +11,7 @@ const basePath = BasePath.ACCOUNT;
 export default class AccountService {
   static readPage(search = "", page = 1, size = 10): Promise<ApiResponse<PageResponse<AccountResponse>>> {
     return instance.get(`${basePath}`, { params: { search, page, size } });
-  }
-  static create(account: AccountRequest): Promise<ApiResponse<AccountResponse>> {
+  } static create(account: AccountRequest): Promise<ApiResponse<AccountResponse>> {
     return instance.post(basePath, account);
   }
   static updateStatus(id: number, account: AccountStatusRequest): Promise<ApiResponse<AccountStatusResponse>> {
@@ -29,5 +28,8 @@ export default class AccountService {
   }
   static readProfile(id: number): Promise<ApiResponse<AccountProfileResponse>> {
     return instance.get(`${basePath}/profile/${id}`);
+  }
+  static search(search: AccountSearch): Promise<ApiResponse<PageResponse<AccountResponse>>> {
+    return instance.get(basePath, { params: { ...search } });
   }
 }

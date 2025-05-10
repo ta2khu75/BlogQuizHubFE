@@ -1,9 +1,9 @@
-
 import { BasePath } from "@/env/BasePath";
 import { AccountPasswordRequest } from "@/types/request/account/AccountPasswordRequest";
 import { AccountProfileRequest } from "@/types/request/account/AccountProfileRequest";
 import { AccountRequest } from "@/types/request/account/AccountRequest";
 import { AuthRequest } from "@/types/request/AuthRequest";
+import { AccountResponse } from "@/types/response/Account/AccountResponse";
 import api from "@/util/AxiosApi";
 import axios from "axios";
 const basePath = BasePath.AUTH

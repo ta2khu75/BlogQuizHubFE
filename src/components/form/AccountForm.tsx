@@ -75,7 +75,7 @@ const AccountForm = ({ onSubmit, roles }: Props) => {
           roles &&
           <FormField control={form.control} name='role_id' render={({ field }) => (
             <FormItem>
-              <FormLabel>Quiz category</FormLabel>
+              <FormLabel>Role</FormLabel>
               <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={`${field.value}`}>
                 <FormControl>
                   <SelectTrigger>
