@@ -14,8 +14,8 @@ type Props = {
 const AccountCreate = ({ setAccountPage, roles }: Props) => {
     const [open, setOpen] = useState(false)
     const onSubmit = (value: AccountRequest) => {
-        handleMutation<AccountRequest, AccountResponse>(value,
-            (val) => AccountService.create(val),
+        handleMutation<AccountResponse>(
+            () => AccountService.create(value),
             (response) => {
                 setOpen(false)
                 StateHelpers.prependStatePage(setAccountPage, response.data)

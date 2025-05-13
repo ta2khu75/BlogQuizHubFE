@@ -1,10 +1,12 @@
 import { BasePath } from "@/env/BasePath";
+import { ReportId } from "@/types/id/ReportId";
 import { ReportStatus } from "@/types/ReportStatus";
 import { ReportSearch } from "@/types/request/search/ReportSearch";
+import { ReportResponse } from "@/types/response/ReportResponse";
 import instance from "@/util/AxiosApi";
 const basePath = BasePath.REPORT
 export default class ReportService {
-    static create(date: ReportRequest): Promise<ApiResponse<PageResponse<ReportResponse>>> {
+    static create(date: ReportRequest): Promise<ApiResponse<ReportResponse>> {
         return instance.post(basePath, date);
     }
     static read(targetId: string): Promise<ApiResponse<ReportResponse>> {

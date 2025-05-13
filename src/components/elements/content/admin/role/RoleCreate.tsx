@@ -15,8 +15,8 @@ const RoleCreate = ({ setRoles, permissionGroups }: Props) => {
     const onSubmit = (value: RoleRequest) => {
         console.log(value);
 
-        handleMutation<RoleRequest, RoleResponse>(value,
-            (val) => RoleService.create(val),
+        handleMutation<RoleResponse>(
+            () => RoleService.create(value),
             (response) => {
                 setOpen(false)
                 StateHelpers.prependState<RoleResponse>(setRoles, response.data)

@@ -1,20 +1,20 @@
-import Modal from '@/components/elements/util/Modal'
+import Modal from '@/components/common/Modal'
 import { Button } from '@/components/ui/button'
 import { FormMessage } from '@/components/ui/form'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useToast } from '@/hooks/use-toast'
 import ReportService from '@/services/ReportService'
 import { ReportType } from '@/types/ReportType'
+import { ReportResponse } from '@/types/response/ReportResponse'
 import { TargetType } from '@/types/TargetType'
-import FunctionUtil from '@/util/FunctionUtil'
+import { handleMutation } from '@/util/mutation'
 import React, { useState } from 'react'
 type Props = {
     targetId: string
     targetType: TargetType
+    setReport: (value: ReportResponse) => void
 }
-const ReportElement = ({ targetId, targetType }: Props) => {
-    const { toast } = useToast()
-    const [openReport, setOpenReport] = useState(false)
+const ReportElement = ({ targetId, targetType, setReport }: Props) => {
+    const [open, setOpen] = useState(false)
     const [isError, setIsError] = useState(false)
     const [reportType, setReportType] = useState<ReportType>()
     const onConfirm = () => {
@@ -22,27 +22,19 @@ const ReportElement = ({ targetId, targetType }: Props) => {
             setIsError(true)
         } else {
             setIsError(false)
-            fetchCreateReport({ target_id: targetId, report_type: reportType, target_type: targetType })
+            fetchCreateReport({ target_id: targetId, type: reportType, target_type: targetType })
         }
     }
     const fetchCreateReport = async (value: ReportRequest) => {
-        ReportService.create(value).then(res => {
-            if (res.success) {
-                toast({ title: "Report success" })
-            } else {
-                toast({ title: "Report failed", description: res.message_error, variant: "destructive" })
-            }
-        }
-        ).catch(err => toast({ title: "Report failed", description: FunctionUtil.showError(err), variant: "destructive" }))
+        handleMutation<ReportResponse>(() => ReportService.create(value), (res) => {
+            setOpen(false)
+            setReport(res.data)
+        }, undefined, { success: 'Report success', error: 'Report failed' })
     }
     return (
         <>
-            <div>
-                <Button onClick={() => setOpenReport(true)}>Report</Button>
-            </div>
-            <Modal open={openReport} onConfirm={() => onConfirm()} onCancel={() => setOpenReport(false)}>
-
-                <h1>Report</h1>
+            <Button onClick={() => setOpen(true)}>Report</Button>
+            <Modal open={open} title='Report' onConfirm={() => onConfirm()} onCancel={() => setOpen(false)}>
                 <Select onValueChange={(value) => { setReportType(value as ReportType) }}>
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select a fruit" />

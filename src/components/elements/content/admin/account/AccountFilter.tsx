@@ -41,16 +41,16 @@ const AccountFilter = ({ roles, setAccountPage }: Props) => {
         return params.toString()
     }
     const searchValues: AccountSearch = useMemo(() => ({
-        keyword: searchParams.get("keyword") ?? undefined,
+        keyword: ParseHelper.parseString(searchParams.get("keyword")),
         role_id: ParseHelper.parseNumber(searchParams.get("role_id")),
         enabled: ParseHelper.parseBoolean(searchParams.get("enabled")),
         non_locked: ParseHelper.parseBoolean(searchParams.get("non_locked")),
         createdFrom: ParseHelper.parseDate(searchParams.get("createdFrom")),
         createdTo: ParseHelper.parseDate(searchParams.get("createdTo")),
-        page: Number(searchParams.get("page")) || 1,
+        page: Number(searchParams.get("page")),
     }), [searchParams])
     const fetchAccountFilter = useCallback((searchValues: AccountSearch) => {
-        handleMutation<AccountSearch, PageResponse<AccountResponse>>(searchValues, AccountService.search, res => {
+        handleMutation<PageResponse<AccountResponse>>(() => AccountService.search(searchValues), res => {
             setAccountPage(res.data)
         })
     }, []);

@@ -4,6 +4,9 @@ export default class ParseHelper {
         if (value === 'false') return false;
         return undefined;
     };
+    static parseString(value: string | null): string | undefined {
+        return value ?? undefined;
+    };
     static parseDate(value: string | null): Date | undefined {
         return value ? new Date(value) : undefined;
     };

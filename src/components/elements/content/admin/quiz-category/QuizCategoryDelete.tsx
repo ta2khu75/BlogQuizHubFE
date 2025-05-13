@@ -15,7 +15,7 @@ const QuizCategoryDelete = ({ setQuizCategories, quizCategory, open, setOpen }: 
         setOpen(false)
     }
     const onContinue = () => {
-        handleMutation<QuizCategoryResponse, void>(quizCategory, (val) => QuizCategoryService.delete(val.id), () => {
+        handleMutation<void>(() => QuizCategoryService.delete(quizCategory.id), () => {
             setOpen(false)
             StateHelpers.removeItemById<RoleResponse>(setQuizCategories, quizCategory.id)
         }, undefined,

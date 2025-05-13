@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 export default class StateHelpers {
     static updateItemById<T extends { id: number | string }>(
         setState: React.Dispatch<React.SetStateAction<T[]>>,
@@ -54,7 +56,7 @@ export default class StateHelpers {
             return { ...prev, content: [...(prev.content || []), newItem] };
         });
     }
-    static updateItemByIdPage<T extends { id: number | string }>(
+    static updateItemByIdPage<T extends { id: number | string | object }>(
         setState: React.Dispatch<React.SetStateAction<PageResponse<T> | undefined>>,
         updatedItem: T
     ) {
@@ -63,12 +65,12 @@ export default class StateHelpers {
             return {
                 ...prev,
                 content: (prev.content || []).map((item) =>
-                    item.id === updatedItem.id ? updatedItem : item
+                    _.isEqual(item.id, updatedItem.id) ? updatedItem : item
                 )
             };
         });
     }
-    static removeItemByIdPage<T extends { id: number | string }>(
+    static removeItemByIdPage<T extends { id: number | string | object }>(
         setState: React.Dispatch<React.SetStateAction<PageResponse<T> | undefined>>,
         idToRemove: T['id']
     ) {
@@ -76,7 +78,7 @@ export default class StateHelpers {
             if (!prev) return prev;
             return {
                 ...prev,
-                content: (prev.content || []).filter((item) => item.id !== idToRemove)
+                content: (prev.content || []).filter((item) => !_.isEqual(item.id, idToRemove))
             };
         });
     }

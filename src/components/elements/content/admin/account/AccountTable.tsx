@@ -70,13 +70,13 @@ const AccountTable = ({ array, setAccount }: Props) => {
         key: "createdAt",
         label: "Created At",
         render(data) {
-            return <>{data.createdAt && new Date(data.createdAt).toDateString()}</>
+            return <>{data.created_at && new Date(data.created_at).toDateString()}</>
         },
     },
     {
         key: "updatedAt",
         label: "Updated At",
-        name: "updatedAt",
+        name: "updated_at",
     }, {
         key: "action",
         label: "Action",

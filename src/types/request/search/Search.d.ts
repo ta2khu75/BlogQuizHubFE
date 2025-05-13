@@ -2,5 +2,5 @@ interface Search {
     page?: number,
     size?: number,
     keyword?: string,
-    authorId?: string
+    author_id?: string
 }

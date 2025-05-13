@@ -2,9 +2,9 @@ import { ReportStatus } from "@/types/ReportStatus";
 import { TargetType } from "@/types/TargetType";
 
 interface ReportSearch extends Search {
-    targetType?: TargetType,
-    reportType?: ReportType,
-    reportStatus?: ReportStatus,
-    fromDate?: string,
-    toDate?: string
+    target_type?: TargetType,
+    type?: ReportType,
+    status?: ReportStatus,
+    from_date?: Date,
+    to_date?: Date
 }

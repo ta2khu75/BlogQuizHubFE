@@ -1,5 +1,5 @@
 interface BaseResponse<T> {
     id: T,
-    createdAt: string,
-    updatedAt: string,
+    created_at: string,
+    updated_at: string,
 }

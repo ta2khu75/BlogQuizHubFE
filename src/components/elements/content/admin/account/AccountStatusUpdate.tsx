@@ -16,8 +16,8 @@ type Props = {
 }
 const AccountStatusUpdate = ({ setAccountPage, roles, account, open, setOpen }: Props) => {
   const onSubmit = (value: AccountStatusRequest) => {
-    handleMutation<AccountStatusRequest, AccountStatusResponse>(value,
-      (val) => AccountService.updateStatus(account.status.id, val),
+    handleMutation<AccountStatusResponse>(
+      () => AccountService.updateStatus(account.status.id, value),
       (res) => {
         StateHelpers.updateItemByIdPage(setAccountPage, { ...account, status: res.data })
       }, undefined, {

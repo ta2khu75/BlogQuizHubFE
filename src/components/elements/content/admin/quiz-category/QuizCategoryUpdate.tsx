@@ -13,8 +13,8 @@ type Props = {
 }
 const QuizCategoryUpdate = ({ setQuizCategories, quizCategory, open, setOpen }: Props) => {
     const onSubmit = (value: QuizCategoryRequest) => {
-        handleMutation<QuizCategoryRequest, QuizCategoryResponse>(value,
-            (val) => QuizCategoryService.update(quizCategory.id, val),
+        handleMutation<QuizCategoryResponse>(
+            () => QuizCategoryService.update(quizCategory.id, value),
             (res) => {
                 StateHelpers.updateItemById(setQuizCategories, res.data)
                 setOpen(false)

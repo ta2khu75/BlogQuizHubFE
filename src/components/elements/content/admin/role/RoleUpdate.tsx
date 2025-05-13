@@ -14,8 +14,8 @@ type Props = {
 }
 const RoleUpdate = ({ role, setRoles, permissionGroups, open, setOpen }: Props) => {
     const onSubmit = (value: RoleRequest) => {
-        handleMutation<RoleRequest, RoleResponse>(value,
-            (val) => RoleService.update(role.id, val),
+        handleMutation<RoleResponse>(
+            () => RoleService.update(role.id, value),
             (res) => {
                 StateHelpers.updateItemById(setRoles, res.data)
                 setOpen(false)

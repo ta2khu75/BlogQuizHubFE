@@ -1,12 +1,35 @@
 import TableElement, { Column } from "@/components/common/TableElement"
+import BlogReportRender from "@/components/elements/content/admin/report/BlogReportRender"
+import QuizReportRender from "@/components/elements/content/admin/report/QuizReportRender"
 import { Button } from "@/components/ui/button"
+import { ReportStatus } from "@/types/ReportStatus"
+import { BlogResponse } from "@/types/response/BlogResponse"
+import { QuizResponse } from "@/types/response/QuizResponse"
+import { ReportResponse } from "@/types/response/ReportResponse"
+import { TargetType } from "@/types/TargetType"
+import { usePathname } from "next/navigation"
+import { useCallback } from "react"
 
 type Props = {
-    array?: ReportResponse[]
-    onEdit: (data: ReportResponse) => void
-    onDelete: (data: ReportResponse) => void
+    array?: ReportResponse[],
+    onUpdateStatus: (data: ReportResponse, status: ReportStatus) => void
 }
-const QuizCategoryTable = ({ array, onEdit, onDelete }: Props) => {
+const ReportTable = ({ array, onUpdateStatus }: Props) => {
+    const pathname = usePathname()
+    const makeUrl = useCallback((profileId: number) => {
+        return `${pathname}?author_id=${profileId}`
+    }, [])
+    const renderTarget = useCallback((data: ReportResponse) => {
+        switch (data.id.target_type as TargetType) {
+            case TargetType.BLOG:
+                return <BlogReportRender makeUrl={makeUrl} blog={data.target as BlogResponse} />
+            case TargetType.QUIZ:
+                return <QuizReportRender makeUrl={makeUrl} quiz={data.target as QuizResponse} />
+            default:
+                return <>null</>
+        }
+    }, [])
+
     const columns: Column<ReportResponse>[] = [
         {
             label: "No",
@@ -16,12 +39,12 @@ const QuizCategoryTable = ({ array, onEdit, onDelete }: Props) => {
         {
             label: "Report Type",
             key: "report_type",
-            render: (data) => data.report_type
+            render: (data) => data.type
         },
         {
             label: "Report status",
             key: "report_status",
-            render: (data) => data.report_status
+            render: (data) => data.status
         },
         {
             label: "Target",
@@ -31,51 +54,26 @@ const QuizCategoryTable = ({ array, onEdit, onDelete }: Props) => {
         {
             label: "Created At",
             key: "created_at",
-            render: (data) => data.info.created_at
+            render: (data) => data.created_at
         },
         {
             label: "Updated At ",
             key: "updated_at",
-            render: (data) => data.info.updated_at
+            render: (data) => data.updated_at
         },
         {
             label: "Actions",
             key: "actions",
             render: (data) => <div className='flex flex-col gap-y-2'>
-                <Button onClick={() => fetchUpdateStatus(data, ReportStatus.RESOLVED)}>Resolved</Button>
-                <Button onClick={() => fetchUpdateStatus(data, ReportStatus.REJECTED)}>Rejected</Button>
-                <Button onClick={() => fetchDetail(data)}>View {data.target_type === TargetType.BLOG ? "Blog" : "Quiz"}</Button>
+                <Button onClick={() => onUpdateStatus(data, ReportStatus.RESOLVED)}>Resolved</Button>
+                <Button onClick={() => onUpdateStatus(data, ReportStatus.REJECTED)}>Rejected</Button>
             </div>
         }
     ]
 
-    const columns: Column<ReportResponse>[] = [{
-        key: "no",
-        label: "No",
-        render: (_, index) => {
-            return index + 1
-        },
-    }, {
-        key: "name",
-        label: "Name",
-        name: "report_type"
-    },
-    {
-        key: "action",
-        label: "Action",
-        className: "flex items-start",
-        render: (data) => {
-            return (
-                <div className='flex'>
-                    <Button onClick={() => onEdit(data)}>Edit</Button>
-                    <Button onClick={() => onDelete(data)}>Delete</Button>
-                </div>
-            )
-        }
-    }]
     return (
         <TableElement<ReportResponse> array={array} columns={columns} />
     )
 }
 
-export default QuizCategoryTable;
+export default ReportTable;

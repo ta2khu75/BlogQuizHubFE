@@ -13,8 +13,8 @@ const QuizCategoryCreate = ({ setQuizCategories }: Props) => {
     const [open, setOpen] = useState(false)
     const onSubmit = (value: QuizCategoryRequest) => {
         console.log(value);
-        handleMutation<QuizCategoryRequest, QuizCategoryResponse>(value,
-            (val) => QuizCategoryService.create(val),
+        handleMutation<QuizCategoryResponse>(
+            () => QuizCategoryService.create(value),
             (response) => {
                 setOpen(false)
                 StateHelpers.prependState<RoleResponse>(setQuizCategories, response.data)

@@ -2,9 +2,8 @@
 
 import { toast } from "@/hooks/use-toast";
 
-export const handleMutation = async<T, R>(
-    value: T,
-    serviceFn: (val: T) => Promise<ApiResponse<R>>,
+export const handleMutation = async<R>(
+    serviceFn: () => Promise<ApiResponse<R>>,
     onSuccess: (data: ApiResponse<R>) => void,
     onError?: (error: ApiResponse<object>) => void,
     messages?: {
@@ -13,7 +12,7 @@ export const handleMutation = async<T, R>(
     }
 ) => {
     try {
-        const response = await serviceFn(value);
+        const response = await serviceFn();
         if (messages?.success) {
             toast({ title: messages.success });
         }

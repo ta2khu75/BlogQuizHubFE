@@ -15,7 +15,7 @@ const RoleDelete = ({ open, setRoles, role, setOpen }: Props) => {
         setOpen(false)
     }
     const onContinue = () => {
-        handleMutation<RoleResponse, void>(role, (val) => RoleService.delete(val.id), () => {
+        handleMutation<void>(() => RoleService.delete(role.id), () => {
             setOpen(false)
             StateHelpers.removeItemById<RoleResponse>(setRoles, role.id)
         }, undefined,
