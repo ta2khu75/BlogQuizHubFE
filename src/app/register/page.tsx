@@ -3,6 +3,7 @@ import TitleContent from '@/components/common/TitleContent'
 import AccountForm from '@/components/form/AccountForm'
 import { useToast } from '@/hooks/use-toast'
 import AuthService from '@/services/AuthService'
+import { AccountRequest } from '@/types/request/account/AccountRequest'
 import { useRouter } from 'next/navigation'
 const RegisterPage = () => {
     const { toast } = useToast()

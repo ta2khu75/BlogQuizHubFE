@@ -8,5 +8,15 @@ export const questionSchema = z.object({
     shuffle_answer: z.boolean(),
     type: z.nativeEnum(QuestionType),
     answers: z.array(answerDtoSchema).refine((answers) => answers.some((answer) => answer.correct), { message: 'At least one answer must be correct' }),
-}).refine(data => data.answers.some(answer => answer.correct), { message: "At least one answer must be correct", path: ["answers"] })
+})
+export const answerCorrectCheckSchema = z.array(answerDtoSchema).refine(
+    (answers) => answers.some((a) => a.correct),
+    { message: 'At least one answer must be correct' }
+);
+
+// .refine(data => {
+//     console.log("Answers in refine:", data.answers);
+//     data.answers.some(answer => answer.correct)
+// }
+//     , { message: "At least one answer must be correct", path: ["answers"] })
 export type QuestionDto = z.infer<typeof questionSchema>

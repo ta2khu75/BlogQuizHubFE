@@ -13,12 +13,13 @@ export type ComboboxOption = {
 
 type Props = {
     array: ComboboxOption[]
-    value: string
-    onSelectChange: (value: string) => void
+    value?: string | number
+    canAdd?: boolean,
+    onSelectChange: (value: string | number | undefined) => void
     onInputChange?: (value: string) => void
 }
 
-export function Combobox({ array, value, onSelectChange, onInputChange }: Props) {
+export function Combobox({ array, value, canAdd, onSelectChange, onInputChange }: Props) {
     const [open, setOpen] = React.useState(false)
     const [input, setInput] = React.useState("")
 
@@ -75,7 +76,7 @@ export function Combobox({ array, value, onSelectChange, onInputChange }: Props)
                         }}
                     />
                     <CommandList>
-                        {displayOptions.length === 0 && !matchedOption && lowerInput ? (
+                        {canAdd && displayOptions.length === 0 && !matchedOption && lowerInput ? (
                             <CommandItem onSelect={() => handleSelect(lowerInput)}>
                                 <PlusCircle className="mr-2 h-4 w-4 text-primary" />
                                 Thêm tag mới: <span className="ml-1 font-medium">{lowerInput}</span>
@@ -100,7 +101,7 @@ export function Combobox({ array, value, onSelectChange, onInputChange }: Props)
                                 ))}
                             </CommandGroup>
                         )}
-                        <CommandEmpty>Không tìm thấy tag.</CommandEmpty>
+                        <CommandEmpty>Không tìm thấy.</CommandEmpty>
                     </CommandList>
                 </Command>
             </PopoverContent>

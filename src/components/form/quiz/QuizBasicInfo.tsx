@@ -1,23 +1,43 @@
 import ButtonSubmit from "@/components/common/ButtonSubmit";
+import { Combobox, ComboboxOption } from "@/components/common/Combobox";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import useDebounce from "@/hooks/useDebounce";
+import { BlogService } from "@/services/BlogService";
 import { AccessModifier } from "@/types/AccessModifier";
 import { QuizResultMode } from "@/types/DisplayMode";
 import { QuizLevel } from "@/types/QuizLevel";
 import { QuizRequest } from "@/types/request/QuizRequest";
+import { handleMutation } from "@/util/mutation";
+import { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 type Props = {
     quizCategories: QuizCategoryResponse[]
 }
 const QuizBasicInfo = ({ quizCategories }: Props) => {
-    const { control, formState, reset } = useFormContext<QuizRequest>()
-    const onReset = () => {
-        reset({})
+    const { control, formState, reset, getValues } = useFormContext<QuizRequest>()
+    const [keywordBlog, setKeywordBlog] = useState("")
+    const [blogOptions, setBlogOptions] = useState<ComboboxOption[]>([])
+    const searchBlog = useDebounce(keywordBlog)
+    const [image, setImage] = useState<{ value: File, error: boolean }>()
+    const onChangeImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) setImage({ value: e.target.files?.[0], error: false })
     }
+    const onReset = () => {
+        const values = getValues()
+        reset({ questions: values.questions })
+    }
+    const fetchSearchBlog = useCallback((titleBlog: string) => {
+        handleMutation(() => BlogService.search({ keyword: titleBlog }), (res) =>
+            setBlogOptions(res.data?.content?.map((blog) => ({ label: blog.name, value: blog.id })) ?? []))
+    }, [])
+    useEffect(() => {
+        fetchSearchBlog(searchBlog)
+    }, [searchBlog, fetchSearchBlog])
     return (
         <>
             <FormField control={control} name='title' render={({ field }) => (
@@ -29,26 +49,16 @@ const QuizBasicInfo = ({ quizCategories }: Props) => {
                     <FormMessage />
                 </FormItem>
             )} />
-            {/* <FormField control={control} name='blog_id' render={({ field }) => (
+            <FormField control={control} name='blog_id' render={({ field }) => (
                 <FormItem>
                     <FormLabel>Blog</FormLabel>
-                    <div className='flex items-center gap-2'>
-                        <Input value={search} onChange={(e) => setSearch(e.target.value)} />
-                        <Select onValueChange={(value) => field.onChange(value)} defaultValue={`${field.value}`}>
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select blog" />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                {blogs.map(blog => (
-                                    <SelectItem key={blog.id} value={`${blog.id}`}>{blog.title}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                    <FormItem>
+                        <FormControl>
+                            <Combobox array={blogOptions} value={field.value} onSelectChange={(value) => { field.onChange(value); setKeywordBlog("") }} onInputChange={setKeywordBlog} />
+                        </FormControl>
+                    </FormItem>
                 </FormItem>
-            )} /> */}
+            )} />
             <FormField control={control} name='category_id' render={({ field }) => (
                 <FormItem>
                     <FormLabel>Quiz category</FormLabel>
@@ -204,8 +214,7 @@ const QuizBasicInfo = ({ quizCategories }: Props) => {
                     <FormMessage />
                 </FormItem>
             )} />
-            <ButtonSubmit onReset={onReset} isSubmitting={formState.isSubmitting} />
-            {/* <FormItem>
+            <FormItem>
                 <FormLabel>Image</FormLabel>
                 <FormControl>
                     <Input type='file' accept='image/*' name='image' placeholder='Image' required
@@ -213,7 +222,8 @@ const QuizBasicInfo = ({ quizCategories }: Props) => {
                     />
                 </FormControl>
                 {image?.error && <FormMessage />}
-            </FormItem> */}
+            </FormItem>
+            <ButtonSubmit onReset={onReset} isSubmitting={formState.isSubmitting} />
         </>
     )
 }
