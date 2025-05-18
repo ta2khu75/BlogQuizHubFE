@@ -2,8 +2,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import React from 'react'
 type Props = {
     open: boolean,
-    onCancel?: () => void
-    onContinue?: () => void,
+    onCancel: () => void
+    onContinue: () => void,
     title: string,
     description?: string
 }
@@ -18,8 +18,8 @@ const Confirm = ({ open, onCancel, onContinue, title, description }: Props) => {
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    {onCancel && <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>}
-                    {onContinue && <AlertDialogAction onClick={onContinue}>Continue</AlertDialogAction>}
+                    <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={onContinue}>Continue</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

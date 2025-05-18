@@ -14,13 +14,13 @@ export const handleMutation = async<R>(
     try {
         const response = await serviceFn();
         if (messages?.success) {
-            toast({ title: messages.success });
+            toast({ variant: 'success', title: messages.success });
         }
         onSuccess(response);
     } catch (error) {
         const err = error as ApiResponse<object>;
         if (messages?.error) {
-            toast({ title: messages.error, description: err.message, variant: 'destructive' });
+            toast({ title: messages.error, description: err.message, variant: 'error' });
         }
         onError?.(err);
     }

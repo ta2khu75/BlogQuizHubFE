@@ -1,4 +1,3 @@
-import ButtonSubmit from '@/components/common/ButtonSubmit'
 import Modal from '@/components/common/Modal'
 import QuizBasicInfo from '@/components/form/quiz/QuizBasicInfo'
 import { Button } from '@/components/ui/button'
@@ -11,7 +10,7 @@ import { QuizLevel } from '@/types/QuizLevel'
 import { QuizRequest, quizSchema } from '@/types/request/QuizRequest'
 import { QuizResponse } from '@/types/response/QuizResponse'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import QuestionList from '@/components/form/quiz/QuestionList'
 type Props = {
@@ -20,8 +19,8 @@ type Props = {
     quizCategories: QuizCategoryResponse[]
 }
 const QuizForm = ({ quiz, onSubmit, quizCategories }: Props) => {
-    const defaultQuestion: QuestionDto = { content: "", type: QuestionType.SINGLE_CHOICE, shuffle_answer: false, answers: Array(4).fill({ content: "", correct: false }) };
-    const defaultValues: QuizRequest = {
+    const defaultQuestion: QuestionDto = useMemo(() => ({ content: "", type: QuestionType.SINGLE_CHOICE, shuffle_answer: false, answers: Array(4).fill({ content: "", correct: false }) }), []);
+    const defaultQuiz: QuizRequest = useMemo(() => ({
         title: '',
         blog_id: undefined,
         category_id: 0,
@@ -33,26 +32,33 @@ const QuizForm = ({ quiz, onSubmit, quizCategories }: Props) => {
         duration: 5,
         description: '',
         questions: [defaultQuestion]
-    }
+    }), [defaultQuestion])
     const form = useForm<QuizRequest>({
         resolver: zodResolver(quizSchema),
-        defaultValues,
-        // shouldUnregister: false
+        defaultValues: defaultQuiz,
     })
     const [openInfo, setOpenInfo] = useState(false)
     useEffect(() => {
         if (quiz) form.reset({ ...quiz, category_id: quiz.category.id })
-    }, [quiz])
+    }, [quiz, form])
+    const onResetBaseInfo = useCallback(() => {
+        const questions = form.getValues("questions")
+        if (quiz) {
+            form.reset({ ...quiz, category_id: quiz?.category.id, questions })
+        }
+        else {
+            form.reset({ ...defaultQuiz, questions })
+        }
+    }, [quiz, form, defaultQuiz])
     return (
         <Form {...form}>
             <FormProvider {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className='w-full flex flex-col gap-4'>
-                    <Button type='button' onClick={() => setOpenInfo(true)}>Open</Button>
-                    <Modal open={openInfo} onCancel={() => setOpenInfo(false)} >
-                        <QuizBasicInfo quizCategories={quizCategories} />
+                    <Button type='button' variant={"info"} onClick={() => setOpenInfo(true)}>Basic information</Button>
+                    <Modal title='Basic information' open={openInfo} setOpen={setOpenInfo} >
+                        <QuizBasicInfo onReset={onResetBaseInfo} quizCategories={quizCategories} />
                     </Modal>
-                    <QuestionList defaultQuestion={defaultQuestion} />
-                    <ButtonSubmit isSubmitting={form.formState.isSubmitting} />
+                    <QuestionList quiz={quiz} defaultQuiz={defaultQuiz} />
                 </form>
             </FormProvider>
         </Form>

@@ -10,11 +10,11 @@ type Props = {
 };
 
 const variantMap: Record<Status, ButtonProps['variant']> = {
-    selected: 'selected',
+    selected: 'info',
     unselected: 'outline',
-    error: 'destructive',
+    error: 'error',
     warning: 'warning',
-    correct: 'correct',
+    correct: 'success',
 };
 
 const QuestionMenu = ({ onIndexClick, states }: Props) => {

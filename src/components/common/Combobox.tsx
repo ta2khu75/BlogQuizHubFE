@@ -49,12 +49,12 @@ export function Combobox({ array, value, canAdd, onSelectChange, onInputChange }
     }
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
+            <PopoverTrigger className="w-full" asChild>
                 <Button type="button"
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="w-[240px] justify-between"
+                    className="w-full justify-between"
                 >
                     {value
                         ? array.find((item) => item.value === value)?.label ?? value
@@ -62,7 +62,7 @@ export function Combobox({ array, value, canAdd, onSelectChange, onInputChange }
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent forceMount className="w-[240px] p-0">
+            <PopoverContent forceMount className="p-0">
                 <Command>
                     <CommandInput
                         placeholder="Nhập tag..."

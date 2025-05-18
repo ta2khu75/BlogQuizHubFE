@@ -6,7 +6,7 @@ type Props = {
 }
 const TitleContent = ({ children, className }: Props) => {
     return (
-        <div className={clsx("text-2xl", "font-bold", className)}>{children}</div>
+        <div className={clsx("text-xl", className)}>{children}</div>
     )
 }
 

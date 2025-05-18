@@ -9,10 +9,6 @@ export const questionSchema = z.object({
     type: z.nativeEnum(QuestionType),
     answers: z.array(answerDtoSchema).refine((answers) => answers.some((answer) => answer.correct), { message: 'At least one answer must be correct' }),
 })
-export const answerCorrectCheckSchema = z.array(answerDtoSchema).refine(
-    (answers) => answers.some((a) => a.correct),
-    { message: 'At least one answer must be correct' }
-);
 
 // .refine(data => {
 //     console.log("Answers in refine:", data.answers);

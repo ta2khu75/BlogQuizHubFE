@@ -9,10 +9,11 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        selected: "bg-blue-600 hover:bg-blue-500 text-white shadow-md",
+        info: "bg-info text-info-foreground hover:bg-info-hover hover:text-info-foreground-hover shadow-md",
+        success: "bg-success text-success-foreground hover:bg-success-hover hover:text-success-foreground-hover shadow-md",
+        warning: "bg-warning text-warning-foreground hover:bg-warning-hover hover:text-warning-foreground-hover shadow-md",
+        error: "bg-error text-error-foreground hover:bg-error-hover hover:text-error-foreground-hover shadow-md",
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        correct: "bg-green-600 hover:bg-green-500 text-white shadow-md",
-        warning: "bg-yellow-600 hover:bg-yellow-500 text-white shadow-md",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
