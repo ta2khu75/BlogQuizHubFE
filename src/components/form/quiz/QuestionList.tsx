@@ -95,7 +95,7 @@ const QuestionList = ({ defaultQuiz, quiz }: Props) => {
         setTimeout(() => {
             api?.scrollTo(newIndex);
         }, 0)
-    }, [api, current, remove])
+    }, [api, current, remove, fields.length])
     // }, [current, handleRemove, onReset, openConfirmType])
     const handleAdd = useCallback(() => {
         append(defaultQuestion);
