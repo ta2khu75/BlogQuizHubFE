@@ -4,13 +4,19 @@ import { Separator } from '@/components/ui/separator'
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
 import { $getSelection, $isRangeSelection, CAN_REDO_COMMAND, CAN_UNDO_COMMAND, FORMAT_ELEMENT_COMMAND, FORMAT_TEXT_COMMAND, REDO_COMMAND, SELECTION_CHANGE_COMMAND, UNDO_COMMAND } from 'lexical'
 import { useEffect, useState } from 'react'
-import { mergeRegister } from "@lexical/utils"
+import { mergeRegister, $getNearestNodeOfType } from "@lexical/utils"
 import { Button } from '@/components/ui/button'
 import SelectElement from '@/components/common/SelectElement'
 import { HeadingTagType, $createHeadingNode, HeadingNode } from "@lexical/rich-text"
-import { $wrapNodes } from "@lexical/selection"
+import { $setBlocksType } from "@lexical/selection"
+import useKeyBindings from '@/components/common/RichTextEditor/plugin/useKeyBindings'
+import ColorPlugin from '@/components/common/RichTextEditor/plugin/ColorPlugin'
+import ListPlugin from '@/components/common/RichTextEditor/plugin/ListPlugin'
+import { $isListNode, ListNode } from "@lexical/list"
+import { getSelected } from '@/components/common/RichTextEditor/plugin/Util'
 const ToolbarPlugin = () => {
     const [editor] = useLexicalComposerContext()
+    const [blockType, setBlockType] = useState("paragraph")
     const [disableRecord, setDisableRecord] = useState<Partial<Record<RichTextAction, boolean>>>({
         [RichTextAction.Undo]: true,
         [RichTextAction.Redo]: true
@@ -43,28 +49,24 @@ const ToolbarPlugin = () => {
                 [RichTextAction.Code]: selection.hasFormat("code"),
             }
             setSelectionRecord(newSelectionRecord);
-        }
-    }
-    // const getSelections = () => {
-    //     if (selectionRecord) {
-    //         const data =
-    //             Object.entries(selectionRecord)?.filter(([_, value]) => value)?.map(([key, _]) => key);
-    //         console.log("data", data);
-    //         return data
 
-    //     }
-    //     return [];
-    // }
-    const getSelected = (value?: boolean) => {
-        if (value) {
-            return "default"
-        } return "outline"
+            const element = anchorNode.getKey() === "root" ? anchorNode : anchorNode.getTopLevelElementOrThrow();
+            const elementKey = element.getKey();
+            const elementDOM = editor.getElementByKey(elementKey);
+            if (!elementDOM) return
+            if ($isListNode(element)) {
+                const parentList = $getNearestNodeOfType(anchorNode, ListNode);
+                const type = parentList ? parentList.getTag() : element.getTag()
+                setBlockType(type);
+            }
+
+        }
     }
     const updateHeading = (heading: HeadingTagType) => {
         editor.update(() => {
             const selection = $getSelection();
             if ($isRangeSelection(selection)) {
-                $wrapNodes(selection, () => $createHeadingNode(heading))
+                $setBlocksType(selection, () => $createHeadingNode(heading))
             }
         })
     }
@@ -148,32 +150,38 @@ const ToolbarPlugin = () => {
         }
 
     }
-
+    useKeyBindings({ onAction })
     return (
-        <div className='flex flex-wrap h-10 gap-2'>
-            {/* <h1 className='text-6xl'>minh</h1> */}
-            <SelectElement value={selectedHeading} defaultValue='paragraph' className='w-36' options={HEADINGS.map((heading) => ({ value: heading, label: heading }))} onChange={(value) => updateHeading(value as HeadingTagType)} />
-            <Separator orientation="vertical" className='mx-2 bg-black' />
-            {RICH_TEXT_OPTIONS.map(({ label, id, icon }, index) => {
-                if (id === RichTextAction.Divider) {
-                    return <Separator orientation="vertical" className='mx-2 bg-black' key={`separator-${id}-${index}`} />
-                }
-                else if (label) {
+        <div>
+
+            <div className='flex flex-wrap gap-1'>
+                <SelectElement value={selectedHeading} defaultValue='paragraph' className='w-36' options={HEADINGS.map((heading) => ({ value: heading, label: heading }))} onChange={(value) => updateHeading(value as HeadingTagType)} />
+                <Separator orientation="vertical" className='h-10 bg-black' />
+                {RICH_TEXT_OPTIONS.map(({ label, id, icon }, index) => {
+                    if (id === RichTextAction.Divider) {
+                        return <Separator orientation="vertical" className='mx-2 h-10 bg-black' key={`separator-${id}-${index}`} />
+                    }
+                    else if (label) {
+                        return (
+                            <TooltipElement content={label} key={id}>
+                                <Button variant={getSelected(selectionRecord[id])} disabled={disableRecord[id]} onClick={() => onAction(id)}>
+                                    {icon}
+                                </Button>
+                            </TooltipElement>
+                        )
+                    }
                     return (
-                        <TooltipElement content={label} key={id}>
-                            <Button variant={getSelected(selectionRecord[id])} disabled={disableRecord[id]} onClick={() => onAction(id)}>
-                                {icon}
-                            </Button>
-                        </TooltipElement>
+                        <Button variant={getSelected(selectionRecord[id])} onClick={() => onAction(id)} key={id}>
+                            {icon}
+                        </Button>
                     )
                 }
-                return (
-                    <Button variant={getSelected(selectionRecord[id])} onClick={() => onAction(id)} key={id}>
-                        {icon}
-                    </Button>
-                )
-            }
-            )}
+                )}
+            </div>
+            <div className='flex gap-1'>
+                <ColorPlugin />
+                <ListPlugin blockType={blockType} setBlockType={setBlockType} />
+            </div>
         </div>
     )
 }

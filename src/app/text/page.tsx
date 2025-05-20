@@ -1,12 +1,12 @@
 "use client"
 import RichTextEditor from '@/components/common/RichTextEditor/RichTextEditor'
-import React from 'react'
+import React, { useState } from 'react'
 
-const page = () => {
+const Text = () => {
+    const [value, setValue] = useState("")
     return (
-        <RichTextEditor />
+        <RichTextEditor placeholder='Select Blog' value={value} name='blog' onChange={(value) => setValue(value)} />
     )
-
 }
 
-export default page
+export default Text 

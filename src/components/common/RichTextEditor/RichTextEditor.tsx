@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo, useMemo } from 'react'
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { HeadingNode } from "@lexical/rich-text"
 import { CodeHighlightNode, CodeNode } from "@lexical/code"
@@ -9,7 +9,9 @@ import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin"
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin"
 import ToolbarPlugin from '@/components/common/RichTextEditor/plugin/ToolbarPlugin';
 import { EditorThemeClasses } from 'lexical';
-import { cn } from '@/lib/utils';
+import { ListItemNode, ListNode } from "@lexical/list"
+import { ListPlugin } from "@lexical/react/LexicalListPlugin"
+import CustomOnChangePlugin from '@/components/common/RichTextEditor/plugin/CustomOnChangePlugin';
 const theme: EditorThemeClasses = {
     heading: {
         h1: "text-6xl",
@@ -20,38 +22,50 @@ const theme: EditorThemeClasses = {
         h6: "text-xl",
         paragraph: "text-base",
     },
+    list: {
+        ul: "list-disc",
+        ol: "list-decimal",
+    },
     text: {
-        bold: cn("font-bold"),
-        italic: cn("italic"),
-        underline: cn("underline"),
-        strikethrough: cn("line-through"),
-        superscript: cn("sup"),
-        subscript: cn("sub"),
-        highlight: cn("text-black p-1 bg-yellow-300 border border-yellow-600"),
-        code: cn("text-black p-1 text-sm font-mono bg-gray-200"),
+        bold: "font-bold",
+        italic: "italic",
+        underline: "underline",
+        strikethrough: "line-through",
+        superscript: "sup",
+        subscript: "sub",
+        highlight: "text-black p-1 bg-yellow-300 border border-yellow-600",
+        code: "text-black p-1 text-sm font-mono bg-gray-200",
     }
 }
-const initialConfig = {
-    namespace: "RickTextEditor",
-    theme,
-    onError: () => { },
-    nodes: [HeadingNode, CodeHighlightNode, CodeNode]
+type Props = {
+    value: string,
+    onChange: (value: string) => void
+    placeholder?: string,
+    name: string;
 }
-const RichTextEditor = () => {
+const RichTextEditor = ({ name, value, onChange, placeholder }: Props) => {
+    const initialConfig = useMemo(() => ({
+        namespace: name,
+        theme,
+        onError: () => { },
+        nodes: [HeadingNode, CodeHighlightNode, CodeNode, ListNode, ListItemNode]
+    }), [name])
     return (
         <LexicalComposer initialConfig={initialConfig}>
             <ToolbarPlugin />
             <div className='relative'>
                 <RichTextPlugin
                     contentEditable={<ContentEditable className={"w-full p-2 h-96 border border-gray-400"} />}
-                    placeholder={<div className='absolute top-2 left-2 text-gray-400'>Some text</div>}
+                    placeholder={<div className='absolute top-2 left-2 text-gray-400'>{placeholder}</div>}
                     ErrorBoundary={LexicalErrorBoundary}
                 />
             </div>
+            <CustomOnChangePlugin value={value} onChange={onChange} />
             <AutoFocusPlugin />
             <HistoryPlugin />
+            <ListPlugin />
         </LexicalComposer>
     )
 }
 
-export default RichTextEditor 
+export default memo(RichTextEditor)
