@@ -1,18 +1,22 @@
 import Confirm from '@/components/common/Confirm'
+import Modal from '@/components/common/Modal'
 import ImageElement from '@/components/common/TextEditor/UploadImage/ImageElement'
 import { Input } from '@/components/ui/input'
 import { useAppDispatch } from '@/redux/hooks'
 import { ImageUrlsActions } from '@/redux/slice/imageUrlsSlide'
 import FunctionUtil from '@/util/FunctionUtil'
 import { Label } from '@radix-ui/react-label'
-import React from 'react'
+import React, { useState } from 'react'
 type UploadImageProps = {
     imageUrls: string[]
+    // onInsert:({url, name, width})=>void
     onAdd: (url: string) => void
 }
 const UploadImage = ({ imageUrls, onAdd }: UploadImageProps) => {
     const dispatch = useAppDispatch()
+    const [imgUrl, setImgUrl] = useState()
     const [showConfirm, setShowConfirm] = React.useState(false)
+    const [open, setOpen] = useState(false);
     const onImageChanged = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             try {
@@ -39,7 +43,7 @@ const UploadImage = ({ imageUrls, onAdd }: UploadImageProps) => {
         <div>
             <Label>Images</Label>
             <div className='grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-2'>
-                {imageUrls?.map((url, index) => <ImageElement onAdd={() => onAdd(url)} onDelete={() => onDeleteImage(index)} width={128} height={128} className='h-32 w-32' key={url} imageUrl={url} />)}
+                {imageUrls?.map((url, index) => <ImageElement onAdd={() => setImgUrl(url)} onDelete={() => onDeleteImage(index)} width={128} height={128} className='h-32 w-32' key={url} imageUrl={url} />)}
                 <Label htmlFor='uploadImage' className='flex justify-center items-center w-32 h-32 border-2 border-dashed'>
                     <Input id='uploadImage' className='hidden' type="file" accept='image/*' onChange={(e) => onImageChanged(e)} />
                     Upload image
@@ -47,11 +51,12 @@ const UploadImage = ({ imageUrls, onAdd }: UploadImageProps) => {
             </div>
             <Confirm
                 open={showConfirm}
+                onContinue={() => console.log("continue")}
                 onCancel={() => setShowConfirm(false)}
                 title='Delete image'
                 description='You must delete the image from the content before deleting it from the list'
             />
-        </div >// 
+        </div >
     )
 }
 

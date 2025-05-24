@@ -9,8 +9,6 @@ type Props = {
 }
 const NavLink = ({ children, href, className }: Props) => {
     const pathname = usePathname()
-    console.log(pathname);
-
     const isActive = pathname === href
     return (
         <Link

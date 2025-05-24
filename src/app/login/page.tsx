@@ -1,24 +1,20 @@
 "use client"
 import TitleContent from '@/components/common/TitleContent'
 import AuthForm from '@/components/form/AuthForm'
-import { useToast } from '@/hooks/use-toast'
 import { useAppDispatch } from '@/redux/hooks'
 import { AuthActions } from '@/redux/slice/authSlide'
+import AuthService from '@/services/AuthService'
 import { AuthRequest } from '@/types/request/AuthRequest'
+import { handleMutation } from '@/util/mutation'
 import { useRouter } from 'next/navigation'
 const LoginPage = () => {
     const dispatch = useAppDispatch()
-    const { toast } = useToast()
     const router = useRouter()
     const onSubmit = async (value: AuthRequest) => {
-        try {
-            await dispatch(AuthActions.fetchLogin(value)).unwrap();
+        await handleMutation(() => AuthService.login(value), (res) => {
+            dispatch(AuthActions.set(res.data))
             router.push('/')
-        } catch (error) {
-            const err = error as ApiResponse<object>;
-            console.log(error);
-            toast({ variant: 'destructive', title: 'Login failed', description: err.message })
-        }
+        }, undefined, { success: 'Login success', error: 'Login failed' })
     };
     return (
         <div className='w-full mx-auto flex flex-col items-center'>

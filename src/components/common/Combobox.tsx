@@ -5,27 +5,24 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover"
+import { Option } from "@/types/Option"
 
-export type ComboboxOption = {
-    value: string
-    label: string
-}
 
 type Props = {
-    array: ComboboxOption[]
+    options: Option[]
     value?: string | number
     canAdd?: boolean,
     onSelectChange: (value: string | number | undefined) => void
     onInputChange?: (value: string) => void
 }
 
-export function Combobox({ array, value, canAdd, onSelectChange, onInputChange }: Props) {
+export function Combobox({ options, value, canAdd, onSelectChange, onInputChange }: Props) {
     const [open, setOpen] = React.useState(false)
     const [input, setInput] = React.useState("")
 
     const lowerInput = input.trim().toLowerCase()
 
-    const normalizedArray = array.map(opt => ({
+    const normalizedArray = options.map(opt => ({
         ...opt,
         value: opt.value.toLowerCase()
     }))
@@ -57,7 +54,7 @@ export function Combobox({ array, value, canAdd, onSelectChange, onInputChange }
                     className="w-full justify-between"
                 >
                     {value
-                        ? array.find((item) => item.value === value)?.label ?? value
+                        ? options.find((option) => option.value === value)?.label ?? value
                         : "Chọn hoặc nhập tag..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>

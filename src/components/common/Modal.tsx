@@ -13,7 +13,7 @@ import React from 'react'
 type Props = {
     children: React.ReactNode
     open: boolean
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>
+    setOpen?: React.Dispatch<React.SetStateAction<boolean>>
     onCancel?: () => void
     onConfirm?: () => void
     className?: string

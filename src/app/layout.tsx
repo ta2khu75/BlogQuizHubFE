@@ -33,7 +33,7 @@ export default function RootLayout({
         <StoreProvider>
           <Toaster />
           <Header />
-          <main className="max-w-5xl   w-full mx-auto px-4">
+          <main className="max-w-5xl w-full mx-auto px-4">
             {children}
           </main>
         </StoreProvider>

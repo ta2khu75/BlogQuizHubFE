@@ -14,6 +14,7 @@ import ColorPlugin from '@/components/common/RichTextEditor/plugin/ColorPlugin'
 import ListPlugin from '@/components/common/RichTextEditor/plugin/ListPlugin'
 import { $isListNode, ListNode } from "@lexical/list"
 import { getSelected } from '@/components/common/RichTextEditor/plugin/Util'
+import ImagePlugin from '@/components/common/RichTextEditor/plugin/ImagePlugin'
 const ToolbarPlugin = () => {
     const [editor] = useLexicalComposerContext()
     const [blockType, setBlockType] = useState("paragraph")
@@ -53,13 +54,13 @@ const ToolbarPlugin = () => {
             const element = anchorNode.getKey() === "root" ? anchorNode : anchorNode.getTopLevelElementOrThrow();
             const elementKey = element.getKey();
             const elementDOM = editor.getElementByKey(elementKey);
+            setBlockType("paragraph")
             if (!elementDOM) return
             if ($isListNode(element)) {
                 const parentList = $getNearestNodeOfType(anchorNode, ListNode);
                 const type = parentList ? parentList.getTag() : element.getTag()
                 setBlockType(type);
             }
-
         }
     }
     const updateHeading = (heading: HeadingTagType) => {
@@ -180,7 +181,8 @@ const ToolbarPlugin = () => {
             </div>
             <div className='flex gap-1'>
                 <ColorPlugin />
-                <ListPlugin blockType={blockType} setBlockType={setBlockType} />
+                <ImagePlugin />
+                <ListPlugin blockType={blockType} />
             </div>
         </div>
     )

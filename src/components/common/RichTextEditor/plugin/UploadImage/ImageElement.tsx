@@ -27,6 +27,7 @@ const ImageElement = ({ imageUrl, className, width, height, onAdd, onDelete }: I
             <Button onClick={onDelete} variant={'destructive'} className='rounded-full absolute top-0 w-2 h-2 p-2 right-0'>
                 <X />
             </Button>
+
         </div>
     )
 }

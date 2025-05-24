@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { AccountProfileResponse } from '@/types/response/Account/AccountProfileResponse'
 import React from 'react'
 type Props = {
     profile?: AccountProfileResponse

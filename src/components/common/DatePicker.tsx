@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import { format, getMonth, getYear, setMonth, setYear } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
@@ -13,7 +11,6 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"
 
 interface DatePickerProps {
     startYear?: number;

@@ -57,10 +57,12 @@ const AccountProfileForm = ({ onSubmit, profile }: Props) => {
                     control={form.control}
                     name="birthday"
                     render={({ field }) => (
-                        <FormItem className="flex flex-col">
+                        <FormItem>
                             <FormLabel>Date of birth</FormLabel>
                             <FormControl>
-                                <DatePicker {...field} />
+                                <div>
+                                    {/* <DatePicker {...field} /> */}
+                                </div>
                             </FormControl>
                             <FormMessage />
                         </FormItem>

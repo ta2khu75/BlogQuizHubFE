@@ -1,7 +1,8 @@
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Option } from "@/types/Option"
 
 type Props = {
-    options: { value: string, label: string }[],
+    options: Option[],
     onChange: (value: string) => void
     placeholder?: string,
     className?: string,

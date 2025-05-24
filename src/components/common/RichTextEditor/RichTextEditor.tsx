@@ -12,6 +12,7 @@ import { EditorThemeClasses } from 'lexical';
 import { ListItemNode, ListNode } from "@lexical/list"
 import { ListPlugin } from "@lexical/react/LexicalListPlugin"
 import CustomOnChangePlugin from '@/components/common/RichTextEditor/plugin/CustomOnChangePlugin';
+import { ImageNode } from '@/components/common/RichTextEditor/plugin/nodes/ImageNode';
 const theme: EditorThemeClasses = {
     heading: {
         h1: "text-6xl",
@@ -47,15 +48,17 @@ const RichTextEditor = ({ name, value, onChange, placeholder }: Props) => {
     const initialConfig = useMemo(() => ({
         namespace: name,
         theme,
-        onError: () => { },
-        nodes: [HeadingNode, CodeHighlightNode, CodeNode, ListNode, ListItemNode]
+        onError: (error) => {
+            console.log(error)
+        },
+        nodes: [HeadingNode, CodeHighlightNode, CodeNode, ListNode, ListItemNode, ImageNode]
     }), [name])
     return (
         <LexicalComposer initialConfig={initialConfig}>
             <ToolbarPlugin />
             <div className='relative'>
                 <RichTextPlugin
-                    contentEditable={<ContentEditable className={"w-full p-2 h-96 border border-gray-400"} />}
+                    contentEditable={<ContentEditable className={"w-full p-2 min-h-96 border border-gray-400"} />}
                     placeholder={<div className='absolute top-2 left-2 text-gray-400'>{placeholder}</div>}
                     ErrorBoundary={LexicalErrorBoundary}
                 />

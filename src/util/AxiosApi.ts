@@ -1,6 +1,8 @@
 import { BasePath } from "@/env/BasePath";
 import { AuthActions } from "@/redux/slice/authSlide";
 import { store } from "@/redux/store";
+import AuthService from "@/services/AuthService";
+import { handleMutation } from "@/util/mutation";
 import axios, { AxiosError, AxiosHeaders, AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import qs from "qs";
 
@@ -44,17 +46,17 @@ const updateAuthHeader = (config: AxiosRequestConfig, token: string) => {
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const refreshTokenAndRetryRequest = async (error: AxiosError<ApiResponse<object>, any>, api: AxiosInstance) => {
-  try {
-    const res = await store.dispatch(AuthActions.fetchRefreshToken()).unwrap();
-    if (error.config) {
-      updateAuthHeader(error.config, res.access_token);
+  await handleMutation(() => AuthService.refreshToken(), (res) => {
+    console.log(res);
+    const response = res.data;
+    if (error.config && response) {
+      updateAuthHeader(error.config, response.access_token);
       return api.request(error.config);
     }
-  } catch (e) {
-    console.log(e);
-    store.dispatch(AuthActions.fetchLogout());
+  }, () => {
+    store.dispatch(AuthActions.reset());
     window.location.href = "/login";
-  }
+  });
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const handleTokenError = (error: AxiosError<ApiResponse<object>, any>, api: AxiosInstance) => {
@@ -75,12 +77,12 @@ const handleTokenError = (error: AxiosError<ApiResponse<object>, any>, api: Axio
           if (description.includes("Jwt expired")) {
             return refreshTokenAndRetryRequest(error, api);
           } else {
-            store.dispatch(AuthActions.fetchLogout());
+            store.dispatch(AuthActions.reset());
           }
           break;
 
         case "missing_token":
-          store.dispatch(AuthActions.fetchLogout());
+          store.dispatch(AuthActions.reset());
           break;
 
         default:
