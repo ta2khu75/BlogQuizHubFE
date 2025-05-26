@@ -4,7 +4,7 @@ import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuL
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useToast } from '@/hooks/use-toast'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
-import { AuthActions } from '@/redux/slice/authSlide'
+import { AuthActions } from '@/redux/slice/authSlice'
 import Link from 'next/link'
 
 

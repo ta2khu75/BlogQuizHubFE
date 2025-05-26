@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { memo, useMemo } from 'react'
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { HeadingNode } from "@lexical/rich-text"
@@ -39,8 +40,8 @@ const theme: EditorThemeClasses = {
     }
 }
 type Props = {
-    value: string,
-    onChange: (value: string) => void
+    value?: any,
+    onChange: (value: any) => void
     placeholder?: string,
     name: string;
 }
@@ -48,7 +49,7 @@ const RichTextEditor = ({ name, value, onChange, placeholder }: Props) => {
     const initialConfig = useMemo(() => ({
         namespace: name,
         theme,
-        onError: (error) => {
+        onError: (error: any) => {
             console.log(error)
         },
         nodes: [HeadingNode, CodeHighlightNode, CodeNode, ListNode, ListItemNode, ImageNode]

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { AccountProfileRequest, accountProfileRequestSchema } from "@/types/request/account/AccountProfileRequest"
+import { AccountProfileResponse } from "@/types/response/Account/AccountProfileResponse"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 import { useEffect } from "react"
@@ -60,9 +61,7 @@ const AccountProfileForm = ({ onSubmit, profile }: Props) => {
                         <FormItem>
                             <FormLabel>Date of birth</FormLabel>
                             <FormControl>
-                                <div>
-                                    {/* <DatePicker {...field} /> */}
-                                </div>
+                                <DatePicker {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

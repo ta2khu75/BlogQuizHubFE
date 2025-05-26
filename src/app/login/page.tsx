@@ -2,7 +2,7 @@
 import TitleContent from '@/components/common/TitleContent'
 import AuthForm from '@/components/form/AuthForm'
 import { useAppDispatch } from '@/redux/hooks'
-import { AuthActions } from '@/redux/slice/authSlide'
+import { AuthActions } from '@/redux/slice/authSlice'
 import AuthService from '@/services/AuthService'
 import { AuthRequest } from '@/types/request/AuthRequest'
 import { handleMutation } from '@/util/mutation'

@@ -1,33 +1,37 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react'
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin"
-import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html"
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $getRoot, $insertNodes } from 'lexical';
 type Props = {
-  value: string;
-  onChange: (value: string) => void
+  value: any;
+  onChange: (value: any) => void
 }
 const CustomOnChangePlugin = ({ value, onChange }: Props) => {
   const [editor] = useLexicalComposerContext();
   const [isFirstRender, setIsFirstRender] = useState(true)
   useEffect(() => {
+    console.log("default value", value);
     if (!value || !isFirstRender) return
     setIsFirstRender(false)
     editor.update(() => {
-      const currentHtml = $generateHtmlFromNodes(editor);
-      if (currentHtml !== value) {
-        $getRoot().clear();
-        const parser = new DOMParser();
-        const dom = parser.parseFromString(value, "text/html")
-        const nodes = $generateNodesFromDOM(editor, dom);
-        $insertNodes(nodes)
+      if (!value) return;
+
+      const isValidState =
+        value &&
+        typeof value === "object" &&
+        value?.root?.type === "root";
+
+      if (!isValidState) return;
+      try {
+        const parsedEditorState = editor.parseEditorState(value);
+        editor.setEditorState(parsedEditorState);
+      } catch (error) {
+        console.error("Failed to parse or set editor state:", error);
       }
     })
   }, [editor, value, isFirstRender])
   return <OnChangePlugin onChange={editorState => {
-    editorState.read(() => {
-      onChange($generateHtmlFromNodes(editor))
-    })
+    onChange(editorState.toJSON())
   }} />
 
 }

@@ -1,71 +1,102 @@
 import Confirm from '@/components/common/Confirm'
-import ImageElement from '@/components/common/TextEditor/UploadImage/ImageElement'
-import ImageForm from '@/components/form/ImageForm'
+import { ImageSize } from '@/components/common/RichTextEditor/plugin/nodes/ImageNode'
+import ImageElement from '@/components/common/RichTextEditor/plugin/UploadImage/ImageElement'
+import TitleContent from '@/components/common/TitleContent'
+import ImageForm, { ImageAttributes } from '@/components/form/ImageForm'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useAppDispatch } from '@/redux/hooks'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { ImageUrlsActions } from '@/redux/slice/imageUrlsSlide'
 import FunctionUtil from '@/util/FunctionUtil'
 import { Label } from '@radix-ui/react-label'
-import React, { useMemo, useState } from 'react'
-type UploadImageProps = {
-    imageUrls: string[]
-    onInsertImage: ({ url, altText, caption, position }: { url: string, altText: string, caption?: string, position?: string }) => void;
+import { ArrowBigLeft } from 'lucide-react'
+import React, { useCallback, useState } from 'react'
+
+type Props = {
+    onInsertImage: (params: {
+        src: string
+        altText?: string
+        caption?: string
+        size?: ImageSize
+    }) => void
+    value?: ImageAttributes
 }
-const UploadImage = ({ imageUrls, onInsertImage }: UploadImageProps) => {
+
+const UploadImage = ({ onInsertImage, value }: Props) => {
+    const imageUrls = useAppSelector((state) => state.imageUrls)
     const dispatch = useAppDispatch()
+
     const [imageUrl, setImageUrl] = useState<string>()
-    const [removeIndex, setRemoveIndex] = React.useState<number>(-1)
-    const [open, setOpen] = React.useState(false)
-    const onImageChanged = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
+    const [removeIndex, setRemoveIndex] = useState(-1)
+
+    const onImageChanged = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files?.[0]) {
             try {
-                const file = e.target.files[0]
-                await dispatch(ImageUrlsActions.fetchCreate(file))
+                await dispatch(ImageUrlsActions.fetchCreate(e.target.files[0]))
             } catch (error) {
-                console.log(error);
+                console.error(error)
             }
         }
-    }
-    const onDelete = async () => {
-        if (removeIndex === -1) return
-        const blogString = localStorage.getItem("blogForm")
+    }, [dispatch])
+
+    const onDelete = useCallback(async () => {
+        const blogString = localStorage.getItem('blogForm')
         if (blogString) {
             const blogForm = JSON.parse(blogString)
-            const imageUrlsUse = FunctionUtil.getImageUrlFromContent(blogForm.content)
-            if (imageUrlsUse.some((imageUrl: string) => imageUrls[removeIndex] === imageUrl)) {
-                setOpen(true)
+            const usedImages = FunctionUtil.getImageUrlFromContent(blogForm.content)
+            const urlToDelete = imageUrls[removeIndex]
+            if (usedImages.includes(urlToDelete)) {
+                setRemoveIndex(-1)
+                return
             }
-        } else {
-            await dispatch(ImageUrlsActions.fetchRemove(removeIndex))
         }
-    }
-    const render = useMemo(() => {
-        if (imageUrl) {
-            return (
-                <ImageForm onSubmit={(value) => onInsertImage({ ...value, url: imageUrl })} />
-            )
-        }
+        dispatch(ImageUrlsActions.fetchRemove(removeIndex))
+    }, [removeIndex, dispatch])
+
+    if (imageUrl) {
         return (
             <div>
-                <Label>Images</Label>
-                <div className='grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-2'>
-                    {imageUrls?.map((url, index) => <ImageElement onAdd={() => setImageUrl(url)} onDelete={() => { setOpen(true); setRemoveIndex(index) }} width={128} height={128} className='h-32 w-32' key={url} imageUrl={url} />)}
-                    <Label htmlFor='uploadImage' className='flex justify-center items-center w-32 h-32 border-2 border-dashed'>
-                        <Input id='uploadImage' className='hidden' type="file" accept='image/*' onChange={(e) => onImageChanged(e)} />
-                        Upload image
-                    </Label>
+                <Button onClick={() => setImageUrl(undefined)} variant="ghost">
+                    <ArrowBigLeft /> Back
+                </Button>
+                <div>
+                    <TitleContent className="text-center">Info image</TitleContent>
+                    <ImageForm value={value} onSubmit={(value) => onInsertImage({ ...value, src: imageUrl })} />
                 </div>
-                <Confirm
-                    open={open}
-                    onCancel={() => setOpen(false)}
-                    onContinue={() => onDelete()}
-                    title='Delete image'
-                    description='You must delete the image from the content before deleting it from the list'
-                />
-            </div >
+            </div>
         )
-    }, [imageUrl])
-    return render;
+    }
+
+    return (
+        <div>
+            <Label>Images</Label>
+            <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-2">
+                {imageUrls.map((url, index) => (
+                    <ImageElement
+                        key={url}
+                        imageUrl={url}
+                        width={128}
+                        height={128}
+                        className="h-32 w-32"
+                        onAdd={() => setImageUrl(url)}
+                        onDelete={() => setRemoveIndex(index)}
+                    />
+                ))}
+                <Label htmlFor="uploadImage" className="flex justify-center items-center w-32 h-32 border-2 border-dashed">
+                    <Input id="uploadImage" className="hidden" type="file" accept="image/*" onChange={onImageChanged} />
+                    Upload image
+                </Label>
+            </div>
+
+            <Confirm
+                open={removeIndex >= 0}
+                onCancel={() => setRemoveIndex(-1)}
+                onContinue={() => onDelete()}
+                title="Delete image"
+                description="You must delete the image from the content before deleting it from the list"
+            />
+        </div>
+    )
 }
 
 export default UploadImage

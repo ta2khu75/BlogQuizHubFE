@@ -1,30 +1,28 @@
 
 import { RootState } from "@/redux/store";
 import FileUtil from "@/util/FileUtil";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 const initialState: string[] = []
 export const imageUrlsSlice = createSlice({
     name: "imagesUrl",
     initialState,
     reducers: {
-        add: (
-            state = initialState,
-            action: PayloadAction<string>
-        ) => {
-            if (!state.includes(action.payload)) state.push(action.payload)
-        },
-        remove: (state, action: PayloadAction<number>) => {
-            state.splice(action.payload, 1)
-        },
         reset: () => {
             return initialState
         },
     },
     extraReducers(builder) {
         builder.addCase(fetchRemove.fulfilled, (state, action) => {
-            imageUrlsSlice.caseReducers.remove(state, action)
+            const index = action.payload;
+            if (index >= 0 && index < state.length) {
+                state.splice(index, 1);
+            }
         }).addCase(fetchCreate.fulfilled, (state, action) => {
-            imageUrlsSlice.caseReducers.add(state, action)
+            const imageUrl = action.payload;
+            console.log("Image URL created:", imageUrl);
+            if (!state.includes(imageUrl)) {
+                state.push(imageUrl);
+            }
         })
     },
 });

@@ -1,5 +1,5 @@
 import { BasePath } from "@/env/BasePath";
-import { AuthActions } from "@/redux/slice/authSlide";
+import { AuthActions } from "@/redux/slice/authSlice";
 import { store } from "@/redux/store";
 import AuthService from "@/services/AuthService";
 import { handleMutation } from "@/util/mutation";
