@@ -9,6 +9,8 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary"
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin"
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin"
 import ToolbarPlugin from '@/components/common/RichTextEditor/plugin/ToolbarPlugin';
+import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
+import { LinkNode } from '@lexical/link';
 import { EditorThemeClasses } from 'lexical';
 import { ListItemNode, ListNode } from "@lexical/list"
 import { ListPlugin } from "@lexical/react/LexicalListPlugin"
@@ -28,6 +30,7 @@ const theme: EditorThemeClasses = {
         ul: "list-disc",
         ol: "list-decimal",
     },
+    link: "font-medium text-blue-600 dark:text-blue-500 cursor-pointer hover:underline",
     text: {
         bold: "font-bold",
         italic: "italic",
@@ -41,18 +44,18 @@ const theme: EditorThemeClasses = {
 }
 type Props = {
     value?: any,
-    onChange: (value: any) => void
+    onChangeValue: (value: any) => void
     placeholder?: string,
     name: string;
 }
-const RichTextEditor = ({ name, value, onChange, placeholder }: Props) => {
+const RichTextEditor = ({ name, value, onChangeValue, placeholder }: Props) => {
     const initialConfig = useMemo(() => ({
         namespace: name,
         theme,
         onError: (error: any) => {
             console.log(error)
         },
-        nodes: [HeadingNode, CodeHighlightNode, CodeNode, ListNode, ListItemNode, ImageNode]
+        nodes: [HeadingNode, CodeHighlightNode, CodeNode, ListNode, ListItemNode, ImageNode, LinkNode]
     }), [name])
     return (
         <LexicalComposer initialConfig={initialConfig}>
@@ -64,10 +67,11 @@ const RichTextEditor = ({ name, value, onChange, placeholder }: Props) => {
                     ErrorBoundary={LexicalErrorBoundary}
                 />
             </div>
-            <CustomOnChangePlugin value={value} onChange={onChange} />
+            <CustomOnChangePlugin value={value} onChangeValue={onChangeValue} />
             <AutoFocusPlugin />
             <HistoryPlugin />
             <ListPlugin />
+            <LinkPlugin />
         </LexicalComposer>
     )
 }

@@ -2,17 +2,12 @@ import { AccessModifier } from "@/types/AccessModifier";
 import { z } from "zod";
 
 export interface BlogRequest extends BlogBase {
-    content: object;
+    content: string;
     quiz_ids?: string[];
 }
 export const blogRequestSchema = z.object({
     title: z.string().min(3),
-    content: z
-        .object({})
-        .passthrough()
-        .refine(obj => Object.keys(obj).length > 0, {
-            message: "Content JSON must not be empty",
-        }),
+    content: z.string(),
     tags: z.array(z.object({
         id: z.number().int().positive(),
         name: z.string().min(3, {

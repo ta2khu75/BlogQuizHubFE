@@ -6,8 +6,9 @@ import { $getSelection, $isRangeSelection, CAN_REDO_COMMAND, CAN_UNDO_COMMAND, F
 import { useEffect, useState } from 'react'
 import { mergeRegister, $getNearestNodeOfType } from "@lexical/utils"
 import { Button } from '@/components/ui/button'
+import { $isLinkNode } from '@lexical/link';
 import SelectElement from '@/components/common/SelectElement'
-import { HeadingTagType, $createHeadingNode, HeadingNode } from "@lexical/rich-text"
+import { HeadingTagType, $createHeadingNode, HeadingNode, $isHeadingNode } from "@lexical/rich-text"
 import { $setBlocksType } from "@lexical/selection"
 import useKeyBindings from '@/components/common/RichTextEditor/plugin/useKeyBindings'
 import ColorPlugin from '@/components/common/RichTextEditor/plugin/ColorPlugin'
@@ -15,6 +16,7 @@ import ListPlugin from '@/components/common/RichTextEditor/plugin/ListPlugin'
 import { $isListNode, ListNode } from "@lexical/list"
 import { getSelected } from '@/components/common/RichTextEditor/plugin/Util'
 import ImagePlugin from '@/components/common/RichTextEditor/plugin/ImagePlugin'
+import LinkPlugin from '@/components/common/RichTextEditor/plugin/LinkPlugin'
 const ToolbarPlugin = () => {
     const [editor] = useLexicalComposerContext()
     const [blockType, setBlockType] = useState("paragraph")
@@ -22,6 +24,7 @@ const ToolbarPlugin = () => {
         [RichTextAction.Undo]: true,
         [RichTextAction.Redo]: true
     })
+    const [isLink, setIsLink] = useState(false)
     const [selectedHeading, setSelectedHeading] = useState<string>()
     const [selectionRecord, setSelectionRecord] = useState<Partial<Record<RichTextAction, boolean>>>({
     })
@@ -29,16 +32,36 @@ const ToolbarPlugin = () => {
         const selection = $getSelection();
         if ($isRangeSelection(selection)) {
             const anchorNode = selection.anchor.getNode();
-
-            // Tìm node heading gần nhất
-            const headingNode = anchorNode.getParent();
-
-            if (headingNode instanceof HeadingNode) {
-                const tag = headingNode.getTag(); // Trả về 'h1', 'h2', ...
-                setSelectedHeading(tag as string); // <- bạn cần một state để lưu heading hiện tại
-            } else {
-                setSelectedHeading(undefined); // Không phải heading
+            let headingParent = anchorNode;
+            while (headingParent !== null && !$isHeadingNode(headingParent)) {
+                headingParent = headingParent.getParent();
             }
+            if ($isHeadingNode(headingParent)) {
+                setSelectedHeading(headingParent.getTag());
+            } else {
+                setSelectedHeading(undefined);
+            }
+
+            // Tìm LinkNode gần nhất
+            let linkParent = anchorNode;
+            while (linkParent !== null && !$isLinkNode(linkParent)) {
+                linkParent = linkParent.getParent();
+            }
+            setIsLink($isLinkNode(linkParent));
+            // Tìm node heading gần nhất
+            // const parent = anchorNode.getParent();
+
+            // if (parent instanceof HeadingNode) {
+            //     const tag = parent.getTag(); // Trả về 'h1', 'h2', ...
+            //     setSelectedHeading(tag as string); // <- bạn cần một state để lưu heading hiện tại
+            // } else {
+            //     setSelectedHeading(undefined); // Không phải heading
+            // }
+            // if ($isLinkNode(parent)) {
+            //     setIsLink(true);
+            // } else {
+            //     setIsLink(false);
+            // }
             const newSelectionRecord = {
                 [RichTextAction.Bold]: selection.hasFormat("bold"),
                 [RichTextAction.Italic]: selection.hasFormat("italic"),
@@ -183,6 +206,7 @@ const ToolbarPlugin = () => {
                 <ColorPlugin />
                 <ImagePlugin />
                 <ListPlugin blockType={blockType} />
+                <LinkPlugin isLink={isLink} />
             </div>
         </div>
     )
