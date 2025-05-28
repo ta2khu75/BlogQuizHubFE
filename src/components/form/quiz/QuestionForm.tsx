@@ -31,7 +31,7 @@ const QuestionForm = ({ name }: Props) => {
                         <FormControl>
                             <RadioGroup
                                 onValueChange={field.onChange}
-                                defaultValue={field.value}
+                                value={field.value}
                                 className="flex space-y-1"
                             >
                                 {Object.values(QuestionType).map((item, index) => (

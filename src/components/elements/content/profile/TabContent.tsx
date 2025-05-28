@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import clsx from 'clsx';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { AccountProfileResponse } from '@/types/response/Account/AccountProfileResponse';
 type Props = {
     profile?: AccountProfileResponse
 }

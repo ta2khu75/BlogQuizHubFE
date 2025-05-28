@@ -6,11 +6,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { useToast } from '@/hooks/use-toast'
 import QuizCategoryService from '@/services/QuizCategoryService'
 import QuizService from '@/services/QuizService'
 import { QuizLevel } from '@/types/QuizLevel'
-import FunctionUtil from '@/util/FunctionUtil'
+import { QuizResponse } from '@/types/response/QuizResponse'
+import { handleMutation } from '@/util/mutation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React, { useCallback, useEffect, useMemo } from 'react'
@@ -30,7 +30,6 @@ type Props = {
 }
 const QuizFilter = ({ setQuizPage }: Props) => {
     const [quizCategories, setQuizCategories] = React.useState<QuizCategoryResponse[]>([])
-    const { toast } = useToast()
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -83,22 +82,21 @@ const QuizFilter = ({ setQuizPage }: Props) => {
         [searchParams]
     )
     const fetchSearch = () => {
-        QuizService.search({ ...searchValues, authorId: searchValues.id }).then((res) => {
-            if (res.success) {
-                setQuizPage(res.data)
-            } else {
-                toast({ title: "Search failed", description: res.message_error, variant: "destructive" })
-            }
+        handleMutation(() => QuizService.search({ ...searchValues, author_id: searchValues.id }), (res) => {
+            setQuizPage(res.data)
+        }, undefined, {
+            error: "Search failed",
+            success: "Search success"
         })
     }
     const fetchReadAllQuizCategory = () => {
-        QuizCategoryService.readAll().then(res => {
-            if (res.success) {
-                setQuizCategories(res.data)
-            } else {
-                toast({ variant: "destructive", description: res.message_error })
-            }
-        }).catch(err => toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
+        if (quizCategories.length > 0) return; // Avoid fetching if already fetched
+        handleMutation(() => QuizCategoryService.readAll(), (res) => {
+            setQuizCategories(res.data)
+        }, undefined, {
+            error: "Fetch categories failed",
+            success: "Fetch categories success"
+        })
     }
     const onFilter = (data: QuizSearch) => {
         router.push(`${pathname}?${createQueryString(data)}`)

@@ -8,7 +8,7 @@ import { mergeRegister, $getNearestNodeOfType } from "@lexical/utils"
 import { Button } from '@/components/ui/button'
 import { $isLinkNode } from '@lexical/link';
 import SelectElement from '@/components/common/SelectElement'
-import { HeadingTagType, $createHeadingNode, HeadingNode, $isHeadingNode } from "@lexical/rich-text"
+import { HeadingTagType, $createHeadingNode, HeadingNode } from "@lexical/rich-text"
 import { $setBlocksType } from "@lexical/selection"
 import useKeyBindings from '@/components/common/RichTextEditor/plugin/useKeyBindings'
 import ColorPlugin from '@/components/common/RichTextEditor/plugin/ColorPlugin'
@@ -32,36 +32,17 @@ const ToolbarPlugin = () => {
         const selection = $getSelection();
         if ($isRangeSelection(selection)) {
             const anchorNode = selection.anchor.getNode();
-            let headingParent = anchorNode;
-            while (headingParent !== null && !$isHeadingNode(headingParent)) {
-                headingParent = headingParent.getParent();
-            }
-            if ($isHeadingNode(headingParent)) {
-                setSelectedHeading(headingParent.getTag());
-            } else {
-                setSelectedHeading(undefined);
-            }
-
-            // Tìm LinkNode gần nhất
-            let linkParent = anchorNode;
-            while (linkParent !== null && !$isLinkNode(linkParent)) {
-                linkParent = linkParent.getParent();
-            }
-            setIsLink($isLinkNode(linkParent));
             // Tìm node heading gần nhất
-            // const parent = anchorNode.getParent();
+            const parent = anchorNode.getParent();
 
-            // if (parent instanceof HeadingNode) {
-            //     const tag = parent.getTag(); // Trả về 'h1', 'h2', ...
-            //     setSelectedHeading(tag as string); // <- bạn cần một state để lưu heading hiện tại
-            // } else {
-            //     setSelectedHeading(undefined); // Không phải heading
-            // }
-            // if ($isLinkNode(parent)) {
-            //     setIsLink(true);
-            // } else {
-            //     setIsLink(false);
-            // }
+            if (parent instanceof HeadingNode) {
+                const tag = parent.getTag(); // Trả về 'h1', 'h2', ...
+                setSelectedHeading(tag as string); // <- bạn cần một state để lưu heading hiện tại
+            } else {
+                setSelectedHeading(undefined); // Không phải heading
+            }
+            setIsLink($isLinkNode(parent));
+
             const newSelectionRecord = {
                 [RichTextAction.Bold]: selection.hasFormat("bold"),
                 [RichTextAction.Italic]: selection.hasFormat("italic"),

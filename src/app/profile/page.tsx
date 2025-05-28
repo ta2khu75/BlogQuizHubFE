@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from '@/hooks/use-toast';
 import useIsOwner from '@/hooks/useIsOwn';
 import AccountService from '@/services/AccountService';
+import { AccountProfileResponse } from '@/types/response/Account/AccountProfileResponse';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 const ProfilePage = () => {

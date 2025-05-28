@@ -3,6 +3,7 @@ import QuizForm from '@/components/form/QuizForm'
 import { useToast } from '@/hooks/use-toast'
 import QuizCategoryService from '@/services/QuizCategoryService'
 import QuizService from '@/services/QuizService'
+import { QuizResponse } from '@/types/response/QuizResponse'
 import FunctionUtil from '@/util/FunctionUtil'
 import { use, useEffect, useState } from 'react'
 

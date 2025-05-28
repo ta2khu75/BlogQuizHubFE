@@ -92,7 +92,7 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
             return QuizService.readAllByKeyword(debounceQuiz)
         }, (res) => {
             const quizzes = res.data.map((quiz) => ({
-                value: quiz.info.id,
+                value: quiz.id,
                 label: quiz.title,
             }))
             setQuizzes(quizzes)

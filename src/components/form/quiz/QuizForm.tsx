@@ -13,9 +13,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import QuestionList from '@/components/form/quiz/QuestionList'
+import QuizFormSync from '@/components/form/quiz/QuizFormSync'
 type Props = {
     quiz?: QuizResponse,
-    onSubmit: (quiz: QuizRequest) => void,
+    onSubmit: (quiz: QuizRequest, image?: File) => void,
     quizCategories: QuizCategoryResponse[]
 }
 const QuizForm = ({ quiz, onSubmit, quizCategories }: Props) => {
@@ -37,6 +38,8 @@ const QuizForm = ({ quiz, onSubmit, quizCategories }: Props) => {
         resolver: zodResolver(quizSchema),
         defaultValues: defaultQuiz,
     })
+    console.log("error", form.formState.errors);
+
     const [openInfo, setOpenInfo] = useState(false)
     useEffect(() => {
         if (quiz) form.reset({ ...quiz, category_id: quiz.category.id })
@@ -53,10 +56,11 @@ const QuizForm = ({ quiz, onSubmit, quizCategories }: Props) => {
     return (
         <Form {...form}>
             <FormProvider {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className='w-full flex flex-col gap-4'>
+                <form className='w-full flex flex-col gap-4'>
+                    <QuizFormSync />
                     <Button type='button' variant={"info"} onClick={() => setOpenInfo(true)}>Basic information</Button>
                     <Modal title='Basic information' open={openInfo} setOpen={setOpenInfo} >
-                        <QuizBasicInfo onReset={onResetBaseInfo} quizCategories={quizCategories} />
+                        <QuizBasicInfo onSubmit={onSubmit} onReset={onResetBaseInfo} quizCategories={quizCategories} />
                     </Modal>
                     <QuestionList quiz={quiz} defaultQuiz={defaultQuiz} />
                 </form>

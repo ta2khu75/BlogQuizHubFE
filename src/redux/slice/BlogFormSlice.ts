@@ -1,4 +1,3 @@
-// store/blogFormSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { BlogRequest } from '@/types/request/BlogRequest'
 

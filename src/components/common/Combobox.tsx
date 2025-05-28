@@ -12,11 +12,12 @@ type Props = {
     options: Option[]
     value?: string | number
     canAdd?: boolean,
+    placeholder?: string
     onSelectChange: (value: string | number | undefined) => void
     onInputChange?: (value: string) => void
 }
 
-export function Combobox({ options, value, canAdd, onSelectChange, onInputChange }: Props) {
+export function Combobox({ options, value, canAdd, onSelectChange, onInputChange, placeholder }: Props) {
     const [open, setOpen] = React.useState(false)
     const [input, setInput] = React.useState("")
 
@@ -55,14 +56,15 @@ export function Combobox({ options, value, canAdd, onSelectChange, onInputChange
                 >
                     {value
                         ? options.find((option) => option.value === value)?.label ?? value
-                        : "Chọn hoặc nhập tag..."}
+                        : `Chọn hoặc nhập ${placeholder ??
+                        ""}`}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
             <PopoverContent forceMount className="p-0">
                 <Command>
                     <CommandInput
-                        placeholder="Nhập tag..."
+                        placeholder={`Nhập ${placeholder ?? ""}`}
                         value={input}
                         onKeyDown={handleKeyDown}
                         onValueChange={value => {
