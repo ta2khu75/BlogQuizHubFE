@@ -1,3 +1,4 @@
-interface BlogTagResponse{
+interface BlogTagResponse {
     name: string
+    id: number
 }

@@ -1,20 +1,18 @@
 "use client"
 import TitleContent from '@/components/common/TitleContent'
 import AuthForm from '@/components/form/AuthForm'
-import { useAppDispatch } from '@/redux/hooks'
-import { AuthActions } from '@/redux/slice/authSlice'
-import AuthService from '@/services/AuthService'
+import { useLoginMutation } from '@/redux/api/authApi'
 import { AuthRequest } from '@/types/request/AuthRequest'
 import { handleMutation } from '@/util/mutation'
 import { useRouter } from 'next/navigation'
 const LoginPage = () => {
-    const dispatch = useAppDispatch()
+    const [login, { isLoading }] = useLoginMutation()
     const router = useRouter()
     const onSubmit = async (value: AuthRequest) => {
-        await handleMutation(() => AuthService.login(value), (res) => {
-            dispatch(AuthActions.set(res.data))
-            router.push('/')
-        }, undefined, { success: 'Login success', error: 'Login failed' })
+        if (isLoading) return; // Prevent multiple submissions
+        await handleMutation(() => login(value).unwrap(), () => {
+            router.push('/');
+        }, undefined, { success: "Login successful", error: "Login failed" })
     };
     return (
         <div className='w-full mx-auto flex flex-col items-center'>

@@ -37,9 +37,13 @@ const AccountPage = () => {
         <>
             <div className="flex justify-between">
                 <TitleContent>Accounts Manager</TitleContent>
-                <AccountCreate setAccountPage={setAccountPage} roles={roles} />
+                <AccountCreate roles={roles} />
             </div>
-            {account && <AccountStatusUpdate account={account} open={openEdit} setOpen={setOpenEdit} setAccountPage={setAccountPage} roles={roles} />}
+            {account && <AccountStatusUpdate account={account} open={openEdit} setOpen={(value) => {
+                if (!value) {
+                    setAccount(undefined)
+                }
+            }} roles={roles} />}
             <div className="flex">
                 <AccountFilter setAccountPage={setAccountPage} roles={roles} />
                 <div>

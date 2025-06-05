@@ -1,6 +1,6 @@
 import ButtonSubmit from "@/components/common/ButtonSubmit";
 import { IMAGE_SIZES, ImageSize } from "@/components/common/RichTextEditor/plugin/nodes/ImageNode";
-import SelectElement from "@/components/common/SelectElement";
+import SelectElement from "@/components/common/Selection";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useEffect } from "react";

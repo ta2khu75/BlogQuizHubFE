@@ -2,12 +2,11 @@ import ButtonSubmit from '@/components/common/ButtonSubmit'
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import AccountService from '@/services/AccountService'
+import { accountHooks } from '@/redux/api/accountApi'
 import { AccountResponse } from '@/types/response/Account/AccountResponse'
-import { handleMutation } from '@/util/mutation'
 import ParseHelper from '@/util/ParseHelper'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import React, { useCallback, useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 type Props = {
     roles: RoleResponse[],
@@ -19,6 +18,16 @@ const AccountFilter = ({ roles, setAccountPage }: Props) => {
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const form = useForm<AccountSearch>()
+    const searchValues: AccountSearch = useMemo(() => ({
+        keyword: ParseHelper.parseString(searchParams.get("keyword")),
+        role_id: ParseHelper.parseNumber(searchParams.get("role_id")),
+        enabled: ParseHelper.parseBoolean(searchParams.get("enabled")),
+        non_locked: ParseHelper.parseBoolean(searchParams.get("non_locked")),
+        createdFrom: ParseHelper.parseDate(searchParams.get("createdFrom")),
+        createdTo: ParseHelper.parseDate(searchParams.get("createdTo")),
+        page: Number(searchParams.get("page")),
+    }), [searchParams])
+    const { data } = accountHooks.useSearchQuery(searchValues);
     const onSubmit = (data: AccountSearch) => {
         router.push(`${pathname}?${createQueryString(data)}`)
     }
@@ -40,24 +49,12 @@ const AccountFilter = ({ roles, setAccountPage }: Props) => {
         })
         return params.toString()
     }
-    const searchValues: AccountSearch = useMemo(() => ({
-        keyword: ParseHelper.parseString(searchParams.get("keyword")),
-        role_id: ParseHelper.parseNumber(searchParams.get("role_id")),
-        enabled: ParseHelper.parseBoolean(searchParams.get("enabled")),
-        non_locked: ParseHelper.parseBoolean(searchParams.get("non_locked")),
-        createdFrom: ParseHelper.parseDate(searchParams.get("createdFrom")),
-        createdTo: ParseHelper.parseDate(searchParams.get("createdTo")),
-        page: Number(searchParams.get("page")),
-    }), [searchParams])
-    const fetchAccountFilter = useCallback((searchValues: AccountSearch) => {
-        handleMutation<PageResponse<AccountResponse>>(() => AccountService.search(searchValues), res => {
-            setAccountPage(res.data)
-        })
-    }, []);
     useEffect(() => {
         form.reset(searchValues)
-        fetchAccountFilter(searchValues)
-    }, [searchValues, fetchAccountFilter, form])
+        if (data) {
+            setAccountPage(data.data)
+        }
+    }, [searchValues, data, form])
     const onReset = () => {
         router.push(`${pathname}`)
     }

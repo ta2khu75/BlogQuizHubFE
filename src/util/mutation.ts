@@ -1,11 +1,9 @@
-// src/utils/mutation.ts
-
 import { toast } from "@/hooks/use-toast";
 
 export const handleMutation = async<R>(
     serviceFn: () => Promise<ApiResponse<R>>,
     onSuccess: (data: ApiResponse<R>) => void,
-    onError?: (error: ApiResponse<object>) => void,
+    onError?: (error: ApiResponse<void>) => void,
     messages?: {
         success?: string;
         error?: string;
@@ -17,11 +15,20 @@ export const handleMutation = async<R>(
             toast({ variant: 'success', title: messages.success });
         }
         onSuccess(response);
-    } catch (error) {
-        const err = error as ApiResponse<object>;
-        if (messages?.error) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+        const err = (error as { data?: ApiResponse<void> })?.data;
+        if (messages?.error && err) {
             toast({ title: messages.error, description: err.message, variant: 'error' });
         }
-        onError?.(err);
+        if (err) onError?.(err);
+        else {
+            // Optional: fallback in case error has no `data`
+            onError?.({
+                status: 500,
+                message: "Unknown error",
+                data: undefined
+            });
+        }
     }
 };

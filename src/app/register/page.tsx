@@ -1,22 +1,18 @@
 "use client"
 import TitleContent from '@/components/common/TitleContent'
 import AccountForm from '@/components/form/AccountForm'
-import { useToast } from '@/hooks/use-toast'
-import AuthService from '@/services/AuthService'
+import { useRegisterMutation } from '@/redux/api/authApi'
 import { AccountRequest } from '@/types/request/account/AccountRequest'
+import { handleMutation } from '@/util/mutation'
 import { useRouter } from 'next/navigation'
 const RegisterPage = () => {
-    const { toast } = useToast()
+    const [register, { isLoading }] = useRegisterMutation()
     const router = useRouter()
     const onRegister = async (value: AccountRequest) => {
-        try {
-            await AuthService.register(value);
+        if (isLoading) return; // Prevent multiple submissions
+        await handleMutation(() => register(value).unwrap(), () => {
             router.push('/login')
-            toast({ title: "Register successful" })
-        } catch (err) {
-            const error = err as ApiResponse<object>;
-            toast({ title: "Register failed", description: error.message, variant: "destructive" })
-        }
+        }, undefined, { success: "Register successful", error: "Register failed" });
     }
     return (
         <div className='w-full mx-auto flex flex-col items-center'>

@@ -15,7 +15,7 @@ const BlogCreatePage = () => {
     const dispatch = useAppDispatch()
     const onSubmit = async (data: BlogRequest) => {
         await fetchCreate(data)
-        await removeUnsetImage(data)
+        // await removeUnsetImage(data)
     }
     const removeUnsetImage = async (data: BlogRequest) => {
         const imageUrlsUse = FunctionUtil.getImageUrlFromContent(data.content)

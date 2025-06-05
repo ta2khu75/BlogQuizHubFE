@@ -1,12 +1,12 @@
 "use client"
 import ButtonSubmit from "@/components/common/ButtonSubmit"
+import Selection from "@/components/common/Selection"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { cn } from "@/lib/utils"
 import { AccountStatusRequest, accountStatusRequestSchema } from "@/types/request/account/AccountStatusRequest"
 import { AccountResponse } from "@/types/response/Account/AccountResponse"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 
 type Props = {
@@ -18,10 +18,16 @@ const AccountStatusForm = ({ account, onSubmit, roles }: Props) => {
     const defaultValues: AccountStatusRequest = { enabled: false, non_locked: false, role_id: 0 }
     const form = useForm<AccountStatusRequest>({
         resolver: zodResolver(accountStatusRequestSchema),
-        defaultValues: { ...account.status }
+        defaultValues: defaultValues
     })
+    const load = () => {
+        form.reset({ ...account.status, role_id: account.status.role.id })
+    }
+    useEffect(() => {
+        if (account) load();
+    }, [account])
     const onReset = () => {
-        if (account) form.reset({ ...account.status, role_id: account.status.role.id })
+        if (account) load()
         else
             form.reset(defaultValues)
     }
@@ -59,7 +65,7 @@ const AccountStatusForm = ({ account, onSubmit, roles }: Props) => {
                         <FormItem>
                             <FormLabel>Non locked</FormLabel>
                             <FormControl>
-                                <RadioGroup defaultValue={field.value ? "true" : "false"} onValueChange={(value) => field.onChange("true" === value)}>
+                                <RadioGroup value={field.value ? "true" : "false"} onValueChange={(value) => field.onChange("true" === value)}>
                                     <FormItem className="flex items-center space-x-3 space-y-0">
                                         <FormControl>
                                             <RadioGroupItem value="true" />
@@ -85,17 +91,7 @@ const AccountStatusForm = ({ account, onSubmit, roles }: Props) => {
                 <FormField control={form.control} name='role_id' render={({ field }) => (
                     <FormItem>
                         <FormLabel>Role</FormLabel>
-                        <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={`${field.value}`}>
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a role for account" />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                {roles.map(role => <SelectItem className={cn("hover:bg-slate-100", field.value === role.id ? "bg-slate-200" : "")} key={role.id} value={`${role.id}`}>{role.name}</SelectItem>)}
-                            </SelectContent>
-                            <FormMessage />
-                        </Select>
+                        <Selection options={roles.map(role => ({ label: role.name, value: role.id }))} onChange={(value) => field.onChange(value)} value={field.value} placeholder="Select a role for account" className="w-full" />
                     </FormItem>
                 )} />
                 <ButtonSubmit onReset={onReset} isSubmitting={form.formState.isSubmitting} />

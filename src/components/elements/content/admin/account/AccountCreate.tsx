@@ -1,25 +1,22 @@
 import Modal from '@/components/common/Modal'
 import AccountForm from '@/components/form/AccountForm'
 import { Button } from '@/components/ui/button'
-import AccountService from '@/services/AccountService'
+import { accountHooks } from '@/redux/api/accountApi'
 import { AccountRequest } from '@/types/request/account/AccountRequest'
 import { AccountResponse } from '@/types/response/Account/AccountResponse'
 import { handleMutation } from '@/util/mutation'
-import StateHelpers from '@/util/StateHelpers'
-import React, { Dispatch, SetStateAction, useState } from 'react'
+import { useState } from 'react'
 type Props = {
-    setAccountPage: Dispatch<SetStateAction<PageResponse<AccountResponse> | undefined>>,
     roles: RoleResponse[]
 }
-const AccountCreate = ({ setAccountPage, roles }: Props) => {
+const AccountCreate = ({ roles }: Props) => {
     const [open, setOpen] = useState(false)
-    const onSubmit = (value: AccountRequest) => {
-        handleMutation<AccountResponse>(
-            () => AccountService.create(value),
-            (response) => {
-                setOpen(false)
-                StateHelpers.prependStatePage(setAccountPage, response.data)
-            },
+    const [createAccount, { isLoading }] = accountHooks.useCreateMutation()
+    const onSubmit = async (value: AccountRequest) => {
+        if (isLoading) return; // Prevent multiple submissions
+        await handleMutation<AccountResponse>(
+            () => createAccount(value).unwrap(),
+            () => setOpen(false),
             undefined,
             { success: 'Create success', error: 'Create failed' })
     }

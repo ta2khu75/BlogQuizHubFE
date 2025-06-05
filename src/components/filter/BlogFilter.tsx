@@ -3,9 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { useToast } from '@/hooks/use-toast'
 import { BlogService } from '@/services/BlogService'
 import { BlogTagService } from '@/services/BlogTagService'
+import { BlogResponse } from '@/types/response/BlogResponse'
+import { handleMutation } from '@/util/mutation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Label } from '@radix-ui/react-label'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -25,7 +26,6 @@ type Props = {
 // Get a new searchParams string by merging the current
 // searchParams with a provided key/value pair
 const BlogFilter = ({ setBlogPage }: Props) => {
-    const { toast } = useToast()
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -76,20 +76,14 @@ const BlogFilter = ({ setBlogPage }: Props) => {
         fetchSearch()
     }, [searchValues])
     const fetchBlogTagNames = () => {
-        BlogTagService.readAll().then((res) => {
+        handleMutation(() => BlogTagService.readAll(), res => {
             setBlogTagNamesList(res.data.map((tag) => tag.name))
-        }).catch((err) => {
-            console.log(err)
         })
     }
     const fetchSearch = () => {
-        BlogService.search(searchValues).then((res) => {
-            if (res.success) {
-                setBlogPage(res.data)
-            } else {
-                toast({ title: "Search failed", description: res.message_error, variant: "destructive" })
-            }
-        })
+        handleMutation(() => BlogService.search(searchValues), res => {
+            setBlogPage(res.data)
+        });
     }
     const onFilter = (data: BlogSearch) => {
         const queryString = createQueryString(data)

@@ -4,33 +4,37 @@ import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { AccessModifier } from '@/types/AccessModifier'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2, Plus, X } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
-import useDebounce from '@/hooks/useDebounce'
 import { BlogTagService } from '@/services/BlogTagService'
 import QuizService from '@/services/QuizService'
-import { Combobox } from '@/components/common/Combobox'
+// import { Combobox } from '@/components/common/Combobox'
 import { BlogResponse } from '@/types/response/BlogResponse'
 import RichTextEditor from '@/components/common/RichTextEditor/RichTextEditor'
 import { BlogRequest, blogRequestSchema } from '@/types/request/BlogRequest'
 import { Option } from '@/types/Option'
 import { handleMutation } from '@/util/mutation'
 import BlogFormSync from '@/components/form/BlogFormSync'
+import ButtonSubmit from '@/components/common/ButtonSubmit'
+import { useAppDispatch } from '@/redux/hooks'
+import { BlogFormActions } from '@/redux/slice/BlogFormSlice'
+import { Combobox } from '@/components/common/Combobox'
+// import { BlogFormActions } from '@/redux/slice/BlogFormSlice'
 type Props = {
     onSubmit: (data: BlogRequest) => void,
     blog?: BlogResponse
 }
 
 const BlogForm = ({ onSubmit, blog }: Props) => {
-    const [reset, setReset] = useState(false)
+    const dispath = useAppDispatch()
+    // const [reset, setReset] = useState(false)
     const [searchBlogTag, setSearchBlogTag] = useState("")
     const [searchQuiz, setSearchQuiz] = useState("")
-    const [blogTags, setBlogTags] = useState<Option[]>([])
-    const [quizzes, setQuizzes] = useState<Option[]>([])
-    const debounceBlogTag = useDebounce(searchBlogTag, 500)
-    const debounceQuiz = useDebounce(searchQuiz, 500)
-    const blogDefault: BlogRequest = { title: "", content: "", quiz_ids: [], tags: [{ id: 0, name: "" }], access_modifier: AccessModifier.PRIVATE }
+    const [blogTags, setBlogTags] = useState<Option<number>[]>([])
+    const [quizzes, setQuizzes] = useState<Option<string>[]>([])
+    const blogDefault: BlogRequest = { title: "", content: "", quiz_ids: [0], tags: [{ id: 0, name: "" }], access_modifier: AccessModifier.PRIVATE }
+    const [newTags, setNewTags] = useState<Option<number>[]>([])
     // const getBlogForm = () => {
     //     form.getValues()
     //     const blogForm = localStorage.getItem("blogForm")
@@ -71,25 +75,27 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
         name: "quiz_ids",
     });
     const onReset = () => {
-        if (blog) {
-            form.reset({ ...blog, quiz_ids: blog?.quizzes?.map((quiz) => quiz.id), content: JSON.parse(blog.content) });
-            setQuizzes(blog?.quizzes?.map((quiz) => ({ value: quiz.id, label: quiz.title })) ?? [])
-        } else {
-            form.reset(blogDefault)
-            setReset(!reset)
-        }
+        dispath(BlogFormActions.reset())
+        // Reset the form state in the Redux store
+        // if (blog) {
+        //     form.reset({ ...blog, quiz_ids: blog?.quizzes?.map((quiz) => quiz.id), content: JSON.parse(blog.content) });
+        //     setQuizzes(blog?.quizzes?.map((quiz) => ({ value: quiz.id, label: quiz.title })) ?? [])
+        // } else {
+        //     form.reset(blogDefault)
+        //     setReset(!reset)
+        // }
     }
     const fetchBlogTag = async () => {
-        await handleMutation(() => BlogTagService.search(debounceBlogTag), (res) => {
+        await handleMutation(() => BlogTagService.search(searchBlogTag), (res) => {
             setBlogTags(res?.data?.map((tag) => ({
-                value: tag.name,
+                value: tag.id,
                 label: tag.name,
             })) ?? [])
         })
     }
     const fetchQuiz = async () => {
         await handleMutation(() => {
-            return QuizService.readAllByKeyword(debounceQuiz)
+            return QuizService.readAllByKeyword(searchQuiz)
         }, (res) => {
             const quizzes = res.data.map((quiz) => ({
                 value: quiz.id,
@@ -99,15 +105,16 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
         })
     }
     useEffect(() => {
-        if (debounceQuiz.trim().length > 0) {
+        if (searchQuiz.trim().length > 0) {
             fetchQuiz()
         }
-    }, [debounceQuiz])
+    }, [searchQuiz])
     useEffect(() => {
-        if (debounceBlogTag.trim().length > 0) {
+        if (searchBlogTag.trim().length > 0) {
             fetchBlogTag()
         }
-    }, [debounceBlogTag])
+    }, [searchBlogTag])
+
     return (
         <Form {...form}>
             <FormProvider {...form} >
@@ -137,14 +144,14 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                                         <FormItem>
                                             <div className='flex'>
                                                 <FormControl>
-                                                    <Combobox options={quizzes} value={field.value} onSelectChange={(value) => { field.onChange(value); setSearchQuiz("") }} onInputChange={setSearchQuiz} />
+                                                    <Combobox options={quizzes} onInputChange={setSearchQuiz} value={{ value: field.value, label: "" }} isOptionEqual={(a, b) => a.value === b.value} onSelectChange={(value) => field.onChange(value.value)} />
                                                 </FormControl>
                                                 <Button
                                                     type="button"
                                                     variant="destructive"
                                                     size="icon"
                                                     onClick={() => removeQuiz(index)}
-                                                    disabled={tagFields.length === 1} // Không xóa nếu chỉ còn 1 input
+                                                    disabled={quizFields.length === 1} // Không xóa nếu chỉ còn 1 input
                                                 >
                                                     <X />
                                                 </Button>
@@ -172,7 +179,17 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                                         <FormItem>
                                             <div className='flex'>
                                                 <FormControl>
-                                                    <Combobox options={blogTags} value={field.value.id} onSelectChange={(value) => { field.onChange(value); setSearchBlogTag("") }} onInputChange={setSearchBlogTag} />
+                                                    <Combobox isOptionEqual={(a, b) => {
+                                                        return a.label == b.label
+                                                    }} options={[...newTags, ...blogTags]} value={{ label: field.value.name, value: field.value.id }} onInputChange={setSearchBlogTag} onSelectChange={(value) => {
+                                                        console.log("select change ", value);
+                                                        field.onChange({ id: value.value === 0 ? undefined : value.value, name: value.label });
+                                                    }} onCreateOption={(value) => {
+                                                        const newTag = { id: 0, name: value }
+                                                        const newOption: Option<number> = { value: newTag.id, label: newTag.name }
+                                                        setNewTags([...newTags, newOption]);
+                                                        return newOption;
+                                                    }} />
                                                 </FormControl>
                                                 <Button
                                                     type="button"
@@ -231,16 +248,7 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                         </FormItem>
                     )} />
                     <div className="flex justify-between">
-                        <Button type='button' onClick={onReset}>Reset</Button>
-
-                        {form.formState.isSubmitting ?
-                            <Button disabled>
-                                <Loader2 className="animate-spin" />
-                                Please wait
-                            </Button>
-                            :
-                            <Button type='submit'>Submit</Button>
-                        }
+                        <ButtonSubmit isSubmitting={form.formState.isSubmitting} onReset={onReset} />
                     </div>
                 </form>
             </FormProvider>

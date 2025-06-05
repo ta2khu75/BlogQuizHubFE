@@ -1,3 +1,4 @@
+import { apiSlice } from '@/redux/apiSlice';
 import { AuthReducer } from '@/redux/slice/authSlice';
 import { BlogFormReducer } from '@/redux/slice/BlogFormSlice';
 import { ImageUrlsReducer } from '@/redux/slice/imageUrlsSlide';
@@ -10,5 +11,7 @@ export const rootReducer = combineReducers({
   userAnswer: UserAnswerReducer,
   imageUrls: ImageUrlsReducer,
   blogForm: BlogFormReducer,
-  quizForm: QuizFormReducer, // Assuming you meant to use the same reducer for quiz form
+  quizForm: QuizFormReducer,
+  [apiSlice.reducerPath]: apiSlice.reducer
+  // Assuming you meant to use the same reducer for quiz form
 });

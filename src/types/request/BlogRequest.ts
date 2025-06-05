@@ -9,7 +9,7 @@ export const blogRequestSchema = z.object({
     title: z.string().min(3),
     content: z.string(),
     tags: z.array(z.object({
-        id: z.number().int().positive(),
+        id: z.number().int().positive().optional(),
         name: z.string().min(3, {
             message: "Tag name must not be empty"
         }).nonempty()

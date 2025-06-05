@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import { mergeRegister, $getNearestNodeOfType } from "@lexical/utils"
 import { Button } from '@/components/ui/button'
 import { $isLinkNode } from '@lexical/link';
-import SelectElement from '@/components/common/SelectElement'
+import SelectElement from '@/components/common/Selection'
 import { HeadingTagType, $createHeadingNode, HeadingNode } from "@lexical/rich-text"
 import { $setBlocksType } from "@lexical/selection"
 import useKeyBindings from '@/components/common/RichTextEditor/plugin/useKeyBindings'

@@ -12,12 +12,16 @@ export default function Layout({
     children: React.ReactNode;
 }>) {
     return (
-        <SidebarProvider>
-            <Aside />
-            <main className="w-full">
-                <SidebarTrigger />
-                {children}
-            </main>
-        </SidebarProvider>
+        <html lang="en">
+            <body>
+                <SidebarProvider>
+                    <Aside />
+                    <main className="w-full">
+                        <SidebarTrigger />
+                        {children}
+                    </main>
+                </SidebarProvider>
+            </body>
+        </html>
     );
 }

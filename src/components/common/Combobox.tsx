@@ -1,106 +1,125 @@
-import * as React from "react"
-import { Check, ChevronsUpDown, PlusCircle } from "lucide-react"
-
-import { cn } from "@/lib/utils"
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, } from "@/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover"
+import { Check, ChevronsUpDown, PlusCircle } from "lucide-react"
+import React from "react"
+import { cn } from "@/lib/utils"
+import useDebounce from "@/hooks/useDebounce"
 import { Option } from "@/types/Option"
 
-
-type Props = {
-    options: Option[]
-    value?: string | number
-    canAdd?: boolean,
-    placeholder?: string
-    onSelectChange: (value: string | number | undefined) => void
+type Props<T extends string | number> = {
+    options: Option<T>[]
+    value: Option<T>
+    isDebounced?: boolean
+    onSelectChange: (value: Option<T>) => void
+    isOptionEqual: (a: Option<T>, b: Option<T>) => boolean
     onInputChange?: (value: string) => void
+    placeholder?: string
+    onCreateOption?: (label: string) => Option<T>
 }
 
-export function Combobox({ options, value, canAdd, onSelectChange, onInputChange, placeholder }: Props) {
+export const Combobox = <T extends string | number>({
+    options,
+    value,
+    isDebounced,
+    placeholder = "Select option",
+    isOptionEqual,
+    onSelectChange,
+    onCreateOption,
+    onInputChange,
+}: Props<T>) => {
     const [open, setOpen] = React.useState(false)
     const [input, setInput] = React.useState("")
-
+    const debouncedInput = useDebounce(input)
+    const searchValue = isDebounced ? debouncedInput : input
+    React.useEffect(() => {
+        if (onInputChange) {
+            onInputChange(searchValue)
+        }
+    }, [searchValue, onInputChange])
     const lowerInput = input.trim().toLowerCase()
-
-    const normalizedArray = options.map(opt => ({
-        ...opt,
-        value: opt.value.toLowerCase()
-    }))
-
-    const matchedOption = normalizedArray.find(opt => opt.value === lowerInput)
-
-    const displayOptions = normalizedArray.filter(opt =>
-        opt.label.toLowerCase().includes(lowerInput)
+    const matched = options.find(
+        (option) => option.label.toLowerCase() === lowerInput
+    )
+    const filtered = options.filter((option) =>
+        option.label.toLowerCase().includes(lowerInput)
     )
 
-    const handleSelect = (val: string) => {
-        onSelectChange(val)
-        setOpen(false)
-        setInput("")
-    }
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && lowerInput) {
-            e.preventDefault()
-            handleSelect(lowerInput)
+    const selectedLabel = options.find((i) => {
+        return isOptionEqual(i, value)
+    })?.label
+
+    const handleCreate = () => {
+        if (onCreateOption) {
+            const newOption = onCreateOption(input.trim())
+            onSelectChange(newOption)
+            setOpen(false)
+            setInput("")
         }
     }
+
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger className="w-full" asChild>
-                <Button type="button"
+            <PopoverTrigger asChild>
+                <Button
                     variant="outline"
                     role="combobox"
-                    aria-expanded={open}
-                    className="w-full justify-between"
+                    className={cn(
+                        "w-[200px] justify-between",
+                        !value && "text-muted-foreground"
+                    )}
                 >
-                    {value
-                        ? options.find((option) => option.value === value)?.label ?? value
-                        : `Chọn hoặc nhập ${placeholder ??
-                        ""}`}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    {selectedLabel ?? placeholder}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent forceMount className="p-0">
+            <PopoverContent className="w-[200px] p-0">
                 <Command>
                     <CommandInput
-                        placeholder={`Nhập ${placeholder ?? ""}`}
+                        placeholder="Search..."
                         value={input}
-                        onKeyDown={handleKeyDown}
-                        onValueChange={value => {
-                            setInput(value);
-                            if (onInputChange) {
-                                onInputChange(value);
-                            }
-                        }}
+                        onValueChange={setInput}
                     />
                     <CommandList>
-                        {canAdd && displayOptions.length === 0 && !matchedOption && lowerInput ? (
-                            <CommandItem onSelect={() => handleSelect(lowerInput)}>
-                                <PlusCircle className="mr-2 h-4 w-4 text-primary" />
-                                Thêm tag mới: <span className="ml-1 font-medium">{lowerInput}</span>
+                        {handleCreate && !matched && input && (
+                            <CommandItem onSelect={handleCreate} className="text-primary">
+                                <PlusCircle className="mr-2 h-4 w-4" />
+                                Add: <span className="ml-1 font-medium">{input}</span>
                             </CommandItem>
-                        ) : null}
-                        {displayOptions.length > 0 && (
-                            <CommandGroup heading="Tag gợi ý">
-                                {displayOptions.map((item) => (
-                                    <CommandItem
-                                        key={item.value}
-                                        value={item.value}
-                                        onSelect={() => handleSelect(item.value)}
-                                    >
-                                        <Check
-                                            className={cn(
-                                                "mr-2 h-4 w-4",
-                                                value === item.value ? "opacity-100" : "opacity-0"
-                                            )}
-                                        />
-                                        {item.label}
-                                    </CommandItem>
-                                ))}
-                            </CommandGroup>
                         )}
-                        <CommandEmpty>Không tìm thấy.</CommandEmpty>
+                        <CommandEmpty>No option found.</CommandEmpty>
+                        <CommandGroup>
+                            {filtered.map((option, index) => (
+                                <CommandItem
+                                    key={option.value ? String(option.value) : index}
+                                    value={option.label}
+                                    onSelect={() => {
+                                        onSelectChange(option)
+                                        setOpen(false)
+                                        setInput("")
+                                    }}
+                                >
+                                    {option.label}
+                                    <Check
+                                        className={cn(
+                                            "ml-auto",
+                                            isOptionEqual(option, value) ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
                     </CommandList>
                 </Command>
             </PopoverContent>
