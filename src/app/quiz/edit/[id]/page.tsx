@@ -1,43 +1,28 @@
 "use client"
-import QuizForm from '@/components/form/QuizForm'
-import { useToast } from '@/hooks/use-toast'
-import QuizCategoryService from '@/services/QuizCategoryService'
-import QuizService from '@/services/QuizService'
-import { QuizResponse } from '@/types/response/QuizResponse'
-import FunctionUtil from '@/util/FunctionUtil'
-import { use, useEffect, useState } from 'react'
+import QuizForm from '@/components/form/quiz/QuizForm'
+import { quizHooks } from '@/redux/api/quizApi'
+import { quizCategoryHooks } from '@/redux/api/quizCategoryApi'
+import { QuizRequest } from '@/types/request/QuizRequest'
+import { handleMutation } from '@/util/mutation'
+import { useRouter } from 'next/navigation'
+import { use } from 'react'
 
 const QuizEditPage = ({ params }: { params: Promise<{ id: string }> }) => {
-    const { toast } = useToast()
     const { id } = use(params)
-    const [quizCategories, setQuizCategories] = useState<QuizCategoryResponse[]>([]);
-    const [quiz, setQuiz] = useState<QuizResponse>();
-    useEffect(() => {
-        fetchQuizCategoryList()
-        fetchQuiz()
-    }, [id])
-    const fetchQuiz = () => {
-        QuizService.readDetail(id).then(res => {
-            if (res.success) {
-                setQuiz(res.data)
-            } else {
-                console.log(res.message_error)
-            }
-        }).catch(err =>
-            toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
-    }
-    const fetchQuizCategoryList = () => {
-        QuizCategoryService.readAll().then(res => {
-            if (res.success) {
-                setQuizCategories(res.data)
-            } else {
-                console.log(res.message_error)
-            }
-        }).catch(err =>
-            toast({ variant: "destructive", description: FunctionUtil.showError(err) }))
+    const router = useRouter()
+    const [updateQuiz, { isLoading }] = quizHooks.useUpdateQuizMutation()
+    const { data: quizData } = quizHooks.useReadQuizDetailQuery(id, { skip: !id })
+    const { data: quizCategoriesData } = quizCategoryHooks.useReadAllQuizCategoryQuery()
+    const quiz = quizData?.data
+    const quizCategories = quizCategoriesData?.data || []
+    const onSubmit = async (data: QuizRequest, image?: File) => {
+        if (isLoading) return
+        await handleMutation(() => updateQuiz({ image, data: { id, body: data } }).unwrap(), (res) => {
+            router.push(`/profile?id=${res.data.author.id}&tab=quiz`)
+        }, undefined, { error: "Update failed", success: "Update success" })
     }
     return (
-        <QuizForm quizCategories={quizCategories} quiz={quiz} />
+        <QuizForm onSubmit={onSubmit} quizCategories={quizCategories} quiz={quiz} />
     )
 }
 

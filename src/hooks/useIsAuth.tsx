@@ -1,11 +1,12 @@
 import { useAppSelector } from "@/redux/hooks"
 
-const useIsAuth = () => {
-    const { profile, access_token, role } = useAppSelector(state => state.auth)
+const useAuth = () => {
+    const auth = useAppSelector(state => state.auth)
+    const { profile, access_token, role } = auth
     if (profile && access_token && role) {
-        return true
+        return auth
     }
-    return false;
+    return null;
 }
 
-export default useIsAuth
+export default useAuth

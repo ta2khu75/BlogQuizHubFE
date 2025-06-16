@@ -1,30 +1,28 @@
 import Modal from '@/components/common/Modal'
 import QuizCategoryForm from '@/components/form/QuizCategoryForm'
-import QuizCategoryService from '@/services/QuizCategoryService'
+import { quizCategoryHooks } from '@/redux/api/quizCategoryApi'
 import { QuizCategoryRequest } from '@/types/request/QuizCategoryRequest'
+import { QuizCategoryResponse } from '@/types/response/QuizCategoryResponse'
 import { handleMutation } from '@/util/mutation'
-import StateHelpers from '@/util/StateHelpers'
-import React, { Dispatch, SetStateAction } from 'react'
+import React from 'react'
 type Props = {
-    setQuizCategories: Dispatch<SetStateAction<QuizCategoryResponse[]>>,
     quizCategory: QuizCategoryResponse,
     open: boolean,
-    setOpen: Dispatch<SetStateAction<boolean>>
+    setOpen: (value: boolean) => void
 }
-const QuizCategoryUpdate = ({ setQuizCategories, quizCategory, open, setOpen }: Props) => {
-    const onSubmit = (value: QuizCategoryRequest) => {
-        handleMutation<QuizCategoryResponse>(
-            () => QuizCategoryService.update(quizCategory.id, value),
-            (res) => {
-                StateHelpers.updateItemById(setQuizCategories, res.data)
-                setOpen(false)
-            },
-            undefined,
+const QuizCategoryUpdate = ({ quizCategory, open, setOpen }: Props) => {
+    const [update, { isLoading }] = quizCategoryHooks.useUpdateQuizCategoryMutation()
+    const onSubmit = async (value: QuizCategoryRequest) => {
+        if (isLoading) return
+        await handleMutation<QuizCategoryResponse>(
+            () => update({ body: value, id: quizCategory.id }).unwrap(),
+            () => setOpen(false),
+            error => console.log(error),
             { success: 'Update success', error: 'Update failed' }
         )
     }
     return (
-        <Modal open={open} onCancel={() => setOpen(false)} title="Update Account Status">
+        <Modal open={open} setOpen={setOpen} title="Update Account Status">
             <QuizCategoryForm
                 onSubmit={onSubmit}
                 quizCategory={quizCategory}

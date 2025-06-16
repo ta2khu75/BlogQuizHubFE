@@ -1,16 +1,14 @@
 "use client"
+import { CountdownTimerRef } from '@/components/common/CountdownTimer'
 import QuestionElement from '@/components/elements/content/question/QuestionElement'
 import QuizMenuElement from '@/components/elements/content/quiz/QuizMenuElement'
-import Carousel from '@/components/elements/util/Carousel'
-import Confirm from '@/components/elements/util/Confirm'
-import CountdownTimer, { CountdownTimerRef } from '@/components/elements/util/CountdownTimer'
-import Modal from '@/components/elements/util/Modal'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useToast } from '@/hooks/use-toast'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { UserAnswerActions } from '@/redux/slice/userAnswerSlice'
 import QuizResultService from '@/services/QuizResultService'
+import { QuizResultResponse } from '@/types/response/QuizResultResponse'
 import FunctionUtil from '@/util/FunctionUtil'
 import StringUtil from '@/util/StringUtil'
 import { useRouter } from 'next/navigation'
@@ -41,7 +39,7 @@ const QuizDetailPage = ({ params }: { params: Promise<{ slug: string }> }) => {
         }));
         try {
             countdownRef.current?.stopCountdown();
-            const res = await QuizResultService.submitQuiz(quizResult?.info.id, { user_answers: answerUser })
+            const res = await QuizResultService.submitQuiz(quizResult?.id, { user_answers: answerUser })
             if (res.success) {
                 setQuizResult(res.data)
                 setOpenResult(true)

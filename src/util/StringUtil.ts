@@ -6,8 +6,11 @@ export default class StringUtil {
     static convertSlugUrl(str: string): string {
         return slugify(str, { locale: 'vi', lower: true });
     }
-    static getIdFromSlugUrl(url: string): string {
+    static readIdFromSlugPath(url: string): string {
         const urlParts = url.split('.html');
         return urlParts[0].split('-').pop() ?? "";
+    }
+    static createSlugFromPath({ path, id }: { path: string, id: string | number }): string {
+        return `${path}-${id}.html`;
     }
 }

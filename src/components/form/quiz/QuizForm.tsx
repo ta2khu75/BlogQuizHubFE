@@ -14,6 +14,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import QuestionList from '@/components/form/quiz/QuestionList'
 import QuizFormSync from '@/components/form/quiz/QuizFormSync'
+import { QuizCategoryResponse } from '@/types/response/QuizCategoryResponse'
 type Props = {
     quiz?: QuizResponse,
     onSubmit: (quiz: QuizRequest, image?: File) => void,

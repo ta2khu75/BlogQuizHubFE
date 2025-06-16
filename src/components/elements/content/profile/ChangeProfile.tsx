@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import AuthService from '@/services/AuthService'
 import { AccountProfileRequest } from '@/types/request/account/AccountProfileRequest'
+import { AccountProfileResponse } from '@/types/response/Account/AccountProfileResponse'
+import { ApiResponse } from '@/types/response/ApiResponse'
 import React, { useState } from 'react'
 type Props = {
     profile?: AccountProfileResponse

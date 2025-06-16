@@ -4,22 +4,16 @@ import QuizCategoryDelete from '@/components/elements/content/admin/quiz-categor
 import QuizCategoryTable from '@/components/elements/content/admin/quiz-category/QuizCategoryTable'
 import QuizCategoryUpdate from '@/components/elements/content/admin/quiz-category/QuizCategoryUpdate'
 import TitleElement from '@/components/elements/content/admin/TitleElement'
-import QuizCategoryService from '@/services/QuizCategoryService'
-import { handleMutation } from '@/util/mutation'
-import React, { useEffect, useState } from 'react'
+import { quizCategoryHooks } from '@/redux/api/quizCategoryApi'
+import { QuizCategoryResponse } from '@/types/response/QuizCategoryResponse'
+import React, { useState } from 'react'
 
 const QuizCategoryAdminPage = () => {
+    const { data } = quizCategoryHooks.useReadAllQuizCategoryQuery();
     const [openEdit, setOpenEdit] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
-    const [quizCategories, setQuizCategories] = useState<QuizCategoryResponse[]>([])
     const [quizCategory, setQuizCategory] = useState<QuizCategoryResponse>()
-    useEffect(() => {
-        fetchQuizCategoryList()
-    }, [])
-    const fetchQuizCategoryList = () => {
-        handleMutation<void, QuizCategoryResponse[]>(undefined, () => QuizCategoryService.readAll(), (res) => setQuizCategories(res.data), err => console.log(err.data)
-            , { success: 'Read success' })
-    }
+    const quizCategories = data?.data || []
     const handleEditClick = (value: QuizCategoryResponse) => {
         setQuizCategory(value)
         setOpenEdit(true)
@@ -32,12 +26,11 @@ const QuizCategoryAdminPage = () => {
         <>
             <div className="flex justify-between">
                 <TitleElement>Quiz Category Manager</TitleElement>
-                <QuizCategoryCreate setQuizCategories={setQuizCategories} />
+                <QuizCategoryCreate />
             </div>
-            {quizCategory && <QuizCategoryUpdate open={openEdit} setOpen={setOpenEdit} setQuizCategories={setQuizCategories} quizCategory={quizCategory} />}
-            {quizCategory && <QuizCategoryDelete open={openDelete} setOpen={setOpenDelete} setQuizCategories={setQuizCategories} quizCategory={quizCategory} />}
+            {quizCategory && <QuizCategoryUpdate open={openEdit} setOpen={setOpenEdit} quizCategory={quizCategory} />}
+            {quizCategory && <QuizCategoryDelete open={openDelete} setOpen={setOpenDelete} quizCategory={quizCategory} />}
             <QuizCategoryTable array={quizCategories} onEdit={handleEditClick} onDelete={handleDeleteClick} />
-            {/* <TableElement<QuizCategoryResponse> array={quizCategories} handleEditClick={handleEditClick} handleDeleteClick={handleDeleteClick} /> */}
         </>
     )
 }

@@ -11,7 +11,7 @@ type Props = {
 }
 const AccountCreate = ({ roles }: Props) => {
     const [open, setOpen] = useState(false)
-    const [createAccount, { isLoading }] = accountHooks.useCreateMutation()
+    const [createAccount, { isLoading }] = accountHooks.useCreateAccountMutation()
     const onSubmit = async (value: AccountRequest) => {
         if (isLoading) return; // Prevent multiple submissions
         await handleMutation<AccountResponse>(
@@ -23,7 +23,7 @@ const AccountCreate = ({ roles }: Props) => {
     return (
         <>
             <Button onClick={() => setOpen(true)}>Create</Button>
-            <Modal open={open} onCancel={() => setOpen(false)} title="Create Account">
+            <Modal open={open} setOpen={setOpen} title="Create Account">
                 <AccountForm roles={roles} onSubmit={onSubmit} />
             </Modal>
         </>

@@ -2,6 +2,7 @@ import AvatarElement from '@/components/common/AvatarElement';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import useIsAuthor from '@/components/util/useIsAuthor';
+import { PageResponse } from '@/types/response/PageResponse';
 import { QuizResponse } from '@/types/response/QuizResponse';
 import StringUtil from '@/util/StringUtil';
 import Image from 'next/image';
@@ -20,7 +21,7 @@ const QuizList = ({ quizPage }: Props) => {
                         <Link href={`/profile?id=${quiz.author.id}`}><AvatarElement profile={quiz.author} /></Link>
                         {isAuthor && !quiz.completed && <>{quiz.access_modifier} <Button variant={"link"}><Link href={`/quiz/edit/${quiz.info.id}`}>Edit</Link></Button></>}
                     </div>
-                    <CardTitle><Link href={`/quiz/about/${StringUtil.convertSlugUrl(quiz.title)}-id-${quiz.id}.html`} className='hover:underline'>{quiz.title}</Link> </CardTitle>
+                    <CardTitle><Link href={`/${StringUtil.convertSlugUrl(quiz.title)}-q${quiz.id}.html`} className='hover:underline'>{quiz.title}</Link> </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Image src={quiz.image_path} width={500} height={500} alt={quiz.title} />

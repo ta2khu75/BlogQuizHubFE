@@ -1,43 +1,73 @@
 import { AccountRequest } from "@/types/request/account/AccountRequest";
 import { AccountResponse } from "@/types/response/Account/AccountResponse";
 import { apiSlice } from "@/redux/apiSlice";
-import { BasePath } from "@/env/BasePath";
 import { AccountStatusRequest } from "@/types/request/account/AccountStatusRequest";
-
+import { BasePath } from "@/env/BasePath";
+import { AccountProfileRequest } from "@/types/request/account/AccountProfileRequest";
+import { BaseTag } from "@/env/BaseTag";
+import { AccountProfileResponse } from "@/types/response/Account/AccountProfileResponse";
+import { ApiResponse } from "@/types/response/ApiResponse";
+import { PageResponse } from "@/types/response/PageResponse";
+import { AccountSearch } from "@/types/request/search/AccountSearch";
+import { BaseId } from "@/env/BaseId";
+const path = BasePath.accounts;
+const tag = BaseTag.ACCOUNT
+const defaultId = BaseId.PAGE;
+const defaultTag = [{ type: tag, id: defaultId }];
 export const accountApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        search: builder.query<ApiResponse<PageResponse<AccountResponse>>, AccountSearch>({
-            query: () => `/${BasePath.ACCOUNT}`,
-            providesTags: (result) => {
-                if (result) {
-                    const final = [...result.data.content.map(({ id }) => ({ type: "Accounts" as const, id })), { type: 'Accounts' as const, id: 'PAGE' }];
-                    return final
+        searchAccount: builder.query<ApiResponse<PageResponse<AccountResponse>>, AccountSearch>({
+            query: (params) => ({ url: path.root(), params }),
+            providesTags: (result, error, params) => {
+                const nullTags = [{ type: tag, id: `${defaultId}-${JSON.stringify(params)}` }];
+                if (!result) {
+                    return nullTags
                 }
-                const final = [{ type: 'Accounts' as const, id: 'PAGE' }]
-                return final;
+                const tags = result.data.content.map((item) => ({
+                    type: tag,
+                    id: item.id,
+                }));
+                return [...tags, ...defaultTag, ...nullTags];
             }
         }),
-        create: builder.mutation<ApiResponse<AccountResponse>, Partial<AccountRequest>>({
+        readAccountProfile: builder.query<ApiResponse<AccountProfileResponse>, number>({
+            query: (id) => ({
+                url: path.profile(id),
+                method: 'GET',
+            }),
+            providesTags: (result, error, id) => [{ type: tag, id }],
+        }),
+        createAccount: builder.mutation<ApiResponse<AccountResponse>, Partial<AccountRequest>>({
             query: (data) => ({
-                url: `/${BasePath.ACCOUNT}`,
+                url: path.root(),
                 method: 'POST',
                 body: data,
             }),
-            invalidatesTags: () => [{ type: "Accounts" as const, id: 'PAGE' }]
+            invalidatesTags: (result, error) => error ? [] : defaultTag
         }),
-        updateStatus: builder.mutation<ApiResponse<AccountResponse>, { id: string, body: AccountStatusRequest }>({
+        updateAccountStatus: builder.mutation<ApiResponse<AccountResponse>, { id: number, body: AccountStatusRequest }>({
             query: (data) => ({
-                url: `/${BasePath.ACCOUNT}/status/${data.id}`,
+                url: `${path.status(data.id)}`,
                 method: 'PUT',
                 body: data.body,
             }),
-            invalidatesTags: (result, error, data) => [{ type: "Accounts" as const, id: data.id }]
+            invalidatesTags: (result, error, data) => error ? [] : [{ type: tag, id: data.id }]
+        }),
+        updateAccountProfile: builder.mutation<ApiResponse<AccountProfileResponse>, { id: string, body: AccountProfileRequest }>({
+            query: (data) => ({
+                url: path.profile(data.id),
+                method: 'PUT',
+                body: data.body,
+            }),
+            invalidatesTags: (result, error, data) => error ? [] : [{ type: tag, id: data.id }]
         }),
     }),
 });
-const { useCreateMutation, useSearchQuery, useUpdateStatusMutation } = accountApi
+const { useCreateAccountMutation, useSearchAccountQuery, useUpdateAccountStatusMutation, useUpdateAccountProfileMutation, useReadAccountProfileQuery } = accountApi
 export const accountHooks = {
-    useCreateMutation,
-    useSearchQuery,
-    useUpdateStatusMutation
+    useCreateAccountMutation,
+    useReadAccountProfileQuery,
+    useUpdateAccountProfileMutation,
+    useSearchAccountQuery,
+    useUpdateAccountStatusMutation
 };

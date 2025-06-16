@@ -1,23 +1,23 @@
 import Modal from '@/components/common/Modal'
 import RoleForm from '@/components/form/RoleForm'
-import RoleService from '@/services/RoleService'
+import { roleHooks } from '@/redux/api/roleApi'
 import { RoleRequest } from '@/types/request/RoleRequest'
+import { PermissionGroupResponse } from '@/types/response/PermissionGroupResponse'
 import { handleMutation } from '@/util/mutation'
-import StateHelpers from '@/util/StateHelpers'
 import React, { Dispatch, SetStateAction } from 'react'
 type Props = {
-    setRoles: Dispatch<SetStateAction<RoleResponse[]>>,
     permissionGroups: PermissionGroupResponse[]
     open: boolean,
     setOpen: Dispatch<SetStateAction<boolean>>
     role: RoleResponse,
 }
-const RoleUpdate = ({ role, setRoles, permissionGroups, open, setOpen }: Props) => {
-    const onSubmit = (value: RoleRequest) => {
-        handleMutation<RoleResponse>(
-            () => RoleService.update(role.id, value),
-            (res) => {
-                StateHelpers.updateItemById(setRoles, res.data)
+const RoleUpdate = ({ role, permissionGroups, open, setOpen }: Props) => {
+    const [update, { isLoading }] = roleHooks.useUpdateRoleMutation()
+    const onSubmit = async (value: RoleRequest) => {
+        if (isLoading) return
+        await handleMutation<RoleResponse>(
+            () => update({ id: role.id, body: value }),
+            () => {
                 setOpen(false)
             },
             undefined,
@@ -25,7 +25,7 @@ const RoleUpdate = ({ role, setRoles, permissionGroups, open, setOpen }: Props) 
         )
     }
     return (
-        <Modal open={open} onCancel={() => setOpen(false)} title="Update Account Status">
+        <Modal open={open} setOpen={setOpen} title="Update Account Status">
             <RoleForm
                 permissionGroups={permissionGroups}
                 onSubmit={onSubmit}

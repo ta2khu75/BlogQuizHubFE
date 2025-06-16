@@ -6,27 +6,22 @@ import AccountCreate from "@/components/elements/content/admin/account/AccountCr
 import AccountFilter from "@/components/elements/content/admin/account/AccountFilter";
 import AccountStatusUpdate from "@/components/elements/content/admin/account/AccountStatusUpdate";
 import AccountTable from "@/components/elements/content/admin/account/AccountTable";
-import { useToast } from "@/hooks/use-toast";
-import RoleService from "@/services/RoleService";
+import { roleHooks } from "@/redux/api/roleApi";
+import { apiSlice } from "@/redux/apiSlice";
+import { useAppDispatch } from "@/redux/hooks";
 import { AccountResponse } from "@/types/response/Account/AccountResponse";
+import { PageResponse } from "@/types/response/PageResponse";
 import { useEffect, useState } from "react";
 
 const AccountPage = () => {
-    const { toast } = useToast()
     const [accountPage, setAccountPage] = useState<PageResponse<AccountResponse>>();
     const [account, setAccount] = useState<AccountResponse>();
-    const [roles, setRoles] = useState<RoleResponse[]>([])
+    const { data } = roleHooks.useReadAllRoleQuery()
+    const roles = data?.data ?? []
+    const dispatch = useAppDispatch();
     const [openEdit, setOpenEdit] = useState(false);
     useEffect(() => {
-        fetchRoleList()
-    }, [])
-
-    const fetchRoleList = () => {
-        RoleService.readAll().then(res => {
-            setRoles(res.data)
-        }).catch(err => toast(err))
-    }
-    useEffect(() => {
+        dispatch(apiSlice.util.resetApiState());
         if (account) {
             setOpenEdit(true)
         } else {

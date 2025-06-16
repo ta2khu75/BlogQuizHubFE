@@ -1,25 +1,23 @@
 import Confirm from "@/components/common/Confirm"
-import RoleService from "@/services/RoleService"
+import { roleHooks } from "@/redux/api/roleApi"
 import { handleMutation } from "@/util/mutation"
-import StateHelpers from "@/util/StateHelpers"
 import { Dispatch, SetStateAction } from "react"
 
 type Props = {
-    setRoles: Dispatch<SetStateAction<RoleResponse[]>>,
     open: boolean,
     role: RoleResponse,
     setOpen: Dispatch<SetStateAction<boolean>>,
 }
-const RoleDelete = ({ open, setRoles, role, setOpen }: Props) => {
+const RoleDelete = ({ open, role, setOpen }: Props) => {
+    const [deleteRole, { isLoading }] = roleHooks.useDeleteRoleMutation()
     const onCancel = () => {
         setOpen(false)
     }
     const onContinue = () => {
-        handleMutation<void>(() => RoleService.delete(role.id), () => {
+        if (isLoading) return
+        handleMutation<void>(() => deleteRole(role.id).unwrap(), () => {
             setOpen(false)
-            StateHelpers.removeItemById<RoleResponse>(setRoles, role.id)
-        }, undefined,
-            { success: 'Delete success', error: 'Delete failed' })
+        }, undefined, { success: 'Delete success', error: 'Delete failed' })
     }
     return (
         <Confirm open={open} title={`Are you want delete role ${role?.name} ?`} onCancel={onCancel} onContinue={onContinue} />

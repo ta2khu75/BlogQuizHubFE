@@ -26,7 +26,4 @@ export default class AuthService {
   static logout(): Promise<ApiResponse<void>> {
     return api.post(`${basePath}/logout`);
   }
-  static checkAdmin(): Promise<ApiResponse<BooleanResponse>> {
-    return api.get(`${basePath}/check-admin`);
-  }
 }

@@ -1,32 +1,32 @@
 import Modal from '@/components/common/Modal'
 import RoleForm from '@/components/form/RoleForm'
 import { Button } from '@/components/ui/button'
-import RoleService from '@/services/RoleService'
+import { roleHooks } from '@/redux/api/roleApi'
 import { RoleRequest } from '@/types/request/RoleRequest'
+import { PermissionGroupResponse } from '@/types/response/PermissionGroupResponse'
 import { handleMutation } from '@/util/mutation'
-import StateHelpers from '@/util/StateHelpers'
-import React, { Dispatch, SetStateAction, useState } from 'react'
+import React, { useState } from 'react'
 type Props = {
-    setRoles: Dispatch<SetStateAction<RoleResponse[]>>,
     permissionGroups: PermissionGroupResponse[]
 }
-const RoleCreate = ({ setRoles, permissionGroups }: Props) => {
+const RoleCreate = ({ permissionGroups }: Props) => {
+    const [createRole, { isLoading }] = roleHooks.useCreateRoleMutation()
     const [open, setOpen] = useState(false)
-    const onSubmit = (value: RoleRequest) => {
+    const onSubmit = async (value: RoleRequest) => {
         console.log(value);
 
-        handleMutation<RoleResponse>(
-            () => RoleService.create(value),
-            (response) => {
+        if (isLoading) return
+        await handleMutation<RoleResponse>(
+            () => createRole(value).unwrap(),
+            () => {
                 setOpen(false)
-                StateHelpers.prependState<RoleResponse>(setRoles, response.data)
             }, undefined,
             { success: 'Create success', error: 'Create failed' })
     }
     return (
         <>
             <Button onClick={() => setOpen(true)}>Create</Button>
-            <Modal open={open} onCancel={() => setOpen(false)} title="Create Account">
+            <Modal open={open} setOpen={setOpen} title="Create Account">
                 <RoleForm permissionGroups={permissionGroups} onSubmit={onSubmit} />
             </Modal>
         </>

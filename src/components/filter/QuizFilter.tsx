@@ -6,11 +6,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import QuizCategoryService from '@/services/QuizCategoryService'
-import QuizService from '@/services/QuizService'
+import { quizHooks } from '@/redux/api/quizApi'
+import { quizCategoryHooks } from '@/redux/api/quizCategoryApi'
 import { QuizLevel } from '@/types/QuizLevel'
+import { QuizSearch } from '@/types/request/search/QuizSearch'
+import { PageResponse } from '@/types/response/PageResponse'
 import { QuizResponse } from '@/types/response/QuizResponse'
-import { handleMutation } from '@/util/mutation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React, { useCallback, useEffect, useMemo } from 'react'
@@ -29,7 +30,6 @@ type Props = {
     setQuizPage: React.Dispatch<React.SetStateAction<PageResponse<QuizResponse> | undefined>>
 }
 const QuizFilter = ({ setQuizPage }: Props) => {
-    const [quizCategories, setQuizCategories] = React.useState<QuizCategoryResponse[]>([])
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -55,13 +55,18 @@ const QuizFilter = ({ setQuizPage }: Props) => {
         },
         shouldUnregister: false
     })
+    const { data: quizCategoriesData } = quizCategoryHooks.useReadAllQuizCategoryQuery();
+    const { data: quizData } = quizHooks.useSearchQuizQuery(searchValues)
+    const quizPage = quizData?.data
+    console.log("quizpage", quizPage);
+
     useEffect(() => {
-        fetchReadAllQuizCategory()
-    }, [])
+        setQuizPage(quizPage)
+    }, [quizPage?.content?.length, quizPage?.page])
+    const quizCategories = quizCategoriesData?.data || []
     useEffect(() => {
         form.reset({ ...searchValues, author_id: searchValues.id })
-        fetchSearch()
-    }, [searchValues])
+    }, [searchValues, form])
 
     const createQueryString = useCallback(
         (search: QuizSearch) => {
@@ -81,23 +86,23 @@ const QuizFilter = ({ setQuizPage }: Props) => {
         },
         [searchParams]
     )
-    const fetchSearch = () => {
-        handleMutation(() => QuizService.search({ ...searchValues, author_id: searchValues.id }), (res) => {
-            setQuizPage(res.data)
-        }, undefined, {
-            error: "Search failed",
-            success: "Search success"
-        })
-    }
-    const fetchReadAllQuizCategory = () => {
-        if (quizCategories.length > 0) return; // Avoid fetching if already fetched
-        handleMutation(() => QuizCategoryService.readAll(), (res) => {
-            setQuizCategories(res.data)
-        }, undefined, {
-            error: "Fetch categories failed",
-            success: "Fetch categories success"
-        })
-    }
+    // const fetchSearch = () => {
+    //     handleMutation(() => QuizService.search({ ...searchValues, author_id: searchValues.id }), (res) => {
+    //         setQuizPage(res.data)
+    //     }, undefined, {
+    //         error: "Search failed",
+    //         success: "Search success"
+    //     })
+    // }
+    // const fetchReadAllQuizCategory = () => {
+    //     if (quizCategories.length > 0) return; // Avoid fetching if already fetched
+    //     handleMutation(() => QuizCategoryService.readAll(), (res) => {
+    //         setQuizCategories(res.data)
+    //     }, undefined, {
+    //         error: "Fetch categories failed",
+    //         success: "Fetch categories success"
+    //     })
+    // }
     const onFilter = (data: QuizSearch) => {
         router.push(`${pathname}?${createQueryString(data)}`)
     }

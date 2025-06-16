@@ -2,11 +2,9 @@ import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { useQueryParam } from '@/hooks/useQueryParam'
 import { FollowService } from '@/services/FollowService'
+import { FollowResponse } from '@/types/response/FollowResponse'
 import React, { useEffect, useState } from 'react'
-type Props = {
-    setProfile: React.Dispatch<React.SetStateAction<AccountProfileResponse | undefined>>
-}
-const FollowProfile = ({ setProfile }: Props) => {
+const FollowProfile = () => {
     const { toast } = useToast()
     const profileId = useQueryParam("id")
     const [disable, setDisable] = useState(false)
@@ -20,7 +18,6 @@ const FollowProfile = ({ setProfile }: Props) => {
         FollowService.follow(profileId).then(res => {
             setFollow(res.data)
             setDisable(false);
-            setProfile(prev => ({ ...prev!, follow_count: (prev?.follow_count ?? 0) + 1 }));
         }).catch(err => {
             toast({ variant: "destructive", description: err.message })
         })

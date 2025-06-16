@@ -4,29 +4,15 @@ import ChangeProfile from '@/components/elements/content/profile/ChangeProfile';
 import FollowProfile from '@/components/elements/content/profile/FollowProfile';
 import TabContent from '@/components/elements/content/profile/TabContent';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { toast } from '@/hooks/use-toast';
 import useIsOwner from '@/hooks/useIsOwn';
-import AccountService from '@/services/AccountService';
-import { AccountProfileResponse } from '@/types/response/Account/AccountProfileResponse';
+import { accountHooks } from '@/redux/api/accountApi';
 import { useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
 const ProfilePage = () => {
     const searchParams = useSearchParams()
     const profile_id = searchParams.get('id')
+    const { data } = accountHooks.useReadAccountProfileQuery(Number(profile_id), { skip: !profile_id })
+    const profile = data?.data
     const isOwner = useIsOwner();
-    const [profile, setProfile] = useState<AccountProfileResponse>()
-    useEffect(() => {
-        fetchProfile()
-    }, [profile_id])
-    const fetchProfile = () => {
-        if (!profile_id) return
-        AccountService.readProfile(Number(profile_id)).then(res => {
-            setProfile(res.data)
-        }).catch(err => {
-            const error = err as ApiResponse<object>;
-            toast({ variant: 'destructive', title: 'Error', description: error.message })
-        })
-    }
 
     return (
         <div>
@@ -44,7 +30,7 @@ const ProfilePage = () => {
                         isOwner ? <>
                             <ChangeProfile profile={profile} />
                             <ChangePassword />
-                        </> : <FollowProfile setProfile={setProfile} />
+                        </> : <FollowProfile />
                     }
                 </div>
             </div>

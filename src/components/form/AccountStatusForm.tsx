@@ -39,7 +39,7 @@ const AccountStatusForm = ({ account, onSubmit, roles }: Props) => {
                         <FormItem>
                             <FormLabel>Enable</FormLabel>
                             <FormControl>
-                                <RadioGroup defaultValue={field.value ? "true" : "false"} onValueChange={(value) => field.onChange("true" === value)}>
+                                <RadioGroup defaultValue={field.value ? "true" : "false"} value={field.value ? "true" : "false"} onValueChange={(value) => field.onChange("true" === value)}>
                                     <FormItem className="flex items-center space-x-3 space-y-0">
                                         <FormControl>
                                             <RadioGroupItem value="true" />
@@ -65,7 +65,7 @@ const AccountStatusForm = ({ account, onSubmit, roles }: Props) => {
                         <FormItem>
                             <FormLabel>Non locked</FormLabel>
                             <FormControl>
-                                <RadioGroup value={field.value ? "true" : "false"} onValueChange={(value) => field.onChange("true" === value)}>
+                                <RadioGroup value={field.value ? "true" : "false"} defaultValue={field.value ? "true" : "false"} onValueChange={(value) => field.onChange("true" === value)}>
                                     <FormItem className="flex items-center space-x-3 space-y-0">
                                         <FormControl>
                                             <RadioGroupItem value="true" />

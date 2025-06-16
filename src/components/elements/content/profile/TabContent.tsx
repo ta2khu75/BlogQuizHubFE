@@ -25,8 +25,7 @@ const TabContent = ({ profile }: Props) => {
         router.push(`${pathname}?${params.toString()}`)
     }
     return (
-        <Tabs
-            defaultValue={tab} onValueChange={(value) => onTabChange(value)}>
+        <Tabs defaultValue={tab} onValueChange={(value) => onTabChange(value)}>
             <TabsList className={
                 clsx("flex md:grid w-full h-16",
                     isOwn ? "md:grid-cols-4" : "md:grid-cols-3"

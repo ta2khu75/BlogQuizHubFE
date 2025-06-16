@@ -13,6 +13,7 @@ import { QuizResultMode } from "@/types/DisplayMode";
 import { Option } from "@/types/Option";
 import { QuizLevel } from "@/types/QuizLevel";
 import { QuizRequest } from "@/types/request/QuizRequest";
+import { QuizCategoryResponse } from "@/types/response/QuizCategoryResponse";
 import { handleMutation } from "@/util/mutation";
 import { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
@@ -24,7 +25,7 @@ type Props = {
 const QuizBasicInfo = ({ quizCategories, onSubmit }: Props) => {
     const { control, formState, reset, handleSubmit, getValues } = useFormContext<QuizRequest>();
     const [keywordBlog, setKeywordBlog] = useState("");
-    const [blogOptions, setBlogOptions] = useState<Option[]>([]);
+    const [blogOptions, setBlogOptions] = useState<Option<string>[]>([]);
     const searchBlog = useDebounce(keywordBlog);
     const [image, setImage] = useState<{ value: File; error: boolean }>();
 

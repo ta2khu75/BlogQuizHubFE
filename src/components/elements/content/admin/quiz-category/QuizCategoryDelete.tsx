@@ -1,24 +1,25 @@
 import Confirm from "@/components/common/Confirm"
-import QuizCategoryService from "@/services/QuizCategoryService"
+import { quizCategoryHooks } from "@/redux/api/quizCategoryApi"
+import { QuizCategoryResponse } from "@/types/response/QuizCategoryResponse"
 import { handleMutation } from "@/util/mutation"
-import StateHelpers from "@/util/StateHelpers"
 import { Dispatch, SetStateAction } from "react"
 
 type Props = {
-    setQuizCategories: Dispatch<SetStateAction<QuizCategoryResponse[]>>,
     quizCategory: QuizCategoryResponse,
     open: boolean,
     setOpen: Dispatch<SetStateAction<boolean>>,
 }
-const QuizCategoryDelete = ({ setQuizCategories, quizCategory, open, setOpen }: Props) => {
+const QuizCategoryDelete = ({ quizCategory, open, setOpen }: Props) => {
+    const [deleteQuizCategory, { isLoading }] = quizCategoryHooks.useDeleteQuizCategoryMutation()
     const onCancel = () => {
         setOpen(false)
     }
-    const onContinue = () => {
-        handleMutation<void>(() => QuizCategoryService.delete(quizCategory.id), () => {
-            setOpen(false)
-            StateHelpers.removeItemById<RoleResponse>(setQuizCategories, quizCategory.id)
-        }, undefined,
+    const onContinue = async () => {
+        if (isLoading) return; // Prevent multiple submissions
+        await handleMutation<void>(
+            () => deleteQuizCategory(quizCategory.id).unwrap(),
+            () => setOpen(false),
+            error => console.log(error),
             { success: 'Delete success', error: 'Delete failed' })
     }
     return (

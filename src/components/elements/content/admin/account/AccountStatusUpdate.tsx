@@ -12,11 +12,11 @@ type Props = {
   setOpen: Dispatch<SetStateAction<boolean>>
 }
 const AccountStatusUpdate = ({ roles, account, open, setOpen }: Props) => {
-  const [updateStatus, { isLoading }] = accountHooks.useUpdateStatusMutation()
+  const [updateStatus, { isLoading }] = accountHooks.useUpdateAccountStatusMutation()
   const onSubmit = async (value: AccountStatusRequest) => {
     if (isLoading) return
     await handleMutation(
-      () => updateStatus({ id: account.id, body: value }).unwrap(),
+      () => updateStatus({ id: account.status.id, body: value }).unwrap(),
       () => setOpen(false),
       undefined, {
       error: 'Update failed',

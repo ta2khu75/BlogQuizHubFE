@@ -27,7 +27,7 @@ const AccountFilter = ({ roles, setAccountPage }: Props) => {
         createdTo: ParseHelper.parseDate(searchParams.get("createdTo")),
         page: Number(searchParams.get("page")),
     }), [searchParams])
-    const { data } = accountHooks.useSearchQuery(searchValues);
+    const { data } = accountHooks.useSearchAccountQuery(searchValues);
     const onSubmit = (data: AccountSearch) => {
         router.push(`${pathname}?${createQueryString(data)}`)
     }

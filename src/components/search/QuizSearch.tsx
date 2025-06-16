@@ -1,6 +1,7 @@
 import Paginator from '@/components/common/Paginator'
 import QuizFilter from '@/components/filter/QuizFilter'
 import QuizList from '@/components/list/QuizList'
+import { PageResponse } from '@/types/response/PageResponse'
 import { QuizResponse } from '@/types/response/QuizResponse'
 import React from 'react'
 

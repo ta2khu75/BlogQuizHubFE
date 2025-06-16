@@ -1,4 +1,5 @@
 import { apiSlice } from "@/redux/apiSlice";
+import { rtkQueryErrorLoggger } from "@/redux/middleware/errorLogger";
 import { rootReducer } from "@/redux/rootReducer";
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
@@ -18,7 +19,7 @@ export const store = configureStore({
             serializableCheck: {
                 ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
             },
-        }).concat(apiSlice.middleware),
+        }).concat(apiSlice.middleware, rtkQueryErrorLoggger),
 });
 setupListeners(store.dispatch)
 export type AppStore = typeof store;
