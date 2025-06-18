@@ -21,7 +21,7 @@ const CustomOnChangePlugin = ({ value, isDebounce, onChangeValue }: Props) => {
     try {
       const parsed = JSON.parse(value);
       const editorState = editor.parseEditorState(parsed);
-      editor.setEditorState(editorState);
+      editor.update(() => editor.setEditorState(editorState));
       lastSerialized.current = parsed;
       hasInitialized.current = true;
     } catch (err) {

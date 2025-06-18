@@ -2,6 +2,7 @@ import Paginator from '@/components/common/Paginator'
 import BlogFilter from '@/components/filter/BlogFilter'
 import BlogList from '@/components/list/BlogList'
 import { BlogResponse } from '@/types/response/BlogResponse'
+import { PageResponse } from '@/types/response/PageResponse'
 import React from 'react'
 
 const BlogSearch = () => {

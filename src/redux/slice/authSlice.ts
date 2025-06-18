@@ -20,6 +20,9 @@ export const authSlide = createSlice({
       state.access_token = undefined;
       state.profile = undefined;
       state.role = undefined;
+    },
+    resetToken: (state) => {
+      state.access_token = undefined
     }
   },
 });

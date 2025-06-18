@@ -1,4 +1,5 @@
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
+import { PageResponse } from '@/types/response/PageResponse'
 import { usePathname, useSearchParams } from 'next/navigation'
 import React, { useMemo } from 'react'
 type Props = {

@@ -5,7 +5,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { AccessModifier } from '@/types/AccessModifier'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, X } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import { BlogTagService } from '@/services/BlogTagService'
 import QuizService from '@/services/QuizService'
@@ -20,6 +20,8 @@ import ButtonSubmit from '@/components/common/ButtonSubmit'
 import { useAppDispatch } from '@/redux/hooks'
 import { BlogFormActions } from '@/redux/slice/BlogFormSlice'
 import { Combobox } from '@/components/common/Combobox'
+import { blogTagHooks } from '@/redux/api/blogTagApi'
+import { quizHooks } from '@/redux/api/quizApi'
 // import { BlogFormActions } from '@/redux/slice/BlogFormSlice'
 type Props = {
     onSubmit: (data: BlogRequest) => void,
@@ -31,9 +33,23 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
     // const [reset, setReset] = useState(false)
     const [searchBlogTag, setSearchBlogTag] = useState("")
     const [searchQuiz, setSearchQuiz] = useState("")
-    const [blogTags, setBlogTags] = useState<Option<number>[]>([])
-    const [quizzes, setQuizzes] = useState<Option<string>[]>([])
-    const blogDefault: BlogRequest = { title: "", content: "", quiz_ids: [0], tags: [{ id: 0, name: "" }], access_modifier: AccessModifier.PRIVATE }
+    const { data: blogTagData } = blogTagHooks.useSearchBlogTagQuery({ keyword: searchBlogTag })
+    const blogTags = useMemo(() => {
+        return blogTagData?.data?.content?.map((tag) => ({
+            value: tag.id,
+            label: tag.name,
+        })) ?? []
+    }, [blogTagData])
+    const { data: quizData } = quizHooks.useSearchQuizQuery({ keyword: searchQuiz })
+    const quizzes = useMemo(() => {
+        return quizData?.data?.content?.map((quiz) => ({
+            value: quiz.id,
+            label: quiz.title,
+        })) ?? []
+    }, [quizData])
+    // const [blogTags, setBlogTags] = useState<Option<number>[]>([])
+    // const [quizzes, setQuizzes] = useState<Option<string>[]>([])
+    const blogDefault: BlogRequest = { title: "", content: "", quiz_ids: [], tags: [{ id: 0, name: "" }], access_modifier: AccessModifier.PRIVATE }
     const [newTags, setNewTags] = useState<Option<number>[]>([])
     // const getBlogForm = () => {
     //     form.getValues()
@@ -85,35 +101,35 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
         //     setReset(!reset)
         // }
     }
-    const fetchBlogTag = async () => {
-        await handleMutation(() => BlogTagService.search(searchBlogTag), (res) => {
-            setBlogTags(res?.data?.map((tag) => ({
-                value: tag.id,
-                label: tag.name,
-            })) ?? [])
-        })
-    }
-    const fetchQuiz = async () => {
-        await handleMutation(() => {
-            return QuizService.readAllByKeyword(searchQuiz)
-        }, (res) => {
-            const quizzes = res.data.map((quiz) => ({
-                value: quiz.id,
-                label: quiz.title,
-            }))
-            setQuizzes(quizzes)
-        })
-    }
-    useEffect(() => {
-        if (searchQuiz.trim().length > 0) {
-            fetchQuiz()
-        }
-    }, [searchQuiz])
-    useEffect(() => {
-        if (searchBlogTag.trim().length > 0) {
-            fetchBlogTag()
-        }
-    }, [searchBlogTag])
+    // const fetchBlogTag = async () => {
+    //     await handleMutation(() => BlogTagService.search(searchBlogTag), (res) => {
+    //         setBlogTags(res?.data?.map((tag) => ({
+    //             value: tag.id,
+    //             label: tag.name,
+    //         })) ?? [])
+    //     })
+    // }
+    // const fetchQuiz = async () => {
+    //     await handleMutation(() => {
+    //         return QuizService.readAllByKeyword(searchQuiz)
+    //     }, (res) => {
+    //         const quizzes = res.data.map((quiz) => ({
+    //             value: quiz.id,
+    //             label: quiz.title,
+    //         }))
+    //         setQuizzes(quizzes)
+    //     })
+    // }
+    // useEffect(() => {
+    //     if (searchQuiz.trim().length > 0) {
+    //         fetchQuiz()
+    //     }
+    // }, [searchQuiz])
+    // useEffect(() => {
+    //     if (searchBlogTag.trim().length > 0) {
+    //         fetchBlogTag()
+    //     }
+    // }, [searchBlogTag])
 
     return (
         <Form {...form}>
@@ -130,7 +146,7 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                         </FormItem>
                     )} />
                     <FormItem>
-                        <Button type="button" className='bg-green-600 hover:bg-green-700' onClick={() => appendQuiz("")}>
+                        <Button type="button" className='bg-green-600 hover:bg-green-700' onClick={() => appendQuiz({ id: 0 })}>
                             <Plus />
                         </Button>
                         <FormLabel>Quiz</FormLabel>
@@ -144,7 +160,7 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                                         <FormItem>
                                             <div className='flex'>
                                                 <FormControl>
-                                                    <Combobox options={quizzes} onInputChange={setSearchQuiz} value={{ value: field.value, label: "" }} isOptionEqual={(a, b) => a.value === b.value} onSelectChange={(value) => field.onChange(value.value)} />
+                                                    <Combobox options={quizzes} onInputChange={setSearchQuiz} value={{ value: field.value.id, label: "" }} isOptionEqual={(a, b) => a.value === b.value} onSelectChange={(value) => field.onChange(value.value)} />
                                                 </FormControl>
                                                 <Button
                                                     type="button"

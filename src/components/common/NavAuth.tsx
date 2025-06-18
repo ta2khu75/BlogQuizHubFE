@@ -2,27 +2,22 @@
 import AvatarElement from '@/components/common/AvatarElement'
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { useToast } from '@/hooks/use-toast'
-import { useLoginMutation, useLogoutMutation } from '@/redux/api/authApi'
+import { useLogoutMutation } from '@/redux/api/authApi'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { AuthActions } from '@/redux/slice/authSlice'
+import { handleMutation } from '@/util/mutation'
 import Link from 'next/link'
 
 
 const NavAuth = () => {
   const auth = useAppSelector(state => state.auth)
-  const [logout] = useLogoutMutation()
-  const { toast } = useToast()
+  const [logout, { isLoading }] = useLogoutMutation()
   const dispatch = useAppDispatch()
   const onLogout = async () => {
-    try {
-      await logout().unwrap()
-      dispatch(AuthActions.reset())
-      toast({ variant: 'success', title: "Logout successful" })
-    } catch (error) {
-      const err = error as ApiResponse<object>;
-      toast({ variant: 'destructive', title: 'Logout failed', description: err.message })
-    }
+    if (isLoading)
+      await handleMutation(() => logout().unwrap(), () => {
+        dispatch(AuthActions.reset())
+      }, undefined, { success: "Logout successful", error: "Logout failed" })
   }
   return (
     <Popover>

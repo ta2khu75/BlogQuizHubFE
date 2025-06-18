@@ -10,6 +10,13 @@ export class BasePath {
             mineByKeyword: (keyword: string) => `${root}/mine/${keyword}`,
         };
     })();
+    static readonly comments = (() => {
+        const root = "comments"
+        return {
+            root: () => root,
+            byId: (id: number | string) => `${root}/${id}`,
+        }
+    })();
     static readonly auth = (() => {
         const root = "auth";
         return {
@@ -49,7 +56,9 @@ export class BasePath {
         return {
             root: () => root,
             byId: (id: number | string) => `${root}/${id}`,
+            comments: (id: number | string) => `${root}/${id}/comments`,
             tags: () => `${root}/tags`,
+
         };
     })();
     static readonly quizCategories = (() => {
@@ -60,8 +69,19 @@ export class BasePath {
         };
     })();
     static readonly blogTags = (() => {
-
-    })
+        const root = "blog-tags";
+        return {
+            root: () => root,
+            byId: (id: number | string) => `${root}/${id}`,
+        }
+    })();
+    static readonly follows = (() => {
+        const root = "follows";
+        return {
+            root: () => root,
+            byId: (id: number | string) => `${root}/${id}`,
+        }
+    })()
     // static readonly AUTH = "auth"
     // static readonly ACCOUNT = "accounts"
     // static readonly FOLLOW = "follows"

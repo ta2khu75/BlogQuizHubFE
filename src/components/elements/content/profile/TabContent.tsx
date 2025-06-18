@@ -18,7 +18,7 @@ const TabContent = ({ profile }: Props) => {
     const pathname = usePathname()
     const router = useRouter()
     const tab = searchParams.get('tab') ?? 'blog'
-    const isOwn = useIsOwn()
+    const isOwn = useIsOwn(profile?.id)
     const onTabChange = (value: string) => {
         const params = new URLSearchParams(searchParams.toString())
         params.set('tab', value)

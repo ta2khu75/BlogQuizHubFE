@@ -1,33 +1,27 @@
+import Paginator from '@/components/common/Paginator'
 import CommentElement from '@/components/elements/content/comment/CommentItem'
-import Pageination from '@/components/elements/util/Pageination'
-import { useToast } from '@/hooks/use-toast'
-import { CommentService } from '@/services/CommentService'
+import { commentHooks } from '@/redux/api/commentApi'
+import { CommentResponse } from '@/types/response/CommentResponse'
+import { PageResponse } from '@/types/response/PageResponse'
+import { handleMutation } from '@/util/mutation'
 import React from 'react'
 type Props = {
     commentPage?: PageResponse<CommentResponse>
     blog_id: string
-    auth: AuthResponse
-    setCommentPage: React.Dispatch<React.SetStateAction<PageResponse<CommentResponse> | undefined>>
 }
-const CommentPagination = ({ commentPage, blog_id, auth, setCommentPage }: Props) => {
-    const { toast } = useToast()
-    const onDelete = (commentId: string) => {
-        CommentService.delete(commentId).then(res => {
-            if (res.success) {
-                setCommentPage(prev => prev ? { ...prev, total_elements: prev.total_elements - 1, content: prev.content?.filter(commentItem => commentId !== commentItem.info.id) } : undefined)
-                toast({ title: "Delete success" })
-            } else {
-                toast({ title: "Delete comment failed", description: res.message_error, variant: "destructive" })
-            }
-        })
+const CommentPagination = ({ commentPage, blog_id }: Props) => {
+    const [deleteComment, { isLoading }] = commentHooks.useDeleteCommentMutation();
+    const onDelete = async (commentId: string) => {
+        if (isLoading) return
+        await handleMutation(() => deleteComment(commentId), () => { }, undefined, { error: "Delete failed", success: "Delete success" })
     }
     return (
         <div className='w-full'>
             {
-                commentPage?.content?.map(comment => <CommentElement onDelete={() => onDelete(comment.info.id)} blog_id={blog_id} key={comment?.info.id} setCommentPage={setCommentPage} isAuthor={comment?.author?.info?.id === auth.account?.info.id} comment={comment} />)
+                commentPage?.content?.map(comment => <CommentElement onDelete={() => onDelete(comment.id)} blog_id={blog_id} key={comment?.id} comment={comment} />)
             }
             {
-                commentPage && <Pageination<CommentResponse> page={commentPage} />
+                commentPage && <Paginator page={commentPage} />
             }
         </div>
     )

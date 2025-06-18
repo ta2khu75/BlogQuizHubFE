@@ -9,10 +9,10 @@ import { accountHooks } from '@/redux/api/accountApi';
 import { useSearchParams } from 'next/navigation';
 const ProfilePage = () => {
     const searchParams = useSearchParams()
-    const profile_id = searchParams.get('id')
-    const { data } = accountHooks.useReadAccountProfileQuery(Number(profile_id), { skip: !profile_id })
+    const profileId = searchParams.get('id')
+    const { data } = accountHooks.useReadAccountProfileQuery(Number(profileId), { skip: !profileId })
     const profile = data?.data
-    const isOwner = useIsOwner();
+    const isOwner = useIsOwner(Number(profileId));
 
     return (
         <div>
@@ -30,7 +30,7 @@ const ProfilePage = () => {
                         isOwner ? <>
                             <ChangeProfile profile={profile} />
                             <ChangePassword />
-                        </> : <FollowProfile />
+                        </> : <FollowProfile profileId={Number(profileId)} />
                     }
                 </div>
             </div>

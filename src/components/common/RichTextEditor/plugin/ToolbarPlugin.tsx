@@ -2,7 +2,7 @@ import { HEADINGS, LOW_PRIORIRTY, RICH_TEXT_OPTIONS, RichTextAction } from '@/co
 import TooltipElement from '@/components/common/TooltipElement'
 import { Separator } from '@/components/ui/separator'
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
-import { $getSelection, $isRangeSelection, CAN_REDO_COMMAND, CAN_UNDO_COMMAND, FORMAT_ELEMENT_COMMAND, FORMAT_TEXT_COMMAND, REDO_COMMAND, SELECTION_CHANGE_COMMAND, UNDO_COMMAND } from 'lexical'
+import { $getSelection, $isElementNode, $isRangeSelection, CAN_REDO_COMMAND, CAN_UNDO_COMMAND, ElementNode, FORMAT_ELEMENT_COMMAND, FORMAT_TEXT_COMMAND, REDO_COMMAND, SELECTION_CHANGE_COMMAND, TextNode, UNDO_COMMAND } from 'lexical'
 import { useEffect, useState } from 'react'
 import { mergeRegister, $getNearestNodeOfType } from "@lexical/utils"
 import { Button } from '@/components/ui/button'
@@ -28,19 +28,29 @@ const ToolbarPlugin = () => {
     const [selectedHeading, setSelectedHeading] = useState<string>()
     const [selectionRecord, setSelectionRecord] = useState<Partial<Record<RichTextAction, boolean>>>({
     })
+    const updateHeadings = (elementNode: ElementNode) => {
+        if (elementNode instanceof HeadingNode) {
+            const tag = elementNode.getTag(); // Trả về 'h1', 'h2', ...
+            setSelectedHeading(tag as string); // <- bạn cần một state để lưu heading hiện tại
+        } else {
+            setSelectedHeading("paragraph"); // Không phải heading
+        }
+    }
+    const updateAlignment = (elementNode: ElementNode) => {
+        if ($isElementNode(elementNode)) {
+            const alignment = elementNode.getFormatType?.() ?? 'left';
+            return alignment;
+        }
+    }
     const updateToolbar = () => {
         const selection = $getSelection();
         if ($isRangeSelection(selection)) {
             const anchorNode = selection.anchor.getNode();
+            const elementNode = anchorNode.getTopLevelElementOrThrow();
+            const alignment = updateAlignment(elementNode);
+            updateHeadings(elementNode)
             // Tìm node heading gần nhất
             const parent = anchorNode.getParent();
-
-            if (parent instanceof HeadingNode) {
-                const tag = parent.getTag(); // Trả về 'h1', 'h2', ...
-                setSelectedHeading(tag as string); // <- bạn cần một state để lưu heading hiện tại
-            } else {
-                setSelectedHeading(undefined); // Không phải heading
-            }
             setIsLink($isLinkNode(parent));
 
             const newSelectionRecord = {
@@ -52,6 +62,10 @@ const ToolbarPlugin = () => {
                 [RichTextAction.Subscript]: selection.hasFormat("subscript"),
                 [RichTextAction.Highlight]: selection.hasFormat("highlight"),
                 [RichTextAction.Code]: selection.hasFormat("code"),
+                [RichTextAction.LeftAlign]: alignment === "left",
+                [RichTextAction.RightAlign]: alignment === "right",
+                [RichTextAction.CenterAlign]: alignment === "center",
+                [RichTextAction.JustifyAlign]: alignment === "justify",
             }
             setSelectionRecord(newSelectionRecord);
 

@@ -1,9 +1,10 @@
 import { AccessModifier } from "@/types/AccessModifier";
+import { BlogBase } from "@/types/base/BlogBase";
 import { z } from "zod";
 
 export interface BlogRequest extends BlogBase {
     content: string;
-    quiz_ids?: string[];
+    quiz_ids?: { id: string }[];
 }
 export const blogRequestSchema = z.object({
     title: z.string().min(3),
@@ -15,6 +16,6 @@ export const blogRequestSchema = z.object({
         }).nonempty()
     })).min(1),
     access_modifier: z.nativeEnum(AccessModifier),
-    quiz_ids: z.string().array().optional()
+    quiz_ids: z.array(z.object({ id: z.number().int().positive() })).optional()
 })
 // export type BlogRequestSchema = z.infer<typeof blogRequestSchema>;

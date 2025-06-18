@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import AuthService from '@/services/AuthService'
 import { AccountPasswordRequest } from '@/types/request/account/AccountPasswordRequest'
+import { ApiResponse } from '@/types/response/ApiResponse'
 import React, { useState } from 'react'
 
 const ChangePassword = () => {

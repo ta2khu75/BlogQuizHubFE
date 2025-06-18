@@ -54,7 +54,7 @@ const refreshTokenAndRetryRequest = async (error: AxiosError<ApiResponse<object>
       return api.request(error.config);
     }
   }, () => {
-    store.dispatch(AuthActions.reset());
+    // store.dispatch(AuthActions.reset());
     window.location.href = "/login";
   });
 };
@@ -77,12 +77,12 @@ const handleTokenError = (error: AxiosError<ApiResponse<object>, any>, api: Axio
           if (description.includes("Jwt expired")) {
             return refreshTokenAndRetryRequest(error, api);
           } else {
-            store.dispatch(AuthActions.reset());
+            // store.dispatch(AuthActions.reset());
           }
           break;
 
         case "missing_token":
-          store.dispatch(AuthActions.reset());
+          // store.dispatch(AuthActions.reset());
           break;
 
         default:

@@ -26,7 +26,7 @@ const ChangeProfile = ({ profile }: Props) => {
     return (
         <>
             <Button onClick={() => setOpen(true)}>Change profile</Button>
-            <Modal open={open} onCancel={() => setOpen(false)} title='Change Profile' description='Please enter your new profile'>
+            <Modal open={open} setOpen={setOpen} title='Change Profile' description='Please enter your new profile'>
                 <AccountProfileForm profile={profile} onSubmit={onSubmit} />
             </Modal>
         </>

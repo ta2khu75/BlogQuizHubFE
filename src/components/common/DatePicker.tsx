@@ -16,7 +16,7 @@ interface DatePickerProps {
     startYear?: number;
     endYear?: number;
     isBirthday?: boolean;
-    value: Date;
+    value?: Date;
     onChange: (date: Date) => void;
 }
 export function DatePicker({
@@ -48,12 +48,12 @@ export function DatePicker({
     );
 
     const handleMonthChange = (month: string) => {
-        const newDate = setMonth(value, months.indexOf(month));
+        const newDate = setMonth(value ?? new Date(), months.indexOf(month));
         onChange(newDate);
     }
 
     const handleYearChange = (year: string) => {
-        const newDate = setYear(value, parseInt(year));
+        const newDate = setYear(value ?? new Date(), parseInt(year));
         onChange(newDate);
     }
 
@@ -85,7 +85,7 @@ export function DatePicker({
                 <div className="flex justify-between p-2">
                     <Select
                         onValueChange={handleMonthChange}
-                        value={months[getMonth(value)]}
+                        value={months[getMonth(value ?? new Date())]}
                     >
                         <SelectTrigger className="w-[110px]">
                             <SelectValue placeholder="Month" />
@@ -98,7 +98,7 @@ export function DatePicker({
                     </Select>
                     <Select
                         onValueChange={handleYearChange}
-                        value={getYear(value).toString()}
+                        value={getYear(value ?? new Date()).toString()}
                     >
                         <SelectTrigger className="w-[110px]">
                             <SelectValue placeholder="Year" />

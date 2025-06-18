@@ -3,10 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { BlogService } from '@/services/BlogService'
-import { BlogTagService } from '@/services/BlogTagService'
+import { blogHooks } from '@/redux/api/blogApi'
+import { blogTagHooks } from '@/redux/api/blogTagApi'
+import { BlogSearch } from '@/types/request/search/BlogSearch'
 import { BlogResponse } from '@/types/response/BlogResponse'
-import { handleMutation } from '@/util/mutation'
+import { PageResponse } from '@/types/response/PageResponse'
+import ParseHelper from '@/util/ParseHelper'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Label } from '@radix-ui/react-label'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -16,32 +18,35 @@ import { z, ZodType } from 'zod'
 
 const formSchema: ZodType<BlogSearch> = z.object({
     keyword: z.string().optional(),
-    blogTagNames: z.array(z.string()).optional(),
+    tagIds: z.array(z.number().positive()).optional(),
     minView: z.number().min(0).optional(),
     maxView: z.number().min(0).optional(),
 })
 type Props = {
     setBlogPage: React.Dispatch<React.SetStateAction<PageResponse<BlogResponse> | undefined>>
 }
-// Get a new searchParams string by merging the current
-// searchParams with a provided key/value pair
 const BlogFilter = ({ setBlogPage }: Props) => {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const searchValues = useMemo(() => ({
-        keyword: searchParams.get("keyword") ?? undefined,
-        blogTagNames: searchParams.getAll("blogTagNames"),
-        minView: Number(searchParams.get("minView")) || undefined,
-        maxView: Number(searchParams.get("maxView")) || undefined,
-        page: Number(searchParams.get("page")) || 1,
-        authorId: searchParams.get("id") ?? undefined,
+        keyword: ParseHelper.parseString(searchParams.get("keyword")),
+        tagIds: searchParams.getAll("tagIds").map(Number),
+        minView: ParseHelper.parseNumber(searchParams.get("minView")),
+        maxView: ParseHelper.parseNumber(searchParams.get("maxView")),
+        page: ParseHelper.parseNumber(searchParams.get("page")) ?? 1,
+        authorId: ParseHelper.parseString(searchParams.get("authorId")),
     }), [searchParams])
-    const [blogTagNamesList, setBlogTagNamesList] = React.useState<string[]>([])
+    const { data: blogTagData } = blogTagHooks.useSearchBlogTagQuery({ page: 1, size: 10, direction: "asc", sort_by: "createdAt" })
+    const { data: blogData } = blogHooks.useSearchBlogQuery(searchValues);
+    const blogTagPage = useMemo(() => blogTagData?.data, [blogTagData]);
+    const blogPage = useMemo(() => blogData?.data, [blogData]);
+    useEffect(() => {
+        if (blogPage) setBlogPage(blogPage)
+    }, [blogPage, setBlogPage])
     const createQueryString = useCallback(
         (search: BlogSearch) => {
             console.log(search);
-
             const params = new URLSearchParams(searchParams.toString())
             Object.entries(search).forEach(([key, value]) => {
                 if (Array.isArray(value)) {
@@ -62,29 +67,15 @@ const BlogFilter = ({ setBlogPage }: Props) => {
         resolver: zodResolver(formSchema),
         defaultValues: {
             keyword: "",
-            blogTagNames: [],
+            tagIds: [],
             minView: undefined,
             maxView: undefined
         },
         shouldUnregister: false
     })
     useEffect(() => {
-        fetchBlogTagNames()
-    }, [])
-    useEffect(() => {
         form.reset(searchValues)
-        fetchSearch()
-    }, [searchValues])
-    const fetchBlogTagNames = () => {
-        handleMutation(() => BlogTagService.readAll(), res => {
-            setBlogTagNamesList(res.data.map((tag) => tag.name))
-        })
-    }
-    const fetchSearch = () => {
-        handleMutation(() => BlogService.search(searchValues), res => {
-            setBlogPage(res.data)
-        });
-    }
+    }, [searchValues, form])
     const onFilter = (data: BlogSearch) => {
         const queryString = createQueryString(data)
         router.push(`${pathname}?${queryString}`)
@@ -139,40 +130,40 @@ const BlogFilter = ({ setBlogPage }: Props) => {
                         </div>
                         <FormField
                             control={form.control}
-                            name="blogTagNames"
+                            name="tagIds"
                             render={() => (
                                 <FormItem>
                                     <div className="mb-4">
                                         <FormLabel className="text-base">Blog tag</FormLabel>
                                     </div>
                                     <div className='grid grid-cols-2'>
-                                        {blogTagNamesList.map((blogTag) => (
+                                        {blogTagPage?.content?.map((blogTag) => (
                                             <FormField
-                                                key={blogTag}
+                                                key={blogTag.id}
                                                 control={form.control}
-                                                name="blogTagNames"
+                                                name="tagIds"
                                                 render={({ field }) => {
                                                     return (
                                                         <FormItem
-                                                            key={blogTag}
+                                                            key={blogTag.id}
                                                             className="flex flex-row items-start space-x-3 space-y-0"
                                                         >
                                                             <FormControl>
                                                                 <Checkbox
-                                                                    checked={field.value?.includes(blogTag)}
+                                                                    checked={field.value?.includes(blogTag.id)}
                                                                     onCheckedChange={(checked) => {
                                                                         return checked
-                                                                            ? field.onChange([...field.value ?? [], blogTag])
+                                                                            ? field.onChange([...field.value ?? [], blogTag.id])
                                                                             : field.onChange(
                                                                                 field.value?.filter(
-                                                                                    (value) => value !== blogTag
+                                                                                    (value) => value !== blogTag.id
                                                                                 )
                                                                             )
                                                                     }}
                                                                 />
                                                             </FormControl>
                                                             <FormLabel className="text-sm font-normal">
-                                                                {blogTag}
+                                                                {blogTag.name}
                                                             </FormLabel>
                                                         </FormItem>
                                                     )

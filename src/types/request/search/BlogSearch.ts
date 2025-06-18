@@ -1,7 +1,7 @@
 import { Search } from "@/types/request/search/Search";
 
 export interface BlogSearch extends Search {
-    blogTagNames?: string[],
+    tagIds?: number[],
     minView?: number,
     maxView?: number,
 }

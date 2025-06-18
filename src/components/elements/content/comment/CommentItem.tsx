@@ -1,36 +1,29 @@
 import AvatarElement from '@/components/common/AvatarElement'
-import Confirm from '@/components/elements/util/Confirm'
+import Confirm from '@/components/common/Confirm'
 import CommentForm from '@/components/form/CommentForm'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import { useToast } from '@/hooks/use-toast'
-import { CommentService } from '@/services/CommentService'
-import FunctionUtil from '@/util/FunctionUtil'
+import useIsOwner from '@/hooks/useIsOwn'
+import { commentHooks } from '@/redux/api/commentApi'
+import { CommentRequest } from '@/types/request/CommentRequest'
+import { CommentResponse } from '@/types/response/CommentResponse'
+import { handleMutation } from '@/util/mutation'
 import Link from 'next/link'
 import React, { useState } from 'react'
 type Props = {
     comment: CommentResponse,
-    isAuthor: boolean,
     blog_id: string,
-    setCommentPage: React.Dispatch<React.SetStateAction<PageResponse<CommentResponse> | undefined>>
     onDelete: () => void
 
 }
-const CommentItem = ({ comment, isAuthor, blog_id, setCommentPage, onDelete }: Props) => {
+const CommentItem = ({ comment, blog_id, onDelete }: Props) => {
     const [open, setOpen] = useState(false)
+    const [updateComment, { isLoading }] = commentHooks.useUpdateCommentMutation()
     const [openConfirm, setOpenConfirm] = useState(false)
-    const { toast } = useToast()
+    const isOwner = useIsOwner(comment.author.id)
     const onSubmit = async (value: CommentRequest) => {
-        try {
-            const res = await CommentService.update(comment.info.id, value)
-            if (res.success) {
-                setCommentPage(prev => prev ? { ...prev, content: prev?.content.map(comment => comment.info.id === res.data.info.id ? res.data : comment) } : undefined)
-                setOpen(false)
-                toast({ title: "Update success" })
-            }
-        } catch (error) {
-            toast({ title: "Update comment failed", description: FunctionUtil.showError(error), variant: "destructive" })
-        }
+        if (isLoading) return
+        await handleMutation(() => updateComment({ id: comment.id, body: value }).unwrap(), () => { setOpen(false) }, undefined, { error: "Update failed", success: "Update success" })
     }
     const isOpenForm = () => {
         if (open) return <CommentForm comment={comment} onSubmit={onSubmit} blog_id={blog_id} />
@@ -40,8 +33,8 @@ const CommentItem = ({ comment, isAuthor, blog_id, setCommentPage, onDelete }: P
         <Card>
             <CardHeader>
                 <div className='flex justify-between items-center'>
-                    <Link href={`/profile?id=${comment.author.info.id}`}><AvatarElement account={comment.author} /></Link>
-                    {isAuthor &&
+                    <Link href={`/profile?id=${comment.author.id}`}><AvatarElement profile={comment.author} /></Link>
+                    {isOwner &&
                         <div>
                             {open ?
                                 <Button onClick={() => setOpen(false)}>Cancel</Button> :
@@ -57,7 +50,7 @@ const CommentItem = ({ comment, isAuthor, blog_id, setCommentPage, onDelete }: P
             <CardContent>
                 {isOpenForm()}
             </CardContent>
-            <CardFooter>{comment.info.created_at}</CardFooter>
+            <CardFooter>{comment.created_at}</CardFooter>
             <Confirm onContinue={onDelete} onCancel={() => setOpenConfirm(false)} open={openConfirm} title={"Delete comment"} description={"Are you sure you want to delete this comment?"} />
         </Card >
     )

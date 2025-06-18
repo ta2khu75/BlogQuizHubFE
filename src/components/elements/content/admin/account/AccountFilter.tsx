@@ -1,9 +1,17 @@
 import ButtonSubmit from '@/components/common/ButtonSubmit'
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
+import { DatePicker } from '@/components/common/DatePicker'
+import Selection from '@/components/common/Selection'
+import { Button } from '@/components/ui/button'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { accountHooks } from '@/redux/api/accountApi'
+import { AccountSearch } from '@/types/request/search/AccountSearch'
+import { Search } from '@/types/request/search/Search'
 import { AccountResponse } from '@/types/response/Account/AccountResponse'
+import { PageResponse } from '@/types/response/PageResponse'
 import ParseHelper from '@/util/ParseHelper'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useMemo } from 'react'
@@ -61,6 +69,19 @@ const AccountFilter = ({ roles, setAccountPage }: Props) => {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
+                <FormField control={form.control} name='keyword' render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Keyword</FormLabel>
+                        <FormControl>
+                            <div className="flex w-full max-w-sm items-center gap-2">
+                                <Input placeholder='Keyword' {...field} />
+                                <Button type="submit">
+                                    Search
+                                </Button>
+                            </div>
+                        </FormControl>
+                    </FormItem>
+                )} />
                 <FormField control={form.control} name='enabled' render={({ field }) => (
                     <FormItem>
                         <FormLabel>Enabled</FormLabel>
@@ -82,14 +103,14 @@ const AccountFilter = ({ roles, setAccountPage }: Props) => {
                                         <RadioGroupItem value={'false'} />
                                     </FormControl>
                                     <FormLabel className="font-normal">
-                                        Not completed
+                                        False
                                     </FormLabel>
                                 </FormItem>
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>
                                         <RadioGroupItem value={'true'} />
                                     </FormControl>
-                                    <FormLabel className="font-normal">Completed</FormLabel>
+                                    <FormLabel className="font-normal">True</FormLabel>
                                 </FormItem>
                             </RadioGroup>
                         </FormControl>
@@ -116,14 +137,14 @@ const AccountFilter = ({ roles, setAccountPage }: Props) => {
                                         <RadioGroupItem value={'false'} />
                                     </FormControl>
                                     <FormLabel className="font-normal">
-                                        Not completed
+                                        True
                                     </FormLabel>
                                 </FormItem>
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>
                                         <RadioGroupItem value={'true'} />
                                     </FormControl>
-                                    <FormLabel className="font-normal">Completed</FormLabel>
+                                    <FormLabel className="font-normal">False</FormLabel>
                                 </FormItem>
                             </RadioGroup>
                         </FormControl>
@@ -133,21 +154,41 @@ const AccountFilter = ({ roles, setAccountPage }: Props) => {
                     <FormItem>
                         <FormLabel>Role</FormLabel>
                         <FormControl>
-                            <Select onValueChange={(value) => field.onChange(Number(value))} value={`${field.value}`}>
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select a verified email to display" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {roles.map(role => (
-                                        <SelectItem key={role.id} value={`${role.id}`}>{role.name}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <Selection options={roles.map(role => ({ value: role.id, label: role.name }))} {...field} />
                         </FormControl>
                     </FormItem>
                 )} />
+                <div>
+                    <Label className="text-base">Created date range</Label>
+                    <div className='grid grid-cols-2 gap-4'>
+                        <FormField control={form.control} name='createdFrom' render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Created From</FormLabel>
+                                <FormControl>
+                                    {/* <Input type='number' placeholder="Min"
+                                                value={field.value ?? ""}
+                                                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                                            /> */}
+                                    <DatePicker value={field.value} onChange={field.onChange} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                        <FormField control={form.control} name='createdTo' render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Created To</FormLabel>
+                                <FormControl>
+                                    <DatePicker value={field.value} onChange={field.onChange} />
+                                    {/* <Input type='number' placeholder="Max"
+                                                value={field.value ?? ""}
+                                                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                                            /> */}
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                    </div>
+                </div>
                 <ButtonSubmit onReset={onReset} isSubmitting={form.formState.isSubmitting} />
             </form>
         </Form >
