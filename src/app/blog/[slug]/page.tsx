@@ -61,10 +61,10 @@ const BlogDetailPage = ({ id }: Props) => {
                         {blog?.tags.map(tag => <Badge key={tag.id} className='text-3xl'><Link href={"/blog/search?tag=" + tag}>{tag.name}</Link></Badge>)}
                     </CardTitle>
                 </CardHeader>
-                {
+                {/* {
                     blog?.content &&
                     <CardContent className="my-4" dangerouslySetInnerHTML={{ __html: (JSON.parse(blog.content) as Descendant[]).map(n => serializeToHtml(n)).join("") }}></CardContent>
-                }
+                } */}
                 {/* <ReportElement targetId={blogId} targetType={TargetType.BLOG} /> */}
                 <CardFooter className='flex flex-col'>
                     <div className='w-full mb-4'>

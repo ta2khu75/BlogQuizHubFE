@@ -32,20 +32,45 @@ export const blogApi = apiSlice.injectEndpoints({
             query: (id) => path.byId(id),
             providesTags: (result, error, arg) => [{ type: tag, id: arg }]
         }),
-        createBlog: builder.mutation<ApiResponse<BlogResponse>, BlogRequest>({
-            query: (data) => ({
-                url: path.root(),
-                method: 'POST',
-                body: data,
-            }),
+        readBlogDetail: builder.query<ApiResponse<BlogResponse>, string>({
+            query: (id) => path.detail(id),
+            providesTags: (result, error, arg) => [{ type: tag, id: arg }]
+        }),
+        createBlog: builder.mutation<ApiResponse<BlogResponse>, { image?: File, body: BlogRequest }>({
+            query: (data) => {
+                const blog = { ...data.body, quiz_ids: data.body.quiz_ids?.map(quiz => quiz.id) };
+                console.log(blog);
+                const form = new FormData();
+                if (data.image) {
+                    form.append('image', data.image);
+                }
+                form.append('blog', JSON.stringify(blog));
+                return {
+                    url: path.root(),
+                    method: 'POST',
+                    body: form,
+                }
+            },
             invalidatesTags: (result, error) => error ? [] : defaultTag,
         }),
-        updateBlog: builder.mutation<ApiResponse<BlogResponse>, { id: number, body: BlogRequest }>({
-            query: (data) => ({
-                url: path.byId(data.id),
-                method: 'PUT',
-                body: data.body,
-            }),
+        updateBlog: builder.mutation<ApiResponse<BlogResponse>, { id: number, image?: File, body: BlogRequest }>({
+            query: (data) => {
+                console.log(data.body);
+
+                const form = new FormData();
+
+                if (data.image) {
+                    form.append('image', data.image);
+                }
+                form.append('blog',
+                    JSON.stringify({ ...data.body, quiz_ids: data.body.quiz_ids?.map(quiz => quiz.id) })
+                );
+                return {
+                    url: path.byId(data.id),
+                    method: 'PUT',
+                    body: form,
+                }
+            },
             invalidatesTags: (result, error, data) => error ? [] : [{ type: tag, id: data.id }]
         }),
         deleteBlog: builder.mutation<ApiResponse<void>, number>({
@@ -74,8 +99,9 @@ export const blogApi = apiSlice.injectEndpoints({
         })
     }),
 });
-const { useCreateBlogMutation, useReadBlogCommentQuery, useDeleteBlogMutation, useCreateBlogCommentMutation, useReadBlogQuery, useUpdateBlogMutation, useSearchBlogQuery } = blogApi;
+const { useReadBlogDetailQuery, useCreateBlogMutation, useReadBlogCommentQuery, useDeleteBlogMutation, useCreateBlogCommentMutation, useReadBlogQuery, useUpdateBlogMutation, useSearchBlogQuery } = blogApi;
 export const blogHooks = {
+    useReadBlogDetailQuery,
     useSearchBlogQuery,
     useCreateBlogMutation,
     useUpdateBlogMutation,

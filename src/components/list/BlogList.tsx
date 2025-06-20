@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import useIsAuthor from '@/components/util/useIsAuthor'
 import { BlogResponse } from '@/types/response/BlogResponse'
+import { PageResponse } from '@/types/response/PageResponse'
 import StringUtil from '@/util/StringUtil'
 import Link from 'next/link'
 type Props = {
@@ -29,7 +30,7 @@ const BlogList = ({ blogPage }: Props) => {
                         </CardHeader>
                         <CardContent className='flex flex-col gap-y-2'>
                             <CardTitle>
-                                <Link href={`/blog/${StringUtil.convertSlugUrl(blog.title)}-id-${blog.id}.html`} className={"hover:underline"}>{blog.title}</Link>
+                                <Link href={`/${StringUtil.convertSlugUrl(blog.title)}-b${blog.id}.html`} className={"hover:underline"}>{blog.title}</Link>
                             </CardTitle>
                             <div className='flex flex-wrap'>
                                 {blog.tags.map(tag => <Badge key={tag.id}>{tag.name}</Badge>)}

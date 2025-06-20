@@ -17,7 +17,7 @@ const BlogCreatePage = () => {
     const [createBlog, { isLoading }] = blogHooks.useCreateBlogMutation()
     const onSubmit = async (data: BlogRequest) => {
         if (isLoading) return
-        await handleMutation(() => createBlog(data).unwrap(), () => {
+        await handleMutation(() => createBlog({ body: data }).unwrap(), () => {
             router.push("/profile")
         }, undefined, { error: "Create failed", success: "Create success" })
         // await fetchCreate(data)

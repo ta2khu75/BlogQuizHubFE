@@ -5,33 +5,27 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { AccessModifier } from '@/types/AccessModifier'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, X } from 'lucide-react'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
-import { BlogTagService } from '@/services/BlogTagService'
-import QuizService from '@/services/QuizService'
 // import { Combobox } from '@/components/common/Combobox'
 import { BlogResponse } from '@/types/response/BlogResponse'
 import RichTextEditor from '@/components/common/RichTextEditor/RichTextEditor'
 import { BlogRequest, blogRequestSchema } from '@/types/request/BlogRequest'
 import { Option } from '@/types/Option'
-import { handleMutation } from '@/util/mutation'
 import BlogFormSync from '@/components/form/BlogFormSync'
 import ButtonSubmit from '@/components/common/ButtonSubmit'
-import { useAppDispatch } from '@/redux/hooks'
-import { BlogFormActions } from '@/redux/slice/BlogFormSlice'
 import { Combobox } from '@/components/common/Combobox'
 import { blogTagHooks } from '@/redux/api/blogTagApi'
 import { quizHooks } from '@/redux/api/quizApi'
-// import { BlogFormActions } from '@/redux/slice/BlogFormSlice'
+import BlogFormInitializer from '@/components/form/BlogFormInitializer'
 type Props = {
     onSubmit: (data: BlogRequest) => void,
     blog?: BlogResponse
 }
 
 const BlogForm = ({ onSubmit, blog }: Props) => {
-    const dispath = useAppDispatch()
-    // const [reset, setReset] = useState(false)
     const [searchBlogTag, setSearchBlogTag] = useState("")
+    const [formActive, setFormActive] = useState(false)
     const [searchQuiz, setSearchQuiz] = useState("")
     const { data: blogTagData } = blogTagHooks.useSearchBlogTagQuery({ keyword: searchBlogTag })
     const blogTags = useMemo(() => {
@@ -47,41 +41,15 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
             label: quiz.title,
         })) ?? []
     }, [quizData])
-    // const [blogTags, setBlogTags] = useState<Option<number>[]>([])
-    // const [quizzes, setQuizzes] = useState<Option<string>[]>([])
-    const blogDefault: BlogRequest = { title: "", content: "", quiz_ids: [], tags: [{ id: 0, name: "" }], access_modifier: AccessModifier.PRIVATE }
+    const blogDefault: BlogRequest = { title: "", content: "", quiz_ids: [{ id: "" }], tags: [{ id: 0, name: "" }], access_modifier: AccessModifier.PRIVATE }
     const [newTags, setNewTags] = useState<Option<number>[]>([])
-    // const getBlogForm = () => {
-    //     form.getValues()
-    //     const blogForm = localStorage.getItem("blogForm")
-    //     if (blogForm) {
-    //         return JSON.parse(blogForm)
-    //     } return undefined;
-    // }
-    // const blogForm = getBlogForm()
-    // useEffect(() => {
-    //     if (_.isEqual(blogForm, blogDefault) && blog) {
-    //         form.reset({ ...blog, quiz_ids: blog?.quizzes?.map((quiz) => quiz.id), content: JSON.parse(blog.content) });
-    //         setQuizzes(blog?.quizzes?.map((quiz) => ({ value: quiz.id, label: quiz.title })) ?? [])
-    //     }
-    // }, [blog])
-    // useEffect(() => {
-    //     if (tagFields.length === 0) {
-    //         appendTag({ id: 0, name: "" }); // Nếu mảng trống, thêm phần tử mới
-    //     }
-    // }, [tagFields.length, appendTag]);
-    // useEffect(() => {
-    //     const subscription = form.watch((values) => {
-    //         localStorage.setItem("blogForm", JSON.stringify(values));
-    //     });
-    //     return () => subscription.unsubscribe();
-    // }, []);
-
     const form = useForm<BlogRequest>({
         resolver: zodResolver(blogRequestSchema),
         defaultValues: blogDefault,
-        shouldUnregister: false
+        shouldUnregister: true
     })
+    console.log(form.formState.errors);
+
     const { fields: tagFields, append: appendTag, remove: removeTag } = useFieldArray({
         control: form.control,
         name: "tags",
@@ -91,51 +59,12 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
         name: "quiz_ids",
     });
     const onReset = () => {
-        dispath(BlogFormActions.reset())
-        // Reset the form state in the Redux store
-        // if (blog) {
-        //     form.reset({ ...blog, quiz_ids: blog?.quizzes?.map((quiz) => quiz.id), content: JSON.parse(blog.content) });
-        //     setQuizzes(blog?.quizzes?.map((quiz) => ({ value: quiz.id, label: quiz.title })) ?? [])
-        // } else {
-        //     form.reset(blogDefault)
-        //     setReset(!reset)
-        // }
+        form.reset(blogDefault)
     }
-    // const fetchBlogTag = async () => {
-    //     await handleMutation(() => BlogTagService.search(searchBlogTag), (res) => {
-    //         setBlogTags(res?.data?.map((tag) => ({
-    //             value: tag.id,
-    //             label: tag.name,
-    //         })) ?? [])
-    //     })
-    // }
-    // const fetchQuiz = async () => {
-    //     await handleMutation(() => {
-    //         return QuizService.readAllByKeyword(searchQuiz)
-    //     }, (res) => {
-    //         const quizzes = res.data.map((quiz) => ({
-    //             value: quiz.id,
-    //             label: quiz.title,
-    //         }))
-    //         setQuizzes(quizzes)
-    //     })
-    // }
-    // useEffect(() => {
-    //     if (searchQuiz.trim().length > 0) {
-    //         fetchQuiz()
-    //     }
-    // }, [searchQuiz])
-    // useEffect(() => {
-    //     if (searchBlogTag.trim().length > 0) {
-    //         fetchBlogTag()
-    //     }
-    // }, [searchBlogTag])
-
     return (
         <Form {...form}>
             <FormProvider {...form} >
                 <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
-                    <BlogFormSync />
                     <FormField control={form.control} name='title' render={({ field }) => (
                         <FormItem>
                             <FormLabel>Title</FormLabel>
@@ -146,7 +75,7 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                         </FormItem>
                     )} />
                     <FormItem>
-                        <Button type="button" className='bg-green-600 hover:bg-green-700' onClick={() => appendQuiz({ id: 0 })}>
+                        <Button type="button" className='bg-green-600 hover:bg-green-700' onClick={() => appendQuiz({ id: "" })}>
                             <Plus />
                         </Button>
                         <FormLabel>Quiz</FormLabel>
@@ -156,11 +85,11 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                                     key={field.id}
                                     control={form.control}
                                     name={`quiz_ids.${index}`}
-                                    render={({ field }) => (
+                                    render={({ field, fieldState }) => (
                                         <FormItem>
                                             <div className='flex'>
                                                 <FormControl>
-                                                    <Combobox options={quizzes} onInputChange={setSearchQuiz} value={{ value: field.value.id, label: "" }} isOptionEqual={(a, b) => a.value === b.value} onSelectChange={(value) => field.onChange(value.value)} />
+                                                    <Combobox options={quizzes} onInputChange={setSearchQuiz} value={{ value: field?.value?.id, label: "" }} isOptionEqual={(a, b) => a.value === b.value} onSelectChange={(value) => field.onChange({ id: value.value })} />
                                                 </FormControl>
                                                 <Button
                                                     type="button"
@@ -172,7 +101,7 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                                                     <X />
                                                 </Button>
                                             </div>
-                                            <FormMessage />
+                                            <p>{fieldState.error?.message}</p>
                                         </FormItem>
                                     )}
                                 />
@@ -197,7 +126,7 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                                                 <FormControl>
                                                     <Combobox isOptionEqual={(a, b) => {
                                                         return a.label == b.label
-                                                    }} options={[...newTags, ...blogTags]} value={{ label: field.value.name, value: field.value.id }} onInputChange={setSearchBlogTag} onSelectChange={(value) => {
+                                                    }} options={[...newTags, ...blogTags]} value={{ label: field?.value?.name, value: field?.value?.id ?? 0 }} onInputChange={setSearchBlogTag} onSelectChange={(value) => {
                                                         console.log("select change ", value);
                                                         field.onChange({ id: value.value === 0 ? undefined : value.value, name: value.label });
                                                     }} onCreateOption={(value) => {
@@ -266,6 +195,8 @@ const BlogForm = ({ onSubmit, blog }: Props) => {
                     <div className="flex justify-between">
                         <ButtonSubmit isSubmitting={form.formState.isSubmitting} onReset={onReset} />
                     </div>
+                    <BlogFormSync formActive={formActive} defaultValue={blogDefault} />
+                    <BlogFormInitializer setFormActive={setFormActive} />
                 </form>
             </FormProvider>
         </Form >

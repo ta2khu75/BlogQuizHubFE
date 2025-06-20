@@ -2,7 +2,7 @@ import { HEADINGS, LOW_PRIORIRTY, RICH_TEXT_OPTIONS, RichTextAction } from '@/co
 import TooltipElement from '@/components/common/TooltipElement'
 import { Separator } from '@/components/ui/separator'
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
-import { $getSelection, $isElementNode, $isRangeSelection, CAN_REDO_COMMAND, CAN_UNDO_COMMAND, ElementNode, FORMAT_ELEMENT_COMMAND, FORMAT_TEXT_COMMAND, REDO_COMMAND, SELECTION_CHANGE_COMMAND, TextNode, UNDO_COMMAND } from 'lexical'
+import { $getSelection, $isElementNode, $isRangeSelection, CAN_REDO_COMMAND, CAN_UNDO_COMMAND, ElementNode, FORMAT_ELEMENT_COMMAND, FORMAT_TEXT_COMMAND, REDO_COMMAND, SELECTION_CHANGE_COMMAND, UNDO_COMMAND } from 'lexical'
 import { useEffect, useState } from 'react'
 import { mergeRegister, $getNearestNodeOfType } from "@lexical/utils"
 import { Button } from '@/components/ui/button'
@@ -28,6 +28,8 @@ const ToolbarPlugin = () => {
     const [selectedHeading, setSelectedHeading] = useState<string>()
     const [selectionRecord, setSelectionRecord] = useState<Partial<Record<RichTextAction, boolean>>>({
     })
+    console.log("is link", isLink);
+
     const updateHeadings = (elementNode: ElementNode) => {
         if (elementNode instanceof HeadingNode) {
             const tag = elementNode.getTag(); // Trả về 'h1', 'h2', ...

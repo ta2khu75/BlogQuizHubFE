@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { TOGGLE_LINK_COMMAND } from '@lexical/link';
 import React, { useRef, useState } from 'react'
-import { Link } from 'lucide-react';
+import { Link, Unlink } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Input } from '@/components/ui/input';
 import { getSelected } from '@/components/common/RichTextEditor/plugin/Util';
@@ -16,7 +16,11 @@ const LinkPlugin = ({ isLink }: Props) => {
     const insertLink = () => {
         if (!linkUrl.current) return;
         editor.dispatchCommand(TOGGLE_LINK_COMMAND, linkUrl.current);
+        setOpen(false)
     };
+    const removeLink = () => {
+        editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
+    }
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         linkUrl.current = e.target.value;
     };
@@ -27,6 +31,11 @@ const LinkPlugin = ({ isLink }: Props) => {
             insertLink(); // Gửi giá trị
         }
     };
+    if (isLink) {
+        return (
+            <Button type='button' onClick={removeLink} variant={getSelected(isLink)}><Unlink /></Button>
+        )
+    }
     return (
 
         <TooltipProvider>

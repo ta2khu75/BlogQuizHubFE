@@ -56,6 +56,7 @@ export class BasePath {
         return {
             root: () => root,
             byId: (id: number | string) => `${root}/${id}`,
+            detail: (id: number | string) => `${root}/${id}/detail`,
             comments: (id: number | string) => `${root}/${id}/comments`,
             tags: () => `${root}/tags`,
 

@@ -1,6 +1,7 @@
 "use client"
 import SlugUtil from "@/util/SlugUtil";
 import QuizAboutPage from "@/app/quiz/about/[slug]/page";
+import BlogDetailPage from "@/app/blog/[slug]/page";
 
 const SlugPage = ({ slug }: { slug: string }) => {
     const prefix = SlugUtil.readPrefixFromSlug(slug)
@@ -10,7 +11,7 @@ const SlugPage = ({ slug }: { slug: string }) => {
         case "q":
             return <QuizAboutPage id={id} />;
         case "b":
-            return null;
+            return <BlogDetailPage id={id} />;
         case "c":
             return null;
 

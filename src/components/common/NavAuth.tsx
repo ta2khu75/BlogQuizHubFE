@@ -14,10 +14,10 @@ const NavAuth = () => {
   const [logout, { isLoading }] = useLogoutMutation()
   const dispatch = useAppDispatch()
   const onLogout = async () => {
-    if (isLoading)
-      await handleMutation(() => logout().unwrap(), () => {
-        dispatch(AuthActions.reset())
-      }, undefined, { success: "Logout successful", error: "Logout failed" })
+    if (isLoading) return
+    await handleMutation(() => logout().unwrap(), () => {
+      dispatch(AuthActions.reset())
+    }, () => dispatch(AuthActions.reset()), { success: "Logout successful", error: "Logout failed" })
   }
   return (
     <Popover>

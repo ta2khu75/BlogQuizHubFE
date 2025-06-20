@@ -38,7 +38,7 @@ const BlogFilter = ({ setBlogPage }: Props) => {
         authorId: ParseHelper.parseString(searchParams.get("authorId")),
     }), [searchParams])
     const { data: blogTagData } = blogTagHooks.useSearchBlogTagQuery({ page: 1, size: 10, direction: "asc", sort_by: "createdAt" })
-    const { data: blogData } = blogHooks.useSearchBlogQuery(searchValues);
+    const { data: blogData } = blogHooks.useSearchBlogQuery(searchValues, { refetchOnMountOrArgChange: false });
     const blogTagPage = useMemo(() => blogTagData?.data, [blogTagData]);
     const blogPage = useMemo(() => blogData?.data, [blogData]);
     useEffect(() => {
