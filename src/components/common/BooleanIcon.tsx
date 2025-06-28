@@ -13,6 +13,7 @@ const BooleanIcon = ({ value, trueColor, falseColor, className, onClick }: Props
     const classNamee = clsx(className, value ? trueColor : falseColor);
 
     return <Icon onClick={() => onClick?.(!value)} className={classNamee} />;
+
 }
 
 export default BooleanIcon

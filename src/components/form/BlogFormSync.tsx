@@ -1,35 +1,31 @@
-import { useEffect } from 'react'
-import { useWatch, useFormContext, useFieldArray } from 'react-hook-form'
-import { useDispatch } from 'react-redux'
-import { BlogFormActions } from '@/redux/slice/BlogFormSlice'
-import { BlogRequest, blogRequestSchema } from '@/types/request/BlogRequest'
-import { useAppSelector } from '@/redux/hooks'
-import _ from 'lodash'
+import { useEffect } from "react";
+import { useWatch, useFormContext, useFieldArray } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { BlogFormActions } from "@/redux/slice/BlogFormSlice";
+import { BlogRequest, blogRequestSchema } from "@/types/request/BlogRequest";
+import { useAppSelector } from "@/redux/hooks";
+import _ from "lodash";
 type Props = {
-    defaultValue: BlogRequest,
-    formActive: boolean
-}
+  defaultValue: BlogRequest;
+  formActive: boolean;
+};
 const BlogFormSync = ({ defaultValue, formActive }: Props) => {
-    const { control, watch } = useFormContext<BlogRequest>()
-    const blogForm = useAppSelector((state) => state.blogForm.form)
-    const dispatch = useDispatch()
-    const formValue = useWatch({ control })
-    // useEffect(() => {
-    //     console.log("blog form", blogForm);
-    //     if (blogForm) {
-    //         reset(blogForm)
-    //     }
-    // }, [])
-    useEffect(() => {
-        console.log("blog form sync", formValue);
-        if (formValue && formActive) {
+  const { control } = useFormContext<BlogRequest>();
+  const formValue = useWatch({ control });
+  const dispatch = useDispatch();
+  useEffect(() => {
+    console.log("blog form sync", formValue);
+    console.log(formActive);
+    const bloggg = _.cloneDeep(formValue);
+    console.log("bloggg", bloggg);
 
-            dispatch(BlogFormActions.set(_.cloneDeep(formValue) as BlogRequest));
-        }
-    }, [dispatch, formValue, formActive])
+    if (formValue && formActive) {
+      dispatch(BlogFormActions.set(_.cloneDeep(formValue) as BlogRequest));
+    }
+  }, [dispatch, formValue, formActive]);
 
-    return null
-}
+  return null;
+};
 export default BlogFormSync;
 // import { useEffect, useRef } from 'react'
 // import { useWatch, useFormContext } from 'react-hook-form'

@@ -38,7 +38,9 @@ export const blogApi = apiSlice.injectEndpoints({
         }),
         createBlog: builder.mutation<ApiResponse<BlogResponse>, { image?: File, body: BlogRequest }>({
             query: (data) => {
-                const blog = { ...data.body, quiz_ids: data.body.quiz_ids?.map(quiz => quiz.id) };
+                console.log(data);
+                
+const blog = { ...data.body, quiz_ids: data.body.quiz_ids?.filter(quiz=>quiz.id.trim().length>0)?.map(quiz => quiz.id) };
                 console.log(blog);
                 const form = new FormData();
                 if (data.image) {
@@ -63,7 +65,7 @@ export const blogApi = apiSlice.injectEndpoints({
                     form.append('image', data.image);
                 }
                 form.append('blog',
-                    JSON.stringify({ ...data.body, quiz_ids: data.body.quiz_ids?.map(quiz => quiz.id) })
+                    JSON.stringify({ ...data.body, quiz_ids: data.body.quiz_ids?.filter(quiz=>quiz.id.trim().length>0)?.map(quiz => quiz.id) })
                 );
                 return {
                     url: path.byId(data.id),
